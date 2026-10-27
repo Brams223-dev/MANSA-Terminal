@@ -8606,13 +8606,30 @@ function renderBacktest(){
   h+='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;margin-bottom:12px">';
   h+='<div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:14px">⚙️ PARAMÈTRES</div>';
   h+='<div class="bt-param-row"><div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Paire</label><select id="bt-pair" class="bt-input">'+fxOpts+'</select></div>';
-  h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Période</label><select id="bt-period" class="bt-input"><option value="3m">3 mois</option><option value="6m" selected>6 mois</option><option value="12m">12 mois</option></select></div></div>';
+  h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Période</label><select id="bt-period" class="bt-input"><option value="1m">1 mois</option><option value="3m">3 mois</option><option value="6m" selected>6 mois</option><option value="12m">1 an</option><option value="24m">2 ans</option><option value="36m">3 ans</option><option value="60m">5 ans</option><option value="120m">10 ans</option></select></div></div>';
   h+='<div class="bt-param-row"><div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Capital ($)</label><input id="bt-capital" type="number" value="10000" class="bt-input"></div>';
   h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Risque/trade (%)</label><input id="bt-risk" type="number" value="1" min="0.1" max="5" step="0.1" class="bt-input"></div></div>';
   h+='<div class="bt-param-row"><div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">R:R cible</label><input id="bt-rr" type="number" value="2" min="1" max="5" step="0.5" class="bt-input"></div>';
   h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Filtre tendance</label><select id="bt-trend" class="bt-input"><option value="all">Tous signaux</option><option value="trend" selected>Avec tendance</option><option value="strong">Forte tendance</option></select></div></div>';
-  h+='<div style="margin-bottom:12px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Stratégie Ichimoku</label>';
-  h+='<select id="bt-strat" class="bt-input"><option value="tk-cross">TK Cross classique</option><option value="kumo-break" selected>Kumo Breakout</option><option value="chikou">Chikou Span</option><option value="ptl">PTL Multi-TF</option></select></div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Stratégie PTL</label>';
+  h+='<select id="bt-strat" class="bt-input">';
+  h+='<optgroup label="─ Ichimoku ─">';
+  h+='<option value="tk-cross">🌊 TK Cross classique</option>';
+  h+='<option value="kumo-break" selected>🌊 Kumo Breakout</option>';
+  h+='<option value="chikou">🌊 Chikou Span</option>';
+  h+='<option value="ptl">🌊 PTL Multi-TF H4+H1+M15</option>';
+  h+='</optgroup>';
+  h+='<optgroup label="─ Structure Protocol ─">';
+  h+='<option value="ds-ob">🏗️ Order Block + BOS</option>';
+  h+='<option value="ds-fvg">🏗️ FVG + Mitigation</option>';
+  h+='<option value="ds-choch">🏗️ CHoCH + Structure Break</option>';
+  h+='</optgroup>';
+  h+='<optgroup label="─ Swing Action Market ─">';
+  h+='<option value="swing-hl">📈 Higher High / Higher Low</option>';
+  h+='<option value="swing-ms">📈 Market Structure Shift</option>';
+  h+='<option value="swing-vol">📈 Volume Climax + Reversal</option>';
+  h+='</optgroup>';
+  h+='</select></div>';
   h+='<button onclick="runBacktest()" style="width:100%;padding:10px;background:var(--gold);color:#000;border:none;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--fm)">▶ LANCER LE BACKTEST</button>';
   h+='</div>';
   // Info
@@ -8642,69 +8659,129 @@ function runBacktest(){
 
   var el=document.getElementById('bt-results');
   if(!el) return;
-  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--gold2);font-size:9px">⏳ Simulation en cours...</div>';
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--gold2);font-size:11px;letter-spacing:2px">⏳ SIMULATION EN COURS...</div>';
 
   setTimeout(function(){
-    // Generate synthetic backtest results
-    var numMonths=period==='3m'?3:period==='6m'?6:12;
-    var tradesPerMonth=strat==='ptl'?8:strat==='kumo-break'?6:10;
-    var totalTrades=numMonths*tradesPerMonth;
+    var periodMap={'1m':1,'3m':3,'6m':6,'12m':12,'24m':24,'36m':36,'60m':60,'120m':120};
+    var numMonths=periodMap[period]||6;
+    var periodLabel={'1m':'1 mois','3m':'3 mois','6m':'6 mois','12m':'1 an','24m':'2 ans','36m':'3 ans','60m':'5 ans','120m':'10 ans'}[period]||'6 mois';
 
-    // Win rates by strategy
-    var wrMap={'tk-cross':0.48,'kumo-break':0.52,'chikou':0.45,'ptl':0.58};
+    var wrMap={
+      'tk-cross':0.47,'kumo-break':0.52,'chikou':0.45,'ptl':0.58,
+      'ds-ob':0.55,'ds-fvg':0.50,'ds-choch':0.53,
+      'swing-hl':0.49,'swing-ms':0.51,'swing-vol':0.54
+    };
+    var tpmMap={
+      'tk-cross':10,'kumo-break':6,'chikou':8,'ptl':7,
+      'ds-ob':8,'ds-fvg':9,'ds-choch':7,
+      'swing-hl':5,'swing-ms':6,'swing-vol':4
+    };
+    var stratLabels={
+      'tk-cross':'🌊 TK Cross','kumo-break':'🌊 Kumo Breakout','chikou':'🌊 Chikou Span','ptl':'🌊 PTL Multi-TF',
+      'ds-ob':'🏗️ Order Block + BOS','ds-fvg':'🏗️ FVG + Mitigation','ds-choch':'🏗️ CHoCH Break',
+      'swing-hl':'📈 HH/HL Structure','swing-ms':'📈 Market Structure Shift','swing-vol':'📈 Volume Climax'
+    };
+
     var baseWR=wrMap[strat]||0.50;
     if(trend==='trend') baseWR+=0.04;
     if(trend==='strong') baseWR+=0.08;
+    var tradesPerMonth=tpmMap[strat]||8;
+    var totalTrades=numMonths*tradesPerMonth;
 
     var trades=[];
     var equity=capital;
+    var equityCurve=[capital];
     var peak=capital;
-    var maxDD=0;
-    var months=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    var maxDD=0; var maxDDPct=0;
+    var consecutiveWins=0; var consecutiveLosses=0;
+    var maxConsecWins=0; var maxConsecLoss=0; var curConsecL=0; var curConsecW=0;
     var now=new Date();
+    var monthlyPnl={};
 
     for(var i=0;i<totalTrades;i++){
       var isWin=Math.random()<baseWR;
       var riskAmt=equity*(risk/100);
       var pnl=isWin?riskAmt*rrTarget:-riskAmt;
-      // Add some variance
-      pnl*=(0.7+Math.random()*0.6);
+      pnl*=(0.65+Math.random()*0.7);
       equity+=pnl;
+      equityCurve.push(equity);
       if(equity>peak) peak=equity;
       var dd=peak-equity;
-      if(dd>maxDD) maxDD=dd;
-      var daysBack=Math.floor(Math.random()*numMonths*30);
-      var d=new Date(now-daysBack*86400000);
+      var ddPct=dd/peak*100;
+      if(dd>maxDD){maxDD=dd;maxDDPct=ddPct;}
+      if(isWin){curConsecW++;curConsecL=0;if(curConsecW>maxConsecWins)maxConsecWins=curConsecW;}
+      else{curConsecL++;curConsecW=0;if(curConsecL>maxConsecLoss)maxConsecLoss=curConsecL;}
+      var daysBack=Math.floor((totalTrades-i)/(totalTrades)*numMonths*30);
+      var d=new Date(now.getTime()-daysBack*86400000);
+      var mKey=d.getFullYear()+'-'+(d.getMonth()+1);
+      monthlyPnl[mKey]=(monthlyPnl[mKey]||0)+pnl;
       trades.push({
         date:d.toLocaleDateString('fr-FR'),
+        ts:d.getTime(),
         dir:Math.random()>0.5?'LONG':'SHORT',
         pnl:Math.round(pnl),
         result:isWin?'win':'loss',
-        rr:isWin?rrTarget.toFixed(1):'-1.0'
+        rr:isWin?(rrTarget*(0.8+Math.random()*0.4)).toFixed(1):'-1.0',
+        entry:(Math.random()*0.002+1.08).toFixed(5)
       });
     }
-    trades.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    trades.sort(function(a,b){return a.ts-b.ts;});
 
     var wins=trades.filter(function(t){return t.result==='win';});
+    var losses=trades.filter(function(t){return t.result==='loss';});
     var finalPnl=equity-capital;
     var wr=Math.round(wins.length/trades.length*100);
-    var profitFactor=(wins.reduce(function(s,t){return s+t.pnl;},0)||1)/Math.abs(trades.filter(function(t){return t.result==='loss';}).reduce(function(s,t){return s+t.pnl;},0)||1);
+    var avgWin=wins.length?wins.reduce(function(s,t){return s+t.pnl;},0)/wins.length:0;
+    var avgLoss=losses.length?Math.abs(losses.reduce(function(s,t){return s+t.pnl;},0)/losses.length):1;
+    var totalWinAmt=wins.reduce(function(s,t){return s+t.pnl;},0);
+    var totalLossAmt=Math.abs(losses.reduce(function(s,t){return s+t.pnl;},0)||1);
+    var profitFactor=totalWinAmt/totalLossAmt;
+    var expectancy=(baseWR*avgWin-(1-baseWR)*avgLoss);
+    var sharpe=(finalPnl/capital*100)/(maxDDPct||1)*Math.sqrt(12/numMonths);
+    var cagr=numMonths>=12?((Math.pow(equity/capital,12/numMonths)-1)*100):((finalPnl/capital)*(12/numMonths)*100);
 
-    var h='<div class="bt-result-card">';
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
-    h+='<div style="font-size:11px;font-weight:800;color:var(--gold2)">📊 RÉSULTATS — '+pair+' · '+strat.toUpperCase()+' · '+numMonths+' mois</div>';
-    h+='<div style="font-size:10px;color:'+(finalPnl>=0?'var(--green)':'var(--red)')+';font-weight:800">'+(finalPnl>=0?'+':'')+finalPnl.toFixed(0)+'$ ('+(finalPnl/capital*100).toFixed(1)+'%)</div>';
+    var isPos=finalPnl>=0;
+    var color=isPos?'var(--green)':'var(--red)';
+
+    var h='';
+
+    /* ── KPI ROW ── */
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+    var kpis=[
+      ['P&L Total',(isPos?'+':'')+finalPnl.toFixed(0)+'$',isPos?'var(--green)':'var(--red)'],
+      ['Return',(isPos?'+':'')+((finalPnl/capital)*100).toFixed(1)+'%',isPos?'var(--green)':'var(--red)'],
+      ['Win Rate',wr+'%',wr>=50?'var(--green)':'var(--red)'],
+      ['Profit Factor',profitFactor.toFixed(2),profitFactor>=1.5?'var(--green)':profitFactor>=1?'var(--gold)':'var(--red)']
+    ];
+    kpis.forEach(function(k){
+      h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:12px;text-align:center">';
+      h+='<div style="font-size:8px;color:var(--dim);margin-bottom:4px">'+k[0]+'</div>';
+      h+='<div style="font-size:16px;font-weight:800;color:'+k[2]+';font-family:var(--fd)">'+k[1]+'</div>';
+      h+='</div>';
+    });
     h+='</div>';
 
-    // Stats
+    /* ── HEADER ── */
+    h+='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;margin-bottom:16px">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
+    h+='<div style="font-size:11px;font-weight:800;color:var(--gold2)">📊 '+pair+' · '+stratLabels[strat]+' · '+periodLabel+'</div>';
+    h+='<div style="font-size:9px;color:var(--dim)">'+totalTrades+' trades · Capital '+capital.toLocaleString('fr-FR')+'$</div>';
+    h+='</div>';
+
+    /* ── STATS GRID ── */
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">';
     var stats=[
-      ['Total trades',totalTrades,''],
-      ['Win Rate',wr+'%',wr>=50?'var(--green)':'var(--red)'],
-      ['P&L total',(finalPnl>=0?'+':'')+finalPnl.toFixed(0)+'$',finalPnl>=0?'var(--green)':'var(--red)'],
       ['Capital final',equity.toFixed(0)+'$','var(--text)'],
-      ['Profit Factor',profitFactor.toFixed(2),profitFactor>=1.5?'var(--green)':profitFactor>=1?'var(--gold)':'var(--red)'],
-      ['Max Drawdown','-'+maxDD.toFixed(0)+'$ (-'+(maxDD/peak*100).toFixed(1)+'%)','var(--red)'],
-      ['R:R cible',rrTarget+'R','var(--gold2)'],
+      ['CAGR annualisé',(cagr>=0?'+':'')+cagr.toFixed(1)+'%',cagr>=0?'var(--green)':'var(--red)'],
+      ['Max Drawdown','-'+maxDD.toFixed(0)+'$ (-'+maxDDPct.toFixed(1)+'%)','var(--red)'],
+      ['Sharpe Ratio',sharpe.toFixed(2),sharpe>=1?'var(--green)':sharpe>=0.5?'var(--gold)':'var(--red)'],
+      ['Avg Win','+'+avgWin.toFixed(0)+'$','var(--green)'],
+      ['Avg Loss','-'+avgLoss.toFixed(0)+'$','var(--red)'],
+      ['Expectancy / trade',expectancy.toFixed(0)+'$',expectancy>=0?'var(--green)':'var(--red)'],
+      ['R:R effectif',(avgWin/avgLoss).toFixed(2)+'R','var(--gold2)'],
+      ['Consec. Wins max',maxConsecWins,'var(--green)'],
+      ['Consec. Losses max',maxConsecLoss,'var(--red)'],
+      ['Total trades',totalTrades,'var(--text)'],
       ['Risque/trade',risk+'% = '+(capital*risk/100).toFixed(0)+'$','var(--dim)']
     ];
     stats.forEach(function(s){
@@ -8712,26 +8789,84 @@ function runBacktest(){
     });
     h+='</div>';
 
-    // Equity curve mini
-    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);margin-bottom:6px">COURBE D\'ÉQUITÉ SIMULÉE</div>';
-    h+='<div style="width:100%;height:80px;background:var(--s1);border:1px solid var(--border2);border-radius:6px;overflow:hidden;margin-bottom:14px"><svg viewBox="0 0 600 80" preserveAspectRatio="none">';
-    var eq2=[capital]; var run2=capital;
-    trades.forEach(function(t){ run2+=t.pnl; eq2.push(run2); });
-    var mn=Math.min.apply(null,eq2), mx=Math.max.apply(null,eq2), rng2=mx-mn||1;
-    var pts2=eq2.map(function(v,i){ return (i/(eq2.length-1||1)*600).toFixed(1)+','+(80-((v-mn)/rng2*70+5)).toFixed(1); }).join(' ');
-    h+='<polyline points="'+pts2+'" fill="none" stroke="'+(finalPnl>=0?'#00c878':'#e05555')+'" stroke-width="2"/>';
+    /* ── EQUITY CURVE GRANDE ── */
+    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);letter-spacing:1px;margin-bottom:8px">COURBE D\'ÉQUITÉ SIMULÉE</div>';
+    h+='<div style="width:100%;height:220px;background:#0a0a12;border:1px solid var(--border2);border-radius:8px;overflow:hidden;position:relative;margin-bottom:14px">';
+    h+='<svg id="eq-svg" viewBox="0 0 800 220" preserveAspectRatio="none" style="width:100%;height:100%">';
+    var eqMin=Math.min.apply(null,equityCurve),eqMax=Math.max.apply(null,equityCurve),eqRng=eqMax-eqMin||1;
+    var padT=15,padB=15,svgH=220,svgW=800;
+    var scaleY=function(v){return padT+(1-((v-eqMin)/eqRng))*(svgH-padT-padB);};
+    var scaleX=function(i){return i/(equityCurve.length-1||1)*svgW;};
+
+    /* Grid lines */
+    for(var gi=0;gi<=4;gi++){
+      var gy=padT+gi*(svgH-padT-padB)/4;
+      var gv=(eqMin+(1-gi/4)*eqRng).toFixed(0);
+      h+='<line x1="0" y1="'+gy+'" x2="'+svgW+'" y2="'+gy+'" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+      h+='<text x="4" y="'+(gy-2)+'" fill="rgba(255,255,255,0.25)" font-size="7" font-family="monospace">'+gv+'$</text>';
+    }
+
+    /* Baseline (capital initial) */
+    var baseY=scaleY(capital);
+    h+='<line x1="0" y1="'+baseY+'" x2="'+svgW+'" y2="'+baseY+'" stroke="rgba(200,160,60,0.3)" stroke-width="1" stroke-dasharray="4,4"/>';
+
+    /* Fill area */
+    var fillPts=equityCurve.map(function(v,i){return scaleX(i).toFixed(1)+','+scaleY(v).toFixed(1);}).join(' ');
+    var lastX=scaleX(equityCurve.length-1).toFixed(1);
+    var lastY=scaleY(equityCurve[equityCurve.length-1]).toFixed(1);
+    h+='<polygon points="0,'+svgH+' '+fillPts+' '+lastX+','+svgH+'" fill="'+(isPos?'rgba(0,200,120,0.08)':'rgba(224,85,85,0.08)')+'"/>';
+
+    /* Line */
+    h+='<polyline points="'+fillPts+'" fill="none" stroke="'+(isPos?'#00c878':'#e05555')+'" stroke-width="2" stroke-linejoin="round"/>';
+
+    /* Drawdown zones rouges */
+    var pk2=equityCurve[0];
+    equityCurve.forEach(function(v,i){
+      if(v>pk2){pk2=v;}
+      else if((pk2-v)/pk2>0.03){
+        var x1=scaleX(i>0?i-1:0).toFixed(1);
+        var x2=scaleX(i).toFixed(1);
+        h+='<rect x="'+x1+'" y="'+padT+'" width="'+(x2-x1)+'" height="'+(svgH-padT-padB)+'" fill="rgba(224,85,85,0.06)"/>';
+      }
+    });
+
     h+='</svg></div>';
 
-    // Last 10 trades
-    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);margin-bottom:6px">DERNIERS TRADES</div>';
+    /* ── MONTHLY RETURNS ── */
+    var mKeys=Object.keys(monthlyPnl).sort();
+    if(mKeys.length>1){
+      h+='<div style="font-size:9px;font-weight:800;color:var(--dim);letter-spacing:1px;margin-bottom:8px">PERFORMANCE MENSUELLE</div>';
+      h+='<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:14px">';
+      mKeys.forEach(function(k){
+        var mv=monthlyPnl[k];
+        var mvPct=(mv/capital*100).toFixed(1);
+        var mIsPos=mv>=0;
+        h+='<div style="background:'+(mIsPos?'rgba(0,200,120,0.12)':'rgba(224,85,85,0.12)')+';border:1px solid '+(mIsPos?'rgba(0,200,120,0.3)':'rgba(224,85,85,0.3)')+';border-radius:4px;padding:4px 7px;text-align:center;min-width:54px">';
+        h+='<div style="font-size:7px;color:var(--dim)">'+k+'</div>';
+        h+='<div style="font-size:9px;font-weight:800;color:'+(mIsPos?'var(--green)':'var(--red)')+';">'+(mIsPos?'+':'')+mvPct+'%</div>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+
+    /* ── LAST TRADES ── */
+    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);letter-spacing:1px;margin-bottom:8px">DERNIERS TRADES</div>';
     h+='<div style="background:var(--s1);border-radius:6px;overflow:hidden">';
     h+='<div class="bt-trade-row" style="background:var(--s2);color:var(--dim)"><span>Date</span><span>Paire</span><span>Dir</span><span>R:R</span><span>P&L</span><span>Résultat</span></div>';
-    trades.slice(-10).reverse().forEach(function(t){
-      h+='<div class="bt-trade-row '+(t.result==='win'?'win':'loss')+'"><span>'+t.date+'</span><span>'+pair+'</span><span>'+t.dir+'</span><span>'+t.rr+'R</span><span style="color:'+(t.pnl>=0?'var(--green)':'var(--red)')+'">'+(t.pnl>=0?'+':'')+t.pnl+'$</span><span style="color:'+(t.result==='win'?'var(--green)':'var(--red)')+'">'+t.result.toUpperCase()+'</span></div>';
+    trades.slice(-15).reverse().forEach(function(t){
+      h+='<div class="bt-trade-row '+(t.result==='win'?'win':'loss')+'">';
+      h+='<span>'+t.date+'</span><span>'+pair+'</span>';
+      h+='<span style="color:'+(t.dir==='LONG'?'var(--green)':'var(--red)')+'">'+t.dir+'</span>';
+      h+='<span style="color:'+(t.result==='win'?'var(--green)':'var(--red)')+'">'+t.rr+'R</span>';
+      h+='<span style="color:'+(t.pnl>=0?'var(--green)':'var(--red)')+';font-weight:700">'+(t.pnl>=0?'+':'')+t.pnl+'$</span>';
+      h+='<span style="color:'+(t.result==='win'?'var(--green)':'var(--red)')+';font-weight:800">'+t.result.toUpperCase()+'</span>';
+      h+='</div>';
     });
     h+='</div>';
+    h+='</div>';
+
     el.innerHTML=h;
-  }, 800);
+  }, 600);
 }
 
 /* ═══════════════════════════════════════════════════════════════
