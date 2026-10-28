@@ -9027,8 +9027,114 @@ function btRenderCompare(months, capital, riskPct){
   return h;
 }
 
-/* V35 — old renderBacktest/runBacktest removed above */
+/* ── V39 renderBacktest — Point d'entrée onglet BACKTEST ── */
+var _btCurrentStrat = 'ds';
+var _btCurrentMonths = 60;
+var _btCapital = 10000;
+var _btRisk = 1;
+var _btRR = null; // null = RR réel de la stratégie
 
+function renderBacktest(){
+  var el = document.getElementById('backtest-content');
+  if(!el) return;
+  /* Injecter le CSS V35 une seule fois */
+  if(!document.getElementById('bt-css-v35')){
+    var s=document.createElement('style'); s.id='bt-css-v35'; s.textContent=BT_CSS;
+    document.head.appendChild(s);
+  }
+  var stratCards = '';
+  Object.keys(BT_STRATS).forEach(function(k){
+    var cfg = BT_STRATS[k];
+    stratCards += '<div class="bt-strat-card'+(k===_btCurrentStrat?' bt-selected':'')+'" onclick="btSelectStrat(\''+k+'\')" id="btcard-'+k+'">'
+      +'<div class="bt-strat-icon">'+cfg.icon+'</div>'
+      +'<div class="bt-strat-name">'+cfg.label+'</div>'
+      +'<div class="bt-strat-tag">'+cfg.tag+'</div>'
+      +'</div>';
+  });
+  el.innerHTML = '<div class="bt-pro-wrap">'
+    +'<div class="bt-pro-params">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--gold2);letter-spacing:.08em;margin-bottom:4px">🔬 BACKTESTING PRO</div>'
+    +'<div style="font-size:8px;color:var(--dim);margin-bottom:8px">Monte Carlo · 15 ans · Métriques institutionnelles</div>'
+    +'<label class="bt-label">Stratégie PTL</label>'
+    +'<div class="bt-strat-cards">'+stratCards+'</div>'
+    +'<label class="bt-label">Période</label>'
+    +'<select class="bt-sel" id="bt-period-sel" onchange="_btCurrentMonths=+this.value;btRunAndRender()">'
+    +'<option value="12">1 an</option><option value="24">2 ans</option><option value="36">3 ans</option>'
+    +'<option value="60" selected>5 ans</option><option value="120">10 ans</option><option value="180">15 ans</option>'
+    +'</select>'
+    +'<div class="bt-row2">'
+    +'<div><label class="bt-label">Capital ($)</label>'
+    +'<input type="number" class="bt-num" id="bt-capital" value="'+_btCapital+'" min="1000" step="500" onchange="_btCapital=+this.value;btRunAndRender()"></div>'
+    +'<div><label class="bt-label">Risque/trade (%)</label>'
+    +'<input type="number" class="bt-num" id="bt-risk" value="'+_btRisk+'" min="0.1" max="5" step="0.1" onchange="_btRisk=+this.value;btRunAndRender()"></div>'
+    +'</div>'
+    +'<button class="bt-run-btn" onclick="btRunAndRender()">▶ LANCER SIMULATION</button>'
+    +'<button class="bt-compare-btn" onclick="btShowCompare()">📊 COMPARER 4 STRATÉGIES</button>'
+    +'</div>'
+    +'<div class="bt-results-area" id="bt-results-area"><div class="bt-loading">'
+    +'<div class="bt-progress-anim"><div class="bt-progress-anim-fill"></div></div>'
+    +'<span>Initialisation...</span></div></div>'
+    +'</div>';
+  setTimeout(btRunAndRender, 80);
+}
+
+function btSelectStrat(k){
+  _btCurrentStrat = k;
+  document.querySelectorAll('.bt-strat-card').forEach(function(c){ c.classList.remove('bt-selected'); });
+  var card = document.getElementById('btcard-'+k);
+  if(card) card.classList.add('bt-selected');
+  btRunAndRender();
+}
+
+function btRunAndRender(){
+  var area = document.getElementById('bt-results-area');
+  if(!area) return;
+  area.innerHTML = '<div class="bt-loading"><div class="bt-progress-anim"><div class="bt-progress-anim-fill"></div></div><span>Simulation Monte Carlo...</span></div>';
+  setTimeout(function(){
+    var r = btSimulate(_btCurrentStrat, _btCurrentMonths, _btCapital, _btRisk, _btRR);
+    var cfg = r.cfg;
+    var isPos = r.finalPnl >= 0;
+    var col = isPos ? 'var(--green)' : 'var(--red)';
+    var pct = ((r.finalPnl / _btCapital)*100);
+    var kpis = [
+      {v:(isPos?'+':'')+Math.round(r.finalPnl).toLocaleString('fr-FR')+'$', l:'P&L TOTAL', c:col},
+      {v:(r.cagr>=0?'+':'')+r.cagr.toFixed(1)+'%', l:'CAGR ANNUEL', c:r.cagr>=0?'var(--green)':'var(--red)'},
+      {v:Math.round(r.wrReal*100)+'%', l:'WIN RATE RÉEL', c:r.wrReal>=0.65?'var(--green)':'var(--gold)'},
+      {v:r.pf.toFixed(2), l:'PROFIT FACTOR', c:r.pf>=2?'var(--green)':r.pf>=1.5?'var(--gold)':'var(--red)'},
+      {v:'-'+r.maxDDpct.toFixed(1)+'%', l:'MAX DRAWDOWN', c:'var(--red)'}
+    ];
+    var kpiH = '<div class="bt-kpi-grid">';
+    kpis.forEach(function(k){ kpiH+='<div class="bt-kpi"><div class="bt-kpi-val" style="color:'+k.c+'">'+k.v+'</div><div class="bt-kpi-lbl">'+k.l+'</div></div>'; });
+    kpiH += '</div>';
+    var statsH = '<div class="bt-section"><div class="bt-section-title">STATISTIQUES DÉTAILLÉES</div><div class="bt-stats-grid">';
+    var stats = [
+      ['Trades totaux', r.trades.length,'var(--text)'],
+      ['Trades gagnants', r.trades.filter(function(t){return t>0;}).length, 'var(--green)'],
+      ['Trades perdants', r.trades.filter(function(t){return t<0;}).length, 'var(--red)'],
+      ['Gain moyen', '$'+(r.trades.filter(function(t){return t>0;}).reduce(function(a,b){return a+b;},0)/(r.trades.filter(function(t){return t>0;}).length||1)).toFixed(0), 'var(--green)'],
+      ['Perte moyenne', '$'+(Math.abs(r.trades.filter(function(t){return t<0;}).reduce(function(a,b){return a+b;},0))/(r.trades.filter(function(t){return t<0;}).length||1)).toFixed(0), 'var(--red)'],
+      ['Sharpe', r.sharpe.toFixed(2), r.sharpe>=1?'var(--green)':'var(--gold)'],
+      ['Calmar', r.calmar.toFixed(2), r.calmar>=2?'var(--green)':'var(--gold)'],
+      ['Capital final', '$'+(r.equityCurve[r.equityCurve.length-1]).toLocaleString('fr-FR'), col],
+      ['Rendement total', (pct>=0?'+':'')+pct.toFixed(1)+'%', col]
+    ];
+    stats.forEach(function(s){ statsH+='<div class="bt-stat-item"><span class="bt-stat-lbl">'+s[0]+'</span><span class="bt-stat-val" style="color:'+s[2]+'">'+s[1]+'</span></div>'; });
+    statsH += '</div></div>';
+    var curveH = '<div class="bt-section"><div class="bt-section-title">COURBE D\'ÉQUITÉ</div>'
+      +'<div class="bt-chart-wrap">'+btDrawCurve(r.equityCurve, r.capital, 800, 200)+'</div></div>';
+    var heatH = '<div class="bt-section"><div class="bt-section-title">HEATMAP MENSUELLE</div>'
+      +btDrawMonthlyHeatmap(r.monthlyPnl, _btCurrentMonths)+'</div>';
+    area.innerHTML = kpiH + curveH + statsH + heatH;
+  }, 120);
+}
+
+function btShowCompare(){
+  var area = document.getElementById('bt-results-area');
+  if(!area) return;
+  area.innerHTML = '<div class="bt-section"><div class="bt-section-title">COMPARAISON 4 STRATÉGIES PTL — '+_btCurrentMonths+' MOIS</div>'+btRenderCompare(_btCurrentMonths, _btCapital, _btRisk)+'</div>';
+}
+
+/* V35 — old renderBacktest/runBacktest stub */
 function _obsolete_runBacktest_v34(){
   /* REMOVED — replaced by V35 runBacktest above */
   var pair=''; var period=''; var capital=10000;
@@ -9897,14 +10003,17 @@ document.addEventListener('keydown', function(e){
   }
 });
 
-document.getElementById('search-overlay').addEventListener('click', function(e){
-  if(e.target===this) closeSearch();
-});
-
-document.getElementById('search-input').addEventListener('input', function(){
-  renderSearchResults(this.value);
-  _srIdx = -1;
-});
+/* V39 — defer search listeners until DOM ready (fix null addEventListener) */
+(function attachSearchListeners(){
+  function bind(){
+    var ov = document.getElementById('search-overlay');
+    var inp = document.getElementById('search-input');
+    if(ov) ov.addEventListener('click', function(e){ if(e.target===this) closeSearch(); });
+    if(inp) inp.addEventListener('input', function(){ renderSearchResults(this.value); _srIdx=-1; });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
 
 
 /* ── RACCOURCIS CLAVIER JS V22 ── */
@@ -11231,53 +11340,6 @@ saveApiKeys = function() {
   </div>
 </div>
 
-<!-- RECHERCHE UNIVERSELLE V22 -->
-<div id="search-overlay">
-  <div id="search-box">
-    <input id="search-input" type="text" placeholder="🔍  Rechercher une paire, panel, indicateur... (Ctrl+K)" autocomplete="off" />
-    <div id="search-results"></div>
-    <div id="search-footer">
-      <span>↑↓ naviguer</span>
-      <span>↵ ouvrir</span>
-      <span>Esc fermer</span>
-      <span style="margin-left:auto;color:var(--gold2)">Mansa Terminal</span>
-    </div>
-  </div>
-</div>
-
-
-<!-- AIDE RACCOURCIS CLAVIER V22 -->
-<div id="kb-help">
-  <div id="kb-box">
-    <h2>⌨ RACCOURCIS CLAVIER — MANSA TERMINAL</h2>
-    <div class="kb-section">
-      <h3>Navigation panels</h3>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">M</span></div><span class="kb-desc">Marchés</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">S</span></div><span class="kb-desc">Screener</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">C</span></div><span class="kb-desc">Charts</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">P</span></div><span class="kb-desc">Setups PTL</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">X</span></div><span class="kb-desc">Smart Money / Banques</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">N</span></div><span class="kb-desc">Macro / Actualités</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">R</span></div><span class="kb-desc">Rendement</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">B</span></div><span class="kb-desc">Crypto / Bitcoin</span></div>
-    </div>
-    <div class="kb-section">
-      <h3>Paires rapides</h3>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">E</span></div><span class="kb-desc">EUR/USD</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">G</span></div><span class="kb-desc">XAU/USD (Gold)</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">J</span></div><span class="kb-desc">USD/JPY</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">U</span></div><span class="kb-desc">GBP/USD</span></div>
-    </div>
-    <div class="kb-section">
-      <h3>Actions</h3>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">K</span></div><span class="kb-desc">Recherche universelle</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">?</span></div><span class="kb-desc">Afficher cette aide</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Esc</span></div><span class="kb-desc">Fermer popup / recherche</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">A</span></div><span class="kb-desc">Nouvelle alerte de prix</span></div>
-      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">J</span></div><span class="kb-desc">Ouvrir journal de trading</span></div>
-    </div>
-    <div style="text-align:center;margin-top:12px"><button onclick="document.getElementById('kb-help').classList.remove('active')" style="background:var(--gold);color:#000;border:none;padding:8px 24px;border-radius:4px;cursor:pointer;font-weight:700;font-size:10px">FERMER</button></div>
-  </div>
-</div>
+<!-- V39: duplicate search-overlay + kb-help removed -->
 </body>
 </html>
