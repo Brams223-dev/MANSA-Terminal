@@ -4,632 +4,919 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mansa Terminal — Process Trading Life</title>
-<meta name="description" content="L'analyse institutionnelle du Forex et des Actions US, prête en 3 minutes. 3 stratégies documentées. Terminal live. Communauté de traders sérieux.">
+<meta name="description" content="Le terminal institutionnel construit pour les 4 stratégies PTL. COT, DMX, Force Devises, Screener Actions, Backtest algorithmique. Accès gratuit.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════
    TOKENS
 ══════════════════════════════════════════════════════ */
 :root {
-  --black:   #020209;
-  --ink:     #07070f;
-  --panel:   #0c0c1a;
-  --surface: #111122;
-  --gold:    #c8a03c;
-  --gold2:   #e2b84a;
-  --gold3:   #f5d060;
-  --green:   #00cc7a;
-  --red:     #e05555;
-  --blue:    #4488ff;
-  --text:    #e8e8f0;
-  --muted:   #8888aa;
-  --faint:   #3a3a58;
-  --border:  rgba(200,160,60,.14);
-  --border2: rgba(255,255,255,.06);
-  --display: 'Bebas Neue', sans-serif;
-  --body:    'Inter', sans-serif;
-  --r:       6px;
+  --black: #070709;
+  --surface: #0e0e12;
+  --surface2: #14141a;
+  --border: rgba(255,255,255,.06);
+  --border2: rgba(255,255,255,.11);
+  --gold: #c8a03c;
+  --gold2: #e2b84a;
+  --gold-dim: rgba(200,160,60,.15);
+  --gold-glow: rgba(200,160,60,.08);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,.12);
+  --blue: #60a5fa;
+  --text: #f0ede8;
+  --muted: #7a7875;
+  --faint: #3a3835;
+  --r: 6px;
+  --r2: 12px;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
 }
 
 /* ══════════════════════════════════════════════════════
-   RESET / BASE
+   RESET
 ══════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { background: var(--black); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
-a { color: inherit; text-decoration: none; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
 img { display: block; max-width: 100%; }
-::selection { background: rgba(200,160,60,.2); }
 
 /* ══════════════════════════════════════════════════════
-   ANIMATIONS
-══════════════════════════════════════════════════════ */
-@keyframes pulse      { 0%,100%{opacity:1} 50%{opacity:.3} }
-@keyframes scan       { 0%{top:-2px;opacity:0} 10%{opacity:.8} 90%{opacity:.3} 100%{top:100%;opacity:0} }
-@keyframes ticker     { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-@keyframes fadeUp     { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-@keyframes shimmer    { 0%{background-position:-300% 0} 100%{background-position:300% 0} }
-@keyframes glow       { 0%,100%{opacity:.6} 50%{opacity:1} }
-@keyframes borderGlow { 0%,100%{border-color:rgba(200,160,60,.2)} 50%{border-color:rgba(200,160,60,.5)} }
-@keyframes countUp    { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-/* ══════════════════════════════════════════════════════
-   LIVE TICKER BAR
+   TICKER
 ══════════════════════════════════════════════════════ */
 #ticker {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 400;
-  height: 30px; background: var(--ink); border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; overflow: hidden;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 32px;
+  background: var(--black);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 100;
 }
 .t-live {
-  flex-shrink: 0; padding: 0 14px; height: 100%;
-  display: flex; align-items: center; gap: 7px;
-  background: rgba(200,160,60,.1); border-right: 1px solid var(--border);
-  font-family: var(--body); font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--gold);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--green);
+  border-right: 1px solid var(--border);
+  height: 100%;
 }
-.t-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 1.2s infinite; }
-#t-track { display: flex; animation: ticker 60s linear infinite; white-space: nowrap; }
-.t-item { display: inline-flex; align-items: center; gap: 6px; padding: 0 18px; height: 30px; border-right: 1px solid var(--border2); font-size: 10px; }
-.t-sym { font-weight: 600; color: var(--text); min-width: 62px; }
-.t-val { font-variant-numeric: tabular-nums; }
-.up  { color: var(--green); }
-.dn  { color: var(--red); }
+.t-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: blink 1.4s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+#t-track {
+  display: flex;
+  gap: 0;
+  animation: scroll-left 55s linear infinite;
+  white-space: nowrap;
+}
+@keyframes scroll-left { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.t-item { display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; border-right: 1px solid var(--border); }
+.t-sym { font-size: 10px; font-weight: 600; color: var(--muted); }
+.t-val { font-size: 10px; font-weight: 600; }
+.up { color: var(--green); }
+.dn { color: var(--red); }
 
 /* ══════════════════════════════════════════════════════
    NAV
 ══════════════════════════════════════════════════════ */
 nav {
-  position: fixed; top: 30px; left: 0; right: 0; z-index: 399;
-  height: 60px; padding: 0 6%;
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(2,2,9,.92); border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(24px);
+  position: fixed;
+  top: 32px; left: 0; right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  background: rgba(7,7,9,.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  z-index: 99;
 }
-.nav-logo {
-  display: flex; align-items: center; gap: 10px;
-}
+.nav-logo { display: flex; flex-direction: column; gap: 2px; }
 .nav-mark {
-  font-family: var(--display); font-size: 22px; letter-spacing: .06em;
-  background: linear-gradient(120deg, var(--gold3), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: .04em;
+  color: var(--text);
 }
-.nav-tag {
-  font-size: 9px; color: var(--muted); letter-spacing: .06em; font-weight: 500;
-  border-left: 1px solid var(--faint); padding-left: 10px; margin-left: 2px;
-}
-.nav-links { display: flex; align-items: center; gap: 6px; }
-.nav-a {
-  font-size: 11px; font-weight: 500; color: var(--muted);
-  padding: 6px 12px; border-radius: var(--r); transition: color .2s;
-}
+.nav-tag { font-size: 8px; font-weight: 600; letter-spacing: .12em; color: var(--gold); }
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-a { font-size: 12px; font-weight: 500; color: var(--muted); transition: color .2s; }
 .nav-a:hover { color: var(--text); }
 .nav-cta {
-  font-size: 11px; font-weight: 600; padding: 8px 18px; border-radius: var(--r);
-  border: 1px solid var(--border); color: var(--text); transition: all .2s;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 7px 16px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  transition: all .2s;
 }
-.nav-cta:hover { border-color: rgba(200,160,60,.4); color: var(--gold2); }
+.nav-cta:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
 .nav-cta-main {
-  font-size: 11px; font-weight: 700; padding: 9px 20px; border-radius: var(--r);
-  background: var(--gold); color: #000; transition: all .2s; letter-spacing: .02em;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+  background: var(--gold);
+  padding: 7px 18px;
+  border-radius: var(--r);
+  transition: background .2s;
 }
-.nav-cta-main:hover { background: var(--gold2); box-shadow: 0 0 24px rgba(200,160,60,.35); }
+.nav-cta-main:hover { background: var(--gold2); }
 
 /* ══════════════════════════════════════════════════════
    HERO
 ══════════════════════════════════════════════════════ */
 #hero {
-  min-height: 100vh; padding: 160px 6% 80px;
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-}
-.hero-bg {
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(200,160,60,.07) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 80% 80%, rgba(0,204,122,.04) 0%, transparent 60%);
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 140px 5% 80px;
+  text-align: center;
+  overflow: hidden;
 }
 .hero-grid {
-  position: absolute; inset: 0; pointer-events: none;
-  background-image: linear-gradient(rgba(200,160,60,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,160,60,.03) 1px, transparent 1px);
-  background-size: 48px 48px;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(200,160,60,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,160,60,.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 0%, transparent 100%);
 }
-.hero-scan {
-  position: absolute; left: 0; right: 0; height: 2px; pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(200,160,60,.2), transparent);
-  animation: scan 7s ease-in-out infinite; filter: blur(1px);
+.hero-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(200,160,60,.12) 0%, transparent 70%);
+  pointer-events: none;
 }
-.hero-inner {
-  position: relative; z-index: 2; max-width: 900px; margin: 0 auto; text-align: center;
-}
+.hero-inner { position: relative; z-index: 2; max-width: 760px; }
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 8px 22px; border-radius: 30px; margin-bottom: 32px;
-  background: rgba(0,204,122,.06);
-  border: 1px solid rgba(0,204,122,.25);
-  box-shadow: 0 0 20px rgba(0,204,122,.08);
-  font-size: 11px; font-weight: 700; color: var(--green);
-  letter-spacing: .14em; text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  color: var(--gold);
+  margin-bottom: 28px;
+  padding: 6px 14px;
+  background: var(--gold-glow);
+  border: 1px solid rgba(200,160,60,.2);
+  border-radius: 20px;
 }
 .hero-eyebrow-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
-  animation: pulse 1.2s infinite;
-  box-shadow: 0 0 8px var(--green);
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: blink 1.4s ease infinite;
 }
-h1 {
-  font-family: var(--display); font-size: clamp(52px,8vw,96px); line-height: .95;
-  letter-spacing: .02em; margin-bottom: 24px; color: var(--text);
+#hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(44px, 7vw, 80px);
+  line-height: 1.07;
+  letter-spacing: -.01em;
+  color: var(--text);
+  margin-bottom: 24px;
 }
-h1 em { font-style: normal; color: var(--gold2); }
+#hero h1 em {
+  font-style: italic;
+  color: var(--gold2);
+}
 .hero-sub {
-  font-size: 16px; font-weight: 400; color: var(--muted); line-height: 1.7;
-  max-width: 560px; margin: 0 auto 40px;
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 560px;
+  margin: 0 auto 36px;
 }
 .hero-sub strong { color: var(--text); font-weight: 600; }
 .hero-actions {
-  display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 52px;
 }
 .btn-primary {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 14px 28px; border-radius: var(--r);
-  background: var(--gold); color: #000;
-  font-family: var(--body); font-size: 13px; font-weight: 700; letter-spacing: .02em;
-  transition: all .2s; position: relative; overflow: hidden;
+  display: inline-block;
+  background: var(--gold);
+  color: var(--black);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: var(--r);
+  letter-spacing: .02em;
+  transition: background .2s, transform .15s;
 }
-.btn-primary::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
-  background-size: 300%; animation: shimmer 2.5s linear infinite;
-}
-.btn-primary:hover { background: var(--gold2); box-shadow: 0 0 36px rgba(200,160,60,.4); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
 .btn-ghost {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 13px 24px; border-radius: var(--r);
-  border: 1px solid var(--faint); color: var(--muted);
-  font-size: 13px; font-weight: 500; transition: all .2s;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 13px 24px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  transition: all .2s;
 }
-.btn-ghost:hover { border-color: rgba(200,160,60,.3); color: var(--text); }
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+
+/* HERO STATS */
 .hero-proof {
-  display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  background: var(--surface);
+  overflow: hidden;
+  max-width: 580px;
+  margin: 0 auto;
 }
 .proof-item {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11px; color: var(--muted); font-weight: 500;
+  flex: 1;
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border);
 }
-.proof-num { font-family: var(--display); font-size: 22px; color: var(--gold2); }
-.proof-sep { width: 1px; height: 20px; background: var(--faint); }
+.proof-item:last-child { border-right: none; }
+.proof-num {
+  font-family: var(--serif);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.proof-label { font-size: 10px; color: var(--muted); }
 
 /* ══════════════════════════════════════════════════════
-   HOW IT WORKS — 3 ÉTAPES
+   SECTION COMMONS
 ══════════════════════════════════════════════════════ */
-#how {
-  padding: 100px 6%; background: var(--ink);
-  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+section { padding: 96px 5%; }
+.section-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--gold);
+  margin-bottom: 14px;
 }
-.how-header { text-align: center; margin-bottom: 64px; }
-.section-label {
-  font-size: 10px; font-weight: 700; letter-spacing: .18em; color: var(--gold);
-  margin-bottom: 12px; text-transform: uppercase;
+.section-h2 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 16px;
 }
-h2 { font-family: var(--display); font-size: clamp(32px,4.5vw,56px); line-height: 1; letter-spacing: .03em; }
-h2 .dim { color: var(--muted); }
-.how-sub { font-size: 14px; color: var(--muted); margin-top: 12px; max-width: 480px; margin-left: auto; margin-right: auto; }
+.section-h2 .dim { color: var(--muted); }
+.section-sub {
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.7;
+}
+.section-header { margin-bottom: 52px; }
+.center { text-align: center; margin-left: auto; margin-right: auto; }
+
+/* ══════════════════════════════════════════════════════
+   HOW IT WORKS — 3 colonnes horizontales
+══════════════════════════════════════════════════════ */
+#how { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+#how .section-header { text-align: center; }
+#how .section-sub { margin: 0 auto; }
 .steps {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; max-width: 1000px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
 }
 .step {
-  padding: 36px 32px; background: var(--panel);
-  border: 1px solid var(--border2); position: relative; overflow: hidden;
+  padding: 36px 32px;
+  border-right: 1px solid var(--border);
+  position: relative;
 }
-.step:first-child { border-radius: var(--r) 0 0 var(--r); }
-.step:last-child  { border-radius: 0 var(--r) var(--r) 0; }
-.step-connector {
-  position: absolute; top: 50%; right: -14px; width: 28px; height: 28px; z-index: 2;
-  background: var(--ink); border: 1px solid var(--border); border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; color: var(--gold); transform: translateY(-50%);
-}
-.step:last-child .step-connector { display: none; }
+.step:last-child { border-right: none; }
 .step-num {
-  font-family: var(--display); font-size: 64px; color: rgba(200,160,60,.06); line-height: 1;
-  position: absolute; top: 16px; right: 20px; letter-spacing: .02em;
+  font-family: var(--serif);
+  font-size: 48px;
+  color: var(--faint);
+  line-height: 1;
+  margin-bottom: 20px;
 }
-.step-icon { font-size: 28px; margin-bottom: 18px; }
-.step-title { font-family: var(--display); font-size: 26px; letter-spacing: .04em; color: var(--gold2); margin-bottom: 8px; }
-.step-desc { font-size: 12px; color: var(--muted); line-height: 1.8; }
-.step-tools { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+.step-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+.step-tools { display: flex; flex-wrap: wrap; gap: 6px; }
 .step-tool {
-  font-size: 9px; font-weight: 600; padding: 3px 9px; border-radius: 3px;
-  background: rgba(200,160,60,.08); border: 1px solid rgba(200,160,60,.18); color: var(--gold);
-  letter-spacing: .04em;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--gold-glow);
+  border: 1px solid rgba(200,160,60,.18);
+  padding: 3px 9px;
+  border-radius: 4px;
 }
+.step-arrow {
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--gold);
+  z-index: 2;
+}
+.step:last-child .step-arrow { display: none; }
 
 /* ══════════════════════════════════════════════════════
-   TERMINAL MOCKUP / LIVE DEMO
+   TERMINAL DEMO
 ══════════════════════════════════════════════════════ */
-#demo {
-  padding: 100px 6%; background: var(--black);
-}
-.demo-header { text-align: center; margin-bottom: 56px; }
+#demo { }
+#demo .section-header { text-align: center; }
+#demo .section-sub { margin: 0 auto; }
 .demo-frame {
-  max-width: 1100px; margin: 0 auto;
-  border-radius: 10px; overflow: hidden;
-  border: 1px solid rgba(200,160,60,.2);
-  box-shadow: 0 40px 100px rgba(0,0,0,.7), 0 0 0 1px rgba(200,160,60,.06), inset 0 0 60px rgba(200,160,60,.01);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: var(--surface);
+  max-width: 1000px;
+  margin: 0 auto;
+  box-shadow: 0 40px 80px rgba(0,0,0,.5), 0 0 0 1px var(--border);
 }
 .demo-bar {
-  height: 38px; background: linear-gradient(180deg,#0e0e1e,#080814);
-  border-bottom: 1px solid rgba(200,160,60,.15);
-  display: flex; align-items: center; padding: 0 16px; gap: 10px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .demo-dots { display: flex; gap: 6px; }
-.demo-dot { width: 11px; height: 11px; border-radius: 50%; }
-.demo-title { font-size: 9px; color: var(--muted); letter-spacing: .08em; margin: 0 auto; font-weight: 500; }
-.demo-url { font-size: 9px; color: var(--faint); margin-right: 4px; font-family: monospace; }
+.demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+.demo-url { font-size: 10px; color: var(--muted); flex: 1; text-align: center; }
+.demo-title { font-size: 10px; font-weight: 700; color: var(--gold); letter-spacing: .06em; }
 .demo-body {
-  background: var(--panel);
-  background-image: linear-gradient(rgba(200,160,60,.015) 1px, transparent 1px), linear-gradient(90deg, rgba(200,160,60,.015) 1px, transparent 1px);
-  background-size: 36px 36px;
-  padding: 20px; display: grid; grid-template-columns: 240px 1fr 200px; gap: 12px;
-  min-height: 400px; position: relative; overflow: hidden;
+  display: grid;
+  grid-template-columns: 200px 1fr 180px;
+  height: 380px;
+  overflow: hidden;
+  position: relative;
 }
 .demo-scan {
-  position: absolute; left: 0; right: 0; height: 2px; pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(200,160,60,.25), transparent);
-  animation: scan 5s ease-in-out infinite;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(200,160,60,.015) 50%, transparent 100%);
+  animation: scan 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
 }
-/* LEFT SIDEBAR */
-.demo-sidebar { display: flex; flex-direction: column; gap: 10px; }
-.dp { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 12px; }
-.dp-hd { font-size: 8px; font-weight: 700; letter-spacing: .1em; color: var(--gold2); margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--border2); }
-.dp-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 8px; }
-.dp-sym { font-weight: 600; color: #d0d0e8; }
-.dp-bar { height: 3px; border-radius: 2px; background: var(--faint); margin: 5px 0; overflow: hidden; }
+@keyframes scan { 0%,100%{transform:translateY(-100%)} 50%{transform:translateY(100%)} }
+.demo-sidebar { border-right: 1px solid var(--border); padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.demo-main { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.demo-right { border-left: 1px solid var(--border); padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.dp { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 10px; }
+.dp-hd { font-size: 8px; font-weight: 700; letter-spacing: .08em; color: var(--muted); margin-bottom: 8px; }
+.dp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.dp-sym { font-size: 9px; font-weight: 700; color: var(--text); }
+.dp-badge { font-size: 7px; font-weight: 700; padding: 2px 5px; border-radius: 3px; }
+.dp-bar { height: 3px; background: var(--faint); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
 .dp-bar-fill { height: 100%; border-radius: 2px; }
-.dp-badge { font-size: 7px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: .06em; }
-/* MAIN CHART AREA */
-.demo-main { display: flex; flex-direction: column; gap: 10px; }
-.demo-chart-box {
-  flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 5px;
-  display: flex; flex-direction: column; overflow: hidden;
+.demo-chart-box { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 10px; }
+.demo-chart-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.demo-sym { font-size: 12px; font-weight: 700; color: var(--text); }
+.demo-price { font-size: 14px; font-weight: 700; color: var(--text); }
+.demo-chg { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+.demo-intervals { display: flex; gap: 3px; margin-left: auto; }
+.demo-int { font-size: 8px; font-weight: 600; color: var(--muted); padding: 2px 5px; border-radius: 3px; cursor: pointer; }
+.demo-int.on { background: var(--gold-dim); color: var(--gold); }
+.chart-placeholder { flex: 1; }
+.chart-svg { width: 100%; height: 90px; display: block; }
+.demo-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
 }
-.demo-chart-hd {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-  border-bottom: 1px solid var(--border2); font-size: 9px;
+.demo-stat-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 12px;
+  text-align: center;
 }
-.demo-sym { font-weight: 700; color: var(--gold2); font-size: 13px; }
-.demo-price { font-weight: 600; font-size: 13px; }
-.demo-chg { font-size: 9px; padding: 2px 7px; border-radius: 3px; font-weight: 600; }
-.demo-intervals { display: flex; gap: 4px; margin-left: auto; }
-.demo-int { font-size: 8px; padding: 2px 6px; border-radius: 3px; color: var(--muted); cursor: default; }
-.demo-int.on { background: rgba(200,160,60,.15); color: var(--gold2); }
-.chart-placeholder {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  background: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,160,60,.03) 40px),
-              repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,160,60,.03) 40px);
-  position: relative; min-height: 140px;
+.dsb-val { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+.dsb-lbl { font-size: 9px; color: var(--muted); }
+.dp-alert {
+  background: rgba(34,197,94,.08);
+  border: 1px solid rgba(34,197,94,.2);
+  border-radius: var(--r);
+  padding: 10px;
 }
-.chart-line { position: absolute; bottom: 30%; left: 0; right: 0; }
-.demo-stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-.demo-stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 12px; text-align: center; }
-.dsb-val { font-family: var(--display); font-size: 24px; letter-spacing: .04em; line-height: 1; margin-bottom: 3px; }
-.dsb-lbl { font-size: 8px; color: var(--muted); font-weight: 500; letter-spacing: .06em; }
-/* RIGHT PANEL */
-.demo-right { display: flex; flex-direction: column; gap: 10px; }
-.dp-alert { background: rgba(0,204,122,.06); border: 1px solid rgba(0,204,122,.2); border-radius: 5px; padding: 10px; }
 .dp-alert-title { font-size: 8px; font-weight: 700; color: var(--green); margin-bottom: 5px; }
-.dp-alert-body { font-size: 7.5px; color: var(--muted); line-height: 1.6; }
-.dp-signal { font-size: 8px; padding: 3px 8px; border-radius: 3px; font-weight: 700; margin-top: 6px; display: inline-block; }
-/* Chart SVG */
-.chart-svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+.dp-alert-body { font-size: 8px; color: var(--muted); line-height: 1.5; margin-bottom: 7px; }
+.dp-signal { font-size: 7px; font-weight: 700; text-align: center; padding: 4px; border-radius: 3px; }
 
 /* ══════════════════════════════════════════════════════
    TOOLS GRID
 ══════════════════════════════════════════════════════ */
-#tools {
-  padding: 100px 6%; background: var(--ink);
-  border-top: 1px solid var(--border);
-}
-.tools-header { margin-bottom: 56px; }
+#tools { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+#tools .section-header { text-align: center; }
+#tools .section-sub { margin: 0 auto; }
 .tools-grid {
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
-  background: var(--border2);
-  border: 1px solid var(--border2); border-radius: var(--r); overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
 }
 .tool-cell {
-  background: var(--panel); padding: 24px 22px;
+  background: var(--surface);
+  padding: 28px 24px;
   transition: background .2s;
 }
-.tool-cell:hover { background: var(--surface); }
-.tool-cell-icon { font-size: 22px; margin-bottom: 12px; }
-.tool-cell-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
-.tool-cell-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
-.tools-more {
-  margin-top: 32px; text-align: center;
-  font-size: 12px; color: var(--muted);
+.tool-cell:hover { background: var(--surface2); }
+.tool-icon { font-size: 22px; margin-bottom: 12px; }
+.tool-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.tool-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.tools-coming {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--muted);
 }
-.tools-more span { color: var(--gold); font-weight: 600; }
+.tools-coming span { color: var(--gold); }
 
 /* ══════════════════════════════════════════════════════
-   3 STRATÉGIES
+   STRATÉGIES
 ══════════════════════════════════════════════════════ */
-#strategies {
-  padding: 100px 6%; background: var(--black);
-  border-top: 1px solid var(--border);
+#strategies { }
+#strategies .section-header { text-align: center; }
+#strategies .section-sub { margin: 0 auto; }
+.algo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(96,165,250,.08);
+  border: 1px solid rgba(96,165,250,.2);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: .06em;
+  margin: 0 auto 24px;
+  display: flex;
+  width: fit-content;
 }
-.strats-header { margin-bottom: 56px; }
-.strats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
-.strat {
-  border: 1px solid var(--border); border-radius: var(--r);
-  background: var(--panel); padding: 32px 28px; position: relative; overflow: hidden;
-  transition: border-color .25s, transform .25s;
+.algo-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: blink 1.5s infinite;
 }
-.strat:hover { border-color: rgba(200,160,60,.35); transform: translateY(-3px); }
-.strat-accent {
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-}
-.strat-n { font-family: var(--display); font-size: 72px; color: rgba(200,160,60,.05); line-height: 1; position: absolute; top: 10px; right: 18px; }
-.strat-icon { font-size: 30px; margin-bottom: 20px; }
-.strat-name { font-family: var(--display); font-size: 24px; letter-spacing: .05em; color: var(--gold2); margin-bottom: 6px; }
-.strat-tag { display: inline-block; font-size: 9px; font-weight: 600; padding: 3px 9px; border-radius: 3px; margin-bottom: 14px; background: rgba(200,160,60,.08); border: 1px solid rgba(200,160,60,.2); color: var(--gold); letter-spacing: .06em; }
-.strat-desc { font-size: 12px; color: var(--muted); line-height: 1.8; margin-bottom: 18px; }
-.strat-list { list-style: none; }
-.strat-list li { font-size: 11px; color: var(--muted); padding: 5px 0; border-bottom: 1px solid var(--border2); display: flex; gap: 8px; line-height: 1.6; }
-.strat-list li:last-child { border-bottom: none; }
-.strat-check { color: var(--gold); flex-shrink: 0; font-size: 9px; margin-top: 3px; }
-
-/* ══════════════════════════════════════════════════════
-   BACKTEST BANNER + STRATS 4-GRID
-══════════════════════════════════════════════════════ */
-.backtest-banner {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0; max-width: 720px; margin: 0 auto 48px;
-  background: var(--panel); border: 1px solid var(--border);
-  border-radius: var(--r); overflow: hidden;
+.bt-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  margin-bottom: 36px;
 }
 .bt-stat {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  padding: 18px 20px; gap: 4px;
+  flex: 1;
+  padding: 20px 24px;
+  text-align: center;
+  border-right: 1px solid var(--border);
 }
-.bt-val { font-family: var(--display); font-size: 28px; letter-spacing: .04em; line-height: 1; }
-.bt-lbl { font-size: 9px; color: var(--muted); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
-.bt-sep { width: 1px; height: 36px; background: var(--border2); flex-shrink: 0; }
-.strats-grid-4 { grid-template-columns: repeat(4,1fr); }
-.strat-perf {
-  margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border2);
-  display: flex; gap: 16px;
+.bt-stat:last-child { border-right: none; }
+.bt-val { display: block; font-family: var(--serif); font-size: 28px; line-height: 1; margin-bottom: 6px; }
+.bt-lbl { font-size: 10px; color: var(--muted); }
+.strats-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
 }
-.sp-row { display: flex; flex-direction: column; gap: 2px; }
-.sp-lbl { font-size: 8px; color: var(--muted); letter-spacing: .06em; }
-.sp-val { font-family: var(--display); font-size: 20px; letter-spacing: .04em; line-height: 1; }
-@media (max-width: 1100px) { .strats-grid-4 { grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 600px) { .strats-grid-4 { grid-template-columns: 1fr; } }
+.strat {
+  background: var(--surface);
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: background .2s;
+}
+.strat:hover { background: var(--surface2); }
+.strat-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.strat-n { font-family: var(--serif); font-size: 36px; color: var(--faint); line-height: 1; margin-bottom: 12px; }
+.strat-icon { font-size: 22px; margin-bottom: 10px; }
+.strat-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.strat-tag { font-size: 9px; font-weight: 600; color: var(--muted); letter-spacing: .06em; margin-bottom: 14px; }
+.strat-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+.strat-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.strat-list li { font-size: 11px; color: var(--muted); display: flex; gap: 7px; }
+.strat-check { color: var(--gold); flex-shrink: 0; }
+.strat-perf { border-top: 1px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.sp-row { display: flex; justify-content: space-between; font-size: 11px; }
+.sp-lbl { color: var(--muted); }
+.sp-val { font-weight: 700; }
+.strats-footnote {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.strats-footnote a { color: var(--gold); font-weight: 600; }
 
 /* ══════════════════════════════════════════════════════
    MARCHÉS
 ══════════════════════════════════════════════════════ */
-#markets {
-  padding: 100px 6%; background: var(--ink);
-  border-top: 1px solid var(--border);
+#markets { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+#markets .section-header { text-align: center; }
+#markets .section-sub { margin: 0 auto; }
+.markets-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
 }
-.markets-header { margin-bottom: 56px; }
-.markets-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
 .mkt {
-  background: var(--panel); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 28px 24px; position: relative; overflow: hidden;
-  transition: border-color .2s, transform .2s;
+  background: var(--surface);
+  padding: 32px 24px;
+  transition: background .2s;
 }
-.mkt:hover { border-color: rgba(200,160,60,.3); transform: translateY(-2px); }
-.mkt::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(200,160,60,.2),transparent); }
-.mkt-icon { font-size: 28px; margin-bottom: 16px; }
-.mkt-name { font-family: var(--display); font-size: 22px; letter-spacing: .04em; color: var(--text); margin-bottom: 6px; }
-.mkt-sub { font-size: 11px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.mkt:hover { background: var(--surface2); }
+.mkt-icon { font-size: 28px; margin-bottom: 14px; }
+.mkt-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.mkt-sub { font-size: 12px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
 .mkt-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-.mkt-tag { font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 3px; background: rgba(255,255,255,.04); border: 1px solid var(--border2); color: var(--muted); }
+.mkt-tag {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
 
 /* ══════════════════════════════════════════════════════
-   CROYANCES / PHILOSOPHIE
+   PHILOSOPHIE
 ══════════════════════════════════════════════════════ */
 #beliefs {
-  padding: 100px 6%; background: var(--black);
-  border-top: 1px solid var(--border);
+  padding: 96px 5%;
 }
-.beliefs-inner { max-width: 880px; }
-.beliefs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 48px; }
+.beliefs-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+#beliefs .section-header { text-align: center; }
+#beliefs .section-sub { margin: 0 auto; }
+.beliefs-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+}
 .belief {
-  background: var(--panel); padding: 32px 28px;
-  border: 1px solid var(--border2);
+  background: var(--surface);
+  padding: 36px 32px;
 }
-.belief:first-child { border-radius: var(--r) 0 0 0; }
-.belief:nth-child(2) { border-radius: 0 var(--r) 0 0; }
-.belief:nth-child(3) { border-radius: 0 0 0 var(--r); }
-.belief:last-child { border-radius: 0 0 var(--r) 0; }
-.belief-never {
-  background: rgba(200,160,60,.04); border-color: rgba(200,160,60,.12);
-  border-left: 3px solid var(--gold);
-}
+.belief-never { background: var(--surface2); }
 .belief-icon { font-size: 24px; margin-bottom: 14px; }
-.belief-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-.belief-body { font-size: 12px; color: var(--muted); line-height: 1.8; }
+.belief-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.belief-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
 /* ══════════════════════════════════════════════════════
-   TESTIMONIALS
+   REVIEWS
 ══════════════════════════════════════════════════════ */
-#reviews {
-  padding: 100px 6%; background: var(--ink);
-  border-top: 1px solid var(--border);
+#reviews { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+#reviews .section-header { text-align: center; }
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
 }
-.reviews-header { text-align: center; margin-bottom: 56px; }
-.reviews-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; max-width: 1000px; margin: 0 auto; }
 .review {
-  background: var(--panel); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 28px; position: relative;
+  background: var(--surface);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.review::before { content: '\201C'; position: absolute; top: -6px; left: 14px; font-size: 72px; color: rgba(200,160,60,.08); font-family: Georgia,serif; line-height: 1; }
-.review-stars { font-size: 12px; letter-spacing: 2px; color: var(--gold); margin-bottom: 14px; }
-.review-text { font-size: 12px; color: var(--muted); line-height: 1.8; margin-bottom: 18px; font-style: italic; }
-.review-author { font-size: 11px; font-weight: 600; color: var(--text); }
-.review-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.review-stars { color: var(--gold); font-size: 13px; letter-spacing: 2px; }
+.review-text { font-size: 13px; color: var(--muted); line-height: 1.7; flex: 1; }
+.review-author { font-size: 13px; font-weight: 700; color: var(--text); }
+.review-meta { font-size: 11px; color: var(--muted); }
 
 /* ══════════════════════════════════════════════════════
    PRICING
 ══════════════════════════════════════════════════════ */
-#pricing {
-  padding: 100px 6%; background: var(--black);
-  border-top: 1px solid var(--border);
-}
-.pricing-header { text-align: center; margin-bottom: 56px; }
+#pricing { }
+#pricing .section-header { text-align: center; }
+#pricing .section-sub { margin: 0 auto; }
 .pricing-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; max-width: 920px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  max-width: 860px;
+  margin: 0 auto;
 }
 .plan {
-  background: var(--panel); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 32px 28px; position: relative; transition: transform .2s;
+  background: var(--surface);
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
-.plan:hover { transform: translateY(-3px); }
 .plan-featured {
-  background: var(--surface); border-color: rgba(200,160,60,.4);
-  box-shadow: 0 0 0 1px rgba(200,160,60,.12), 0 24px 60px rgba(0,0,0,.5);
+  background: var(--surface2);
+  border: none;
 }
-.plan-featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 .plan-badge {
-  position: absolute; top: -1px; right: 20px;
-  font-size: 8px; font-weight: 700; padding: 4px 12px; border-radius: 0 0 6px 6px;
-  background: var(--gold); color: #000; letter-spacing: .08em;
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--black);
+  background: var(--gold);
+  padding: 4px 14px;
+  border-radius: 0 0 6px 6px;
 }
-.plan-name { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--muted); margin-bottom: 18px; }
-.plan-price { font-family: var(--display); font-size: 52px; letter-spacing: .02em; line-height: 1; color: var(--text); margin-bottom: 4px; }
-.plan-price sup { font-family: var(--body); font-size: 18px; vertical-align: top; margin-top: 10px; font-weight: 500; }
-.plan-period { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
-.plan-billed { font-size: 10px; color: var(--muted); background: rgba(255,255,255,.04); padding: 4px 10px; border-radius: 3px; display: inline-block; margin-bottom: 24px; }
-.plan-features { list-style: none; margin-bottom: 28px; }
-.plan-features li { font-size: 11px; color: var(--muted); padding: 7px 0; border-bottom: 1px solid var(--border2); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
-.plan-features li:last-child { border-bottom: none; }
-.plan-check { color: var(--green); flex-shrink: 0; font-size: 12px; margin-top: 1px; }
-.plan-check-x { color: var(--faint); flex-shrink: 0; font-size: 10px; margin-top: 2px; }
+.plan-name { font-size: 10px; font-weight: 700; letter-spacing: .12em; color: var(--muted); margin-bottom: 16px; margin-top: 10px; }
+.plan-price {
+  font-family: var(--serif);
+  font-size: 52px;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.plan-price sup { font-size: 22px; vertical-align: top; margin-top: 8px; font-family: var(--sans); }
+.plan-period { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.plan-billed { font-size: 10px; color: var(--faint); margin-bottom: 24px; }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 24px; }
+.plan-features li { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
+.plan-check { color: var(--green); flex-shrink: 0; font-size: 12px; }
+.plan-check-x { color: var(--faint); flex-shrink: 0; }
 .btn-plan {
-  display: block; width: 100%; padding: 12px; border-radius: var(--r);
-  font-size: 12px; font-weight: 700; text-align: center; letter-spacing: .04em;
-  transition: all .2s; border: none; cursor: pointer; font-family: var(--body);
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 13px;
+  border-radius: var(--r);
+  transition: all .2s;
+  letter-spacing: .02em;
 }
-.btn-plan-ghost { background: transparent; border: 1px solid var(--faint); color: var(--muted); }
-.btn-plan-ghost:hover { border-color: rgba(200,160,60,.35); color: var(--text); }
-.btn-plan-main { background: var(--gold); color: #000; }
-.btn-plan-main:hover { background: var(--gold2); box-shadow: 0 0 24px rgba(200,160,60,.3); }
-.plan-free-note { text-align: center; margin-top: 24px; font-size: 11px; color: var(--muted); }
-.plan-free-note a { color: var(--gold); font-weight: 600; }
+.btn-plan-main {
+  background: var(--gold);
+  color: var(--black);
+}
+.btn-plan-main:hover { background: var(--gold2); }
+.btn-plan-ghost {
+  border: 1px solid var(--border2);
+  color: var(--muted);
+}
+.btn-plan-ghost:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
+.plan-note {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.plan-note a { color: var(--gold); }
 
 /* ══════════════════════════════════════════════════════
    FAQ
 ══════════════════════════════════════════════════════ */
-#faq {
-  padding: 100px 6%; background: var(--ink);
-  border-top: 1px solid var(--border);
-}
-.faq-header { text-align: center; margin-bottom: 56px; }
-.faq-list { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 2px; }
-.faq-item {
-  background: var(--panel); border: 1px solid var(--border2); border-radius: 0;
-  overflow: hidden;
-}
-.faq-item:first-child { border-radius: var(--r) var(--r) 0 0; }
-.faq-item:last-child { border-radius: 0 0 var(--r) var(--r); }
+#faq { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.faq-inner { max-width: 680px; margin: 0 auto; }
+#faq .section-header { text-align: center; }
+.faq-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item:last-child { border-bottom: none; }
 .faq-q {
-  padding: 18px 24px; font-size: 13px; font-weight: 600; color: var(--text);
-  cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px;
-  user-select: none;
+  padding: 20px 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  transition: background .15s;
+  gap: 16px;
 }
-.faq-q:hover { color: var(--gold2); }
-.faq-arrow { color: var(--gold); font-size: 12px; flex-shrink: 0; transition: transform .2s; }
+.faq-q:hover { background: var(--surface2); }
+.faq-arrow {
+  color: var(--gold);
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform .2s;
+}
 .faq-a {
-  max-height: 0; overflow: hidden; transition: max-height .3s ease;
-  font-size: 12px; color: var(--muted); line-height: 1.8; padding: 0 24px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding: 0 24px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease, padding .3s ease;
 }
+.faq-item.open .faq-a { max-height: 300px; padding: 0 24px 20px; }
 .faq-item.open .faq-arrow { transform: rotate(45deg); }
-.faq-item.open .faq-a { max-height: 200px; padding: 0 24px 18px; }
+.faq-item.open .faq-q { background: var(--surface2); }
 
 /* ══════════════════════════════════════════════════════
    CTA FINAL
 ══════════════════════════════════════════════════════ */
 #cta {
-  padding: 120px 6%; background: var(--black);
-  border-top: 1px solid var(--border); text-align: center;
-  position: relative; overflow: hidden;
+  padding: 120px 5%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 .cta-glow {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 600px; height: 300px; pointer-events: none;
-  background: radial-gradient(ellipse, rgba(200,160,60,.07) 0%, transparent 70%);
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(200,160,60,.1) 0%, transparent 70%);
 }
 .cta-inner { position: relative; z-index: 2; max-width: 600px; margin: 0 auto; }
-.cta-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .18em; color: var(--gold); margin-bottom: 16px; }
-.cta-title { font-family: var(--display); font-size: clamp(40px,6vw,72px); letter-spacing: .03em; line-height: .95; margin-bottom: 20px; }
-.cta-sub { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 440px; margin: 0 auto 40px; }
-.cta-links {
-  display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 36px; flex-wrap: wrap;
+.cta-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--gold);
+  margin-bottom: 20px;
 }
+.cta-title {
+  font-family: var(--serif);
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.05;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.cta-sub { font-size: 15px; color: var(--muted); margin-bottom: 36px; line-height: 1.7; }
+.cta-links { display: flex; justify-content: center; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
 .cta-link {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 11px; font-weight: 600; padding: 9px 18px; border-radius: var(--r);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: var(--r);
+  border: 1px solid var(--border2);
+  color: var(--muted);
   transition: all .2s;
 }
-.cta-link-discord { color: #7289da; border: 1px solid rgba(114,137,218,.25); background: rgba(114,137,218,.06); }
-.cta-link-discord:hover { background: rgba(114,137,218,.15); }
-.cta-link-whop { color: var(--gold); border: 1px solid rgba(200,160,60,.25); background: rgba(200,160,60,.06); }
-.cta-link-whop:hover { background: rgba(200,160,60,.15); }
+.cta-link:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
 
 /* ══════════════════════════════════════════════════════
    FOOTER
 ══════════════════════════════════════════════════════ */
 footer {
-  padding: 40px 6% 32px;
+  background: var(--surface);
   border-top: 1px solid var(--border);
-  background: var(--ink);
+  padding: 48px 5% 32px;
 }
 .footer-top {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 40px;
-  padding-bottom: 32px; border-bottom: 1px solid var(--border2); flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  gap: 48px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
-.footer-brand-mark {
-  font-family: var(--display); font-size: 24px; letter-spacing: .06em;
-  background: linear-gradient(120deg, var(--gold3), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  margin-bottom: 6px;
-}
-.footer-brand-sub { font-size: 10px; color: var(--muted); letter-spacing: .04em; }
-.footer-cols { display: flex; gap: 48px; flex-wrap: wrap; }
-.footer-col-title { font-size: 10px; font-weight: 700; color: var(--text); letter-spacing: .08em; margin-bottom: 12px; }
-.footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.footer-links a { font-size: 11px; color: var(--muted); transition: color .2s; }
+.footer-brand { font-family: var(--serif); font-size: 18px; color: var(--text); margin-bottom: 4px; }
+.footer-sub { font-size: 11px; color: var(--muted); }
+.footer-cols { display: flex; gap: 40px; flex-wrap: wrap; }
+.footer-col-title { font-size: 10px; font-weight: 700; color: var(--text); letter-spacing: .1em; margin-bottom: 14px; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { font-size: 12px; color: var(--muted); transition: color .2s; }
 .footer-links a:hover { color: var(--text); }
 .footer-bottom {
-  padding-top: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding-top: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
-.footer-copy { font-size: 10px; color: var(--faint); }
-.footer-disclaimer { font-size: 9px; color: var(--faint); max-width: 600px; line-height: 1.6; }
+.footer-copy { font-size: 11px; color: var(--faint); }
+.footer-disclaimer { font-size: 10px; color: var(--faint); max-width: 540px; line-height: 1.6; }
+
+/* ══════════════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { opacity: 0; }
 
 /* ══════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  .demo-body { grid-template-columns: 1fr 1fr; }
+  .strats-grid, .tools-grid { grid-template-columns: repeat(2,1fr); }
   .demo-right { display: none; }
-  .tools-grid { grid-template-columns: repeat(2,1fr); }
+  .demo-body { grid-template-columns: 200px 1fr; }
 }
 @media (max-width: 800px) {
-  .steps, .strats-grid, .reviews-grid, .pricing-grid { grid-template-columns: 1fr; }
-  .markets-grid { grid-template-columns: repeat(2,1fr); }
-  .step:first-child, .step:last-child { border-radius: var(--r); }
-  .beliefs-grid { grid-template-columns: 1fr; }
-  .demo-body { grid-template-columns: 1fr; }
-  .demo-stats-row { grid-template-columns: repeat(3,1fr); }
+  .steps, .markets-grid, .reviews-grid, .pricing-grid, .beliefs-grid { grid-template-columns: 1fr; }
+  .hero-proof { flex-direction: column; border-radius: var(--r2); }
+  .proof-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .proof-item:last-child { border-bottom: none; }
   nav { padding: 0 4%; }
   .nav-a { display: none; }
+  .bt-banner { flex-wrap: wrap; }
+  .bt-stat { flex: 1 1 40%; border-right: none; border-bottom: 1px solid var(--border); }
 }
 @media (max-width: 600px) {
-  .markets-grid { grid-template-columns: 1fr; }
-  .hero-proof { flex-direction: column; gap: 16px; }
+  .strats-grid, .tools-grid { grid-template-columns: 1fr; }
   .footer-top { flex-direction: column; }
+  #hero h1 { font-size: 40px; }
 }
 </style>
 </head>
@@ -644,12 +931,11 @@ footer {
 <!-- ═══ NAV ════════════════════════════════════════════════════════ -->
 <nav>
   <div class="nav-logo">
-    <div class="nav-mark">MANSA TERMINAL</div>
+    <div class="nav-mark">Mansa Terminal</div>
     <span class="nav-tag">Process Trading Life</span>
   </div>
   <div class="nav-links">
     <a href="#how" class="nav-a">Comment ça marche</a>
-    <a href="#tools" class="nav-a">Outils</a>
     <a href="#strategies" class="nav-a">Stratégies</a>
     <a href="#pricing" class="nav-a">Accès</a>
     <a href="terminal.html?auth=login" class="nav-cta">Connexion</a>
@@ -659,17 +945,16 @@ footer {
 
 <!-- ═══ HERO ════════════════════════════════════════════════════════ -->
 <section id="hero">
-  <div class="hero-bg"></div>
   <div class="hero-grid"></div>
-  <div class="hero-scan"></div>
+  <div class="hero-glow"></div>
   <div class="hero-inner">
     <div class="hero-eyebrow">
       <div class="hero-eyebrow-dot"></div>
-      Terminal live
+      Terminal Live · Process Trading Life
     </div>
     <h1>L'analyse<br>institutionnelle,<br><em>prête en 3 min.</em></h1>
     <p class="hero-sub">
-      <strong>4 stratégies backtestées.</strong> Données institutionnelles, COT, DMX, force des devises et screener actions — tout en un seul terminal construit pour Process Trading Life.
+      <strong>4 stratégies backtestées algorithmiquement.</strong> COT, DMX, force des devises et screener actions — tout en un seul terminal construit pour PTL.
     </p>
     <div class="hero-actions">
       <a href="terminal.html" class="btn-primary">Accéder au Terminal gratuitement</a>
@@ -679,28 +964,25 @@ footer {
       <div class="proof-item">
         <div>
           <div class="proof-num" id="proof-membres">587</div>
-          <div style="font-size:10px;color:var(--muted)">traders actifs</div>
+          <div class="proof-label">traders actifs</div>
         </div>
       </div>
-      <div class="proof-sep"></div>
       <div class="proof-item">
         <div>
           <div class="proof-num">4</div>
-          <div style="font-size:10px;color:var(--muted)">stratégies backtestées</div>
+          <div class="proof-label">stratégies backtestées</div>
         </div>
       </div>
-      <div class="proof-sep"></div>
       <div class="proof-item">
         <div>
           <div class="proof-num" style="color:var(--green)">0€</div>
-          <div style="font-size:10px;color:var(--muted)">accès terminal de base</div>
+          <div class="proof-label">accès de base</div>
         </div>
       </div>
-      <div class="proof-sep"></div>
       <div class="proof-item">
         <div>
-          <div class="proof-num" id="proof-live" style="font-size:14px;color:var(--green)">● LIVE</div>
-          <div style="font-size:10px;color:var(--muted)">données en temps réel</div>
+          <div class="proof-num" style="font-size:14px;color:var(--green)">● LIVE</div>
+          <div class="proof-label">données temps réel</div>
         </div>
       </div>
     </div>
@@ -709,30 +991,28 @@ footer {
 
 <!-- ═══ HOW IT WORKS ════════════════════════════════════════════════ -->
 <section id="how">
-  <div class="how-header">
-    <div class="section-label">Comment ça marche</div>
-    <h2>Ton analyse complète<br><span class="dim">en 3 étapes.</span></h2>
-    <p class="how-sub">Chaque matin avant d'ouvrir un trade, Mansa Terminal te guide à travers le même process que les traders institutionnels.</p>
+  <div class="section-header center">
+    <div class="section-eyebrow">Comment ça marche</div>
+    <h2 class="section-h2">Ton analyse complète<br><span class="dim">en 3 étapes.</span></h2>
+    <p class="section-sub">Chaque matin avant d'ouvrir un trade, Mansa Terminal te guide à travers le même process que les traders institutionnels.</p>
   </div>
   <div class="steps">
-    <div class="step">
-      <div class="step-connector">→</div>
+    <div class="step fade-up">
+      <div class="step-arrow">→</div>
       <div class="step-num">01</div>
-      <div class="step-icon">🌍</div>
-      <div class="step-title">Contexte</div>
-      <p class="step-desc">Comprends ce qui drive les marchés aujourd'hui. Macro, news institutionnelles, sessions actives, sentiment global.</p>
+      <div class="step-title">Contexte macro</div>
+      <p class="step-desc">Comprends ce qui drive les marchés. Macro, news institutionnelles, sessions actives, sentiment global — avant d'ouvrir quoi que ce soit.</p>
       <div class="step-tools">
         <span class="step-tool">Macro Briefing</span>
         <span class="step-tool">Sessions</span>
         <span class="step-tool">Calendrier Éco</span>
       </div>
     </div>
-    <div class="step">
-      <div class="step-connector">→</div>
+    <div class="step fade-up">
+      <div class="step-arrow">→</div>
       <div class="step-num">02</div>
-      <div class="step-icon">🎯</div>
-      <div class="step-title">Direction</div>
-      <p class="step-desc">Identifie les meilleures opportunités selon les 3 stratégies PTL. COT, DMX, force des devises, structure de marché.</p>
+      <div class="step-title">Direction & conviction</div>
+      <p class="step-desc">Identifie les meilleures opportunités selon les 4 stratégies PTL. COT, DMX, force des devises, structure de marché en confluence.</p>
       <div class="step-tools">
         <span class="step-tool">COT — CFTC</span>
         <span class="step-tool">DMX Retail</span>
@@ -740,11 +1020,10 @@ footer {
         <span class="step-tool">Setups PTL</span>
       </div>
     </div>
-    <div class="step">
+    <div class="step fade-up">
       <div class="step-num">03</div>
-      <div class="step-icon">⚡</div>
-      <div class="step-title">Exécution</div>
-      <p class="step-desc">Prépare ton trade avec précision. Charts multi-TF, screener actions US, niveaux clés, alertes setup en temps réel.</p>
+      <div class="step-title">Exécution précise</div>
+      <p class="step-desc">Prépare ton trade avec précision. Charts multi-TF, screener actions US, niveaux clés, alertes setup. Puis tu exécutes — ou tu passes.</p>
       <div class="step-tools">
         <span class="step-tool">Charts TradingView</span>
         <span class="step-tool">Screener US</span>
@@ -757,10 +1036,10 @@ footer {
 
 <!-- ═══ TERMINAL DEMO ════════════════════════════════════════════════ -->
 <section id="demo">
-  <div class="demo-header">
-    <div class="section-label">Le Terminal</div>
-    <h2>Un seul espace.<br><span class="dim">Tout ce qu'il te faut.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:440px;margin-left:auto;margin-right:auto;">Fini les 12 onglets ouverts. Mansa Terminal centralise toutes tes données institutionnelles en un workspace unifié.</p>
+  <div class="section-header center">
+    <div class="section-eyebrow">Le Terminal</div>
+    <h2 class="section-h2">Un seul espace.<br><span class="dim">Tout ce qu'il te faut.</span></h2>
+    <p class="section-sub" style="margin:0 auto">Fini les 12 onglets. Mansa Terminal centralise toutes tes données institutionnelles en un workspace unifié.</p>
   </div>
   <div class="demo-frame">
     <div class="demo-bar">
@@ -774,24 +1053,22 @@ footer {
     </div>
     <div class="demo-body">
       <div class="demo-scan"></div>
-
-      <!-- LEFT: SETUPS + COT -->
       <div class="demo-sidebar">
         <div class="dp">
           <div class="dp-hd">🎯 SETUPS PTL ACTIFS</div>
           <div class="dp-row">
             <span class="dp-sym">EUR/USD</span>
-            <span class="dp-badge" style="background:rgba(0,204,122,.12);color:var(--green);font-size:7px;font-weight:700">🔥 FORT 4/4</span>
+            <span class="dp-badge" style="background:rgba(34,197,94,.12);color:var(--green)">🔥 FORT 4/4</span>
           </div>
           <div class="dp-bar"><div class="dp-bar-fill" style="width:92%;background:var(--green)"></div></div>
           <div class="dp-row">
             <span class="dp-sym">GBP/JPY</span>
-            <span class="dp-badge" style="background:rgba(200,160,60,.12);color:var(--gold);font-size:7px;font-weight:700">✅ 3/4</span>
+            <span class="dp-badge" style="background:var(--gold-glow);color:var(--gold)">✅ 3/4</span>
           </div>
           <div class="dp-bar"><div class="dp-bar-fill" style="width:74%;background:var(--gold)"></div></div>
           <div class="dp-row">
             <span class="dp-sym">NVDA</span>
-            <span class="dp-badge" style="background:rgba(0,204,122,.12);color:var(--green);font-size:7px;font-weight:700">🔥 FORT</span>
+            <span class="dp-badge" style="background:rgba(34,197,94,.12);color:var(--green)">🔥 FORT</span>
           </div>
           <div class="dp-bar"><div class="dp-bar-fill" style="width:85%;background:var(--green)"></div></div>
         </div>
@@ -806,20 +1083,18 @@ footer {
         </div>
         <div class="dp">
           <div class="dp-hd">💪 FORCE DEVISES</div>
-          <div class="dp-row"><span style="font-size:9px;font-weight:700">USD</span><div style="flex:1;margin:0 8px;height:4px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:82%;background:var(--green)"></div></div><span style="font-size:8px;color:var(--green)">82</span></div>
-          <div class="dp-row"><span style="font-size:9px;font-weight:700">EUR</span><div style="flex:1;margin:0 8px;height:4px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:58%;background:var(--blue)"></div></div><span style="font-size:8px;color:var(--blue)">58</span></div>
-          <div class="dp-row"><span style="font-size:9px;font-weight:700">GBP</span><div style="flex:1;margin:0 8px;height:4px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:44%;background:var(--muted)"></div></div><span style="font-size:8px;color:var(--muted)">44</span></div>
-          <div class="dp-row"><span style="font-size:9px;font-weight:700">JPY</span><div style="flex:1;margin:0 8px;height:4px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:32%;background:var(--red)"></div></div><span style="font-size:8px;color:var(--red)">32</span></div>
+          <div class="dp-row"><span style="font-size:9px;font-weight:700">USD</span><div style="flex:1;margin:0 8px;height:3px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:82%;background:var(--green)"></div></div><span style="font-size:8px;color:var(--green)">82</span></div>
+          <div class="dp-row"><span style="font-size:9px;font-weight:700">EUR</span><div style="flex:1;margin:0 8px;height:3px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:58%;background:var(--blue)"></div></div><span style="font-size:8px;color:var(--blue)">58</span></div>
+          <div class="dp-row"><span style="font-size:9px;font-weight:700">GBP</span><div style="flex:1;margin:0 8px;height:3px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:44%;background:var(--muted)"></div></div><span style="font-size:8px;color:var(--muted)">44</span></div>
+          <div class="dp-row"><span style="font-size:9px;font-weight:700">JPY</span><div style="flex:1;margin:0 8px;height:3px;background:var(--faint);border-radius:2px;overflow:hidden"><div style="height:100%;width:32%;background:var(--red)"></div></div><span style="font-size:8px;color:var(--red)">32</span></div>
         </div>
       </div>
-
-      <!-- MAIN CHART + STATS -->
       <div class="demo-main">
         <div class="demo-chart-box">
           <div class="demo-chart-hd">
             <span class="demo-sym">EUR/USD</span>
             <span class="demo-price" id="dem-price">1.0842</span>
-            <span class="demo-chg up" id="dem-chg" style="background:rgba(0,204,122,.12)">+0.17%</span>
+            <span class="demo-chg up" id="dem-chg" style="background:rgba(34,197,94,.12)">+0.17%</span>
             <div class="demo-intervals">
               <span class="demo-int">M5</span><span class="demo-int">M15</span>
               <span class="demo-int">H1</span><span class="demo-int on">H4</span>
@@ -827,17 +1102,16 @@ footer {
             </div>
           </div>
           <div class="chart-placeholder">
-            <svg class="chart-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
+            <svg class="chart-svg" viewBox="0 0 400 90" preserveAspectRatio="none">
               <defs>
-                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="rgba(0,204,122,.25)"/>
-                  <stop offset="100%" stop-color="rgba(0,204,122,0)"/>
+                <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(34,197,94,.2)"/>
+                  <stop offset="100%" stop-color="rgba(34,197,94,0)"/>
                 </linearGradient>
               </defs>
-              <path d="M0,90 C20,85 30,70 50,65 C70,60 80,72 100,68 C120,64 130,48 155,42 C180,36 190,52 215,44 C240,36 255,25 280,20 C300,15 320,28 345,22 C365,17 380,15 400,12" fill="none" stroke="rgba(0,204,122,.5)" stroke-width="1.5"/>
-              <path d="M0,90 C20,85 30,70 50,65 C70,60 80,72 100,68 C120,64 130,48 155,42 C180,36 190,52 215,44 C240,36 255,25 280,20 C300,15 320,28 345,22 C365,17 380,15 400,12 L400,120 L0,120 Z" fill="url(#chartGrad)"/>
-              <!-- Ichimoku cloud hint -->
-              <path d="M0,75 C40,70 80,65 120,60 C160,55 200,50 240,52 C280,54 320,56 360,54 L400,52 L400,90 C360,88 320,84 280,80 C240,76 200,72 160,74 C120,76 80,78 40,82 Z" fill="rgba(200,160,60,.06)" stroke="rgba(200,160,60,.15)" stroke-width=".5"/>
+              <path d="M0,70 C20,65 30,52 50,48 C70,44 80,55 100,50 C120,46 130,34 155,28 C180,22 190,38 215,30 C240,22 255,14 280,10 C300,6 320,18 345,12 C365,8 380,6 400,4" fill="none" stroke="rgba(34,197,94,.6)" stroke-width="1.5"/>
+              <path d="M0,70 C20,65 30,52 50,48 C70,44 80,55 100,50 C120,46 130,34 155,28 C180,22 190,38 215,30 C240,22 255,14 280,10 C300,6 320,18 345,12 C365,8 380,6 400,4 L400,90 L0,90Z" fill="url(#cg)"/>
+              <path d="M0,58 C40,54 80,50 120,46 C160,42 200,38 240,40 C280,42 320,44 360,42 L400,40 L400,70 C360,68 320,64 280,62 C240,60 200,56 160,58 C120,60 80,62 40,65Z" fill="rgba(200,160,60,.05)" stroke="rgba(200,160,60,.12)" stroke-width=".5"/>
             </svg>
           </div>
         </div>
@@ -856,13 +1130,11 @@ footer {
           </div>
         </div>
       </div>
-
-      <!-- RIGHT: ALERTS + SCREENER -->
       <div class="demo-right">
         <div class="dp-alert">
           <div class="dp-alert-title">🔥 ALERT — Structure Protocol</div>
           <div class="dp-alert-body">EUR/USD — BOS H4 confirmé. COT Long net. DMX retail 78% Short. Score 92%.</div>
-          <div class="dp-signal" style="background:rgba(0,204,122,.15);color:var(--green)">ENTRÉE POSSIBLE</div>
+          <div class="dp-signal" style="background:rgba(34,197,94,.15);color:var(--green)">ENTRÉE POSSIBLE</div>
         </div>
         <div class="dp">
           <div class="dp-hd">🔍 SCREENER US</div>
@@ -870,122 +1142,108 @@ footer {
           <div class="dp-row"><span class="dp-sym" style="font-size:9px">MSFT</span><div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--green)">82</div><div style="font-size:7px;color:var(--green)">ACHETER</div></div></div>
           <div class="dp-row"><span class="dp-sym" style="font-size:9px">GOOGL</span><div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--gold)">74</div><div style="font-size:7px;color:var(--gold)">SURVEILLER</div></div></div>
         </div>
-        <div class="dp" style="font-size:8px">
-          <div class="dp-hd">📓 JOURNAL</div>
-          <div class="dp-row"><span style="color:var(--muted)">EUR/USD LONG</span><span style="color:var(--green)">+3.2R</span></div>
-          <div class="dp-row"><span style="color:var(--muted)">NVDA SWING</span><span style="color:var(--green)">+2.8R</span></div>
-          <div class="dp-row"><span style="color:var(--muted)">GBP/USD SHORT</span><span style="color:var(--red)">-1.0R</span></div>
-        </div>
       </div>
     </div>
   </div>
-  <p style="text-align:center;margin-top:24px;font-size:12px;color:var(--muted)">
-    Ce que vous voyez est un aperçu du terminal. <a href="terminal.html" style="color:var(--gold);font-weight:600">Accéder au terminal live →</a>
+  <p style="text-align:center;margin-top:20px;font-size:12px;color:var(--muted)">
+    Aperçu du terminal. <a href="terminal.html" style="color:var(--gold);font-weight:600">Accéder au terminal live →</a>
   </p>
 </section>
 
 <!-- ═══ TOOLS ════════════════════════════════════════════════════════ -->
 <section id="tools">
-  <div class="tools-header">
-    <div class="section-label">Les Outils</div>
-    <h2>Tout l'arsenal<br><span class="dim">institutionnel.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:480px;">Chaque outil est calibré pour les 3 stratégies PTL. Pas de noise — uniquement ce dont tu as besoin pour trader avec conviction.</p>
+  <div class="section-header center">
+    <div class="section-eyebrow">Les Outils</div>
+    <h2 class="section-h2">Tout l'arsenal<br><span class="dim">institutionnel.</span></h2>
+    <p class="section-sub">Chaque outil est calibré pour les 4 stratégies PTL. Pas de noise — uniquement ce dont tu as besoin pour trader avec conviction.</p>
   </div>
   <div class="tools-grid">
-    <div class="tool-cell">
-      <div class="tool-cell-icon">🎯</div>
-      <div class="tool-cell-name">Setups PTL</div>
-      <p class="tool-cell-desc">Score automatique des 3 stratégies sur tous les instruments. COT + DMX + Saisonnalité + Structure en temps réel.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">🎯</div>
+      <div class="tool-name">Setups PTL</div>
+      <p class="tool-desc">Score automatique des 4 stratégies sur tous les instruments. COT + DMX + Saisonnalité + Structure en temps réel.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">📊</div>
-      <div class="tool-cell-name">COT — CFTC</div>
-      <p class="tool-cell-desc">Positions hebdomadaires des hedge funds sur le marché futures. Le thermomètre institutionnel indispensable.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">📊</div>
+      <div class="tool-name">COT — CFTC</div>
+      <p class="tool-desc">Positions hebdomadaires des hedge funds sur le marché futures. Le thermomètre institutionnel indispensable.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">👥</div>
-      <div class="tool-cell-name">DMX Retail</div>
-      <p class="tool-cell-desc">Ratio Long/Short des traders retail. Quand 80% sont Long, les institutionnels sont souvent à contre-courant.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">👥</div>
+      <div class="tool-name">DMX Retail</div>
+      <p class="tool-desc">Ratio Long/Short des traders retail. Quand 80% sont Long, les institutionnels sont souvent à contre-courant.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">💪</div>
-      <div class="tool-cell-name">Force Devises</div>
-      <p class="tool-cell-desc">Indices synthétiques DXY, EXY, GXY, JXY. Identifie la devise la plus forte vs la plus faible instantanément.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">💪</div>
+      <div class="tool-name">Force Devises</div>
+      <p class="tool-desc">Indices synthétiques DXY, EXY, GXY, JXY. Identifie la devise la plus forte vs la plus faible instantanément.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">📈</div>
-      <div class="tool-cell-name">Charts TradingView</div>
-      <p class="tool-cell-desc">Graphiques institutionnels intégrés avec Ichimoku, structure SMC, niveaux clés. Multi-TF en un clic.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">📈</div>
+      <div class="tool-name">Charts TradingView</div>
+      <p class="tool-desc">Graphiques institutionnels intégrés avec Ichimoku, structure SMC, niveaux clés. Multi-TF en un clic.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">🔍</div>
-      <div class="tool-cell-name">Screener Actions US</div>
-      <p class="tool-cell-desc">Score Buffett + Williams %R + flux institutionnels sur le S&amp;P 500. Les meilleures opportunités classées automatiquement.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">🔍</div>
+      <div class="tool-name">Screener Actions US</div>
+      <p class="tool-desc">Score Buffett + Williams %R + flux institutionnels sur le S&amp;P 500. Les meilleures opportunités classées automatiquement.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">📅</div>
-      <div class="tool-cell-name">Saisonnalité</div>
-      <p class="tool-cell-desc">Statistiques historiques 10 ans par mois. Savoir si octobre est historiquement haussier sur EUR/USD avant de trader.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">📅</div>
+      <div class="tool-name">Saisonnalité</div>
+      <p class="tool-desc">Statistiques historiques 10 ans par mois. Savoir si octobre est historiquement haussier sur EUR/USD avant de trader.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">🏦</div>
-      <div class="tool-cell-name">Smart Money</div>
-      <p class="tool-cell-desc">Positions des grandes banques, dark pool activity. Ce que JP Morgan et Goldman font réellement sur les marchés.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">🏦</div>
+      <div class="tool-name">Smart Money</div>
+      <p class="tool-desc">Positions des grandes banques, dark pool activity. Ce que JP Morgan et Goldman font réellement sur les marchés.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">📓</div>
-      <div class="tool-cell-name">Journal de Trades</div>
-      <p class="tool-cell-desc">Historique complet, win rate, R/R moyen, statistiques par stratégie. Le suivi rigoureux qui fait la différence sur le long terme.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">📓</div>
+      <div class="tool-name">Journal de Trades</div>
+      <p class="tool-desc">Historique complet, win rate, R/R moyen, statistiques par stratégie. Le suivi rigoureux qui fait la différence.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">🔔</div>
-      <div class="tool-cell-name">Alertes Setup</div>
-      <p class="tool-cell-desc">Notifications visuelles et sonores dès qu'un setup PTL atteint le score requis. Ne rate plus aucune opportunité.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">🔔</div>
+      <div class="tool-name">Alertes Setup</div>
+      <p class="tool-desc">Notifications visuelles et sonores dès qu'un setup PTL atteint le score requis. Ne rate plus aucune opportunité.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">🌡️</div>
-      <div class="tool-cell-name">Heatmap Crypto</div>
-      <p class="tool-cell-desc">Fear &amp; Greed Index, dominance BTC, corrélations macro. Le sentiment crypto d'un seul regard.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">🌡️</div>
+      <div class="tool-name">Heatmap Crypto</div>
+      <p class="tool-desc">Fear &amp; Greed Index, dominance BTC, corrélations macro. Le sentiment crypto d'un seul regard.</p>
     </div>
-    <div class="tool-cell">
-      <div class="tool-cell-icon">📰</div>
-      <div class="tool-cell-name">Actualités Live</div>
-      <p class="tool-cell-desc">News macro, banques centrales, événements majeurs. TradingView Economic Calendar intégré avec impact sur les paires.</p>
+    <div class="tool-cell fade-up">
+      <div class="tool-icon">📰</div>
+      <div class="tool-name">Actualités Live</div>
+      <p class="tool-desc">News macro, banques centrales, événements majeurs. TradingView Economic Calendar intégré avec impact sur les paires.</p>
     </div>
   </div>
-  <p class="tools-more">Et bien plus à venir — <span>Prop Firm Tracker, Trade Copier PTL, Analyse COT avancée</span></p>
+  <p class="tools-coming">Et bien plus à venir — <span>Prop Firm Tracker, Trade Copier PTL, Analyse COT avancée</span></p>
 </section>
 
 <!-- ═══ STRATÉGIES ══════════════════════════════════════════════════ -->
 <section id="strategies">
-  <div class="strats-header">
-    <div class="section-label">Les Méthodes PTL</div>
-    <h2>4 stratégies.<br><span class="dim">Backtestées. Documentées.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:560px;">Chaque stratégie est issue de backtests algorithmiques sur 10 à 20 ans de données réelles, intégrée dans Mansa Terminal avec ses critères d'entrée précis. Un process institutionnel à chaque trade.</p>
+  <div class="section-header center">
+    <div class="section-eyebrow">Les Méthodes PTL</div>
+    <h2 class="section-h2">4 stratégies.<br><span class="dim">Backtestées. Documentées.</span></h2>
+    <p class="section-sub">Chaque stratégie est issue de backtests algorithmiques sur 10 à 20 ans de données réelles, intégrée dans Mansa Terminal avec ses critères d'entrée précis.</p>
   </div>
 
-  <!-- BADGE ALGO -->
-  <div style="text-align:center;margin-bottom:18px">
-    <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(68,136,255,.1);border:1px solid rgba(68,136,255,.3);border-radius:20px;padding:6px 16px;font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.06em">
-      <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);display:inline-block;animation:pulse 1.5s infinite"></span>
-      BACKTESTÉ ALGORITHMIQUEMENT · DONNÉES RÉELLES 2006–2025
-    </span>
+  <div class="algo-badge" style="margin:0 auto 24px">
+    <span class="algo-dot"></span>
+    BACKTESTÉ ALGORITHMIQUEMENT · DONNÉES RÉELLES 2006–2025
   </div>
 
-  <!-- STATS BACKTEST BANNER -->
-  <div class="backtest-banner">
+  <div class="bt-banner">
     <div class="bt-stat"><span class="bt-val" style="color:var(--green)">68–74%</span><span class="bt-lbl">Win Rate moyen</span></div>
-    <div class="bt-sep"></div>
     <div class="bt-stat"><span class="bt-val" style="color:var(--gold2)">2.0–2.5R</span><span class="bt-lbl">R/R moyen</span></div>
-    <div class="bt-sep"></div>
     <div class="bt-stat"><span class="bt-val" style="color:var(--blue)">10 ans+</span><span class="bt-lbl">Données backtestées</span></div>
-    <div class="bt-sep"></div>
     <div class="bt-stat"><span class="bt-val" style="color:var(--text)">4</span><span class="bt-lbl">Stratégies actives</span></div>
   </div>
 
-  <div class="strats-grid strats-grid-4">
-    <!-- DOUBLE STRUCTURE -->
-    <div class="strat">
+  <div class="strats-grid">
+    <div class="strat fade-up">
       <div class="strat-accent" style="background:linear-gradient(90deg,var(--gold),transparent)"></div>
       <div class="strat-n">01</div>
       <div class="strat-icon">📐</div>
@@ -1003,8 +1261,7 @@ footer {
         <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.5R</span></div>
       </div>
     </div>
-    <!-- MULTI-TF -->
-    <div class="strat">
+    <div class="strat fade-up">
       <div class="strat-accent" style="background:linear-gradient(90deg,var(--blue),transparent)"></div>
       <div class="strat-n">02</div>
       <div class="strat-icon">🔭</div>
@@ -1022,8 +1279,7 @@ footer {
         <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.5R</span></div>
       </div>
     </div>
-    <!-- SAM -->
-    <div class="strat">
+    <div class="strat fade-up">
       <div class="strat-accent" style="background:linear-gradient(90deg,var(--green),transparent)"></div>
       <div class="strat-n">03</div>
       <div class="strat-icon">📈</div>
@@ -1041,19 +1297,18 @@ footer {
         <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.0R</span></div>
       </div>
     </div>
-    <!-- IVC -->
-    <div class="strat">
+    <div class="strat fade-up">
       <div class="strat-accent" style="background:linear-gradient(90deg,#9966ff,transparent)"></div>
       <div class="strat-n">04</div>
       <div class="strat-icon">⚡</div>
       <div class="strat-name">IVC</div>
       <div class="strat-tag">INDICES · M30 · VOLATILITÉ</div>
-      <p class="strat-desc">Intraday Volatility Capture sur indices US (SPX, NAS). Exploitation des pics de volatilité en M30 pendant les sessions London/New York.</p>
+      <p class="strat-desc">Intraday Volatility Capture sur indices US. Exploitation des pics de volatilité en M30 pendant les sessions London/New York.</p>
       <ul class="strat-list">
         <li><span class="strat-check">▸</span>Focus SPX, NAS · sessions actives</li>
         <li><span class="strat-check">▸</span>Breakout M30 sur niveaux clés</li>
         <li><span class="strat-check">▸</span>VIX + sentiment Fear &amp; Greed</li>
-        <li><span class="strat-check">▸</span>R/R cible 2.2 · Duration &lt; 1 session</li>
+        <li><span class="strat-check">▸</span>R/R cible 2.2 · Duration &lt;1 session</li>
       </ul>
       <div class="strat-perf">
         <div class="sp-row"><span class="sp-lbl">Win Rate</span><span class="sp-val" style="color:var(--green)">69%</span></div>
@@ -1061,18 +1316,18 @@ footer {
       </div>
     </div>
   </div>
-  <p style="text-align:center;margin-top:28px;font-size:12px;color:var(--muted)">Résultats issus de backtests algorithmiques PTL sur données historiques 2006–2025 (IVC : 20 ans). <a href="terminal.html" style="color:var(--gold);font-weight:600">Lancer le backtest dans le terminal →</a></p>
+  <p class="strats-footnote">Résultats issus de backtests algorithmiques PTL sur données historiques 2006–2025 (IVC : 20 ans). <a href="terminal.html">Lancer le backtest dans le terminal →</a></p>
 </section>
 
 <!-- ═══ MARCHÉS ══════════════════════════════════════════════════════ -->
 <section id="markets">
-  <div class="markets-header">
-    <div class="section-label">Les Marchés</div>
-    <h2>Focus sur les<br><span class="dim">marchés qui comptent.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:480px;">Liquidité maximale, données COT disponibles, transparence institutionnelle. Pas de BRVM, pas de marchés exotiques — uniquement les meilleurs terrains de jeu.</p>
+  <div class="section-header center">
+    <div class="section-eyebrow">Les Marchés</div>
+    <h2 class="section-h2">Focus sur les marchés<br><span class="dim">qui comptent.</span></h2>
+    <p class="section-sub">Liquidité maximale, données COT disponibles, transparence institutionnelle. Uniquement les meilleurs terrains de jeu.</p>
   </div>
   <div class="markets-grid">
-    <div class="mkt">
+    <div class="mkt fade-up">
       <div class="mkt-icon">💱</div>
       <div class="mkt-name">Forex</div>
       <p class="mkt-sub">$7.5T/jour. Le marché le plus liquide au monde. Données COT CFTC chaque semaine. Terrain de jeu principal PTL.</p>
@@ -1081,7 +1336,7 @@ footer {
         <span class="mkt-tag">GBP/JPY</span><span class="mkt-tag">AUD/USD</span><span class="mkt-tag">USD/CHF</span>
       </div>
     </div>
-    <div class="mkt">
+    <div class="mkt fade-up">
       <div class="mkt-icon">📈</div>
       <div class="mkt-name">Actions US</div>
       <p class="mkt-sub">S&amp;P 500, Nasdaq. Actions growth et dividendes sélectionnées via screener Buffett Score. Stratégie Swing Action Market.</p>
@@ -1090,7 +1345,7 @@ footer {
         <span class="mkt-tag">GOOGL</span><span class="mkt-tag">META</span><span class="mkt-tag">AMZN</span>
       </div>
     </div>
-    <div class="mkt">
+    <div class="mkt fade-up">
       <div class="mkt-icon">🥇</div>
       <div class="mkt-name">Commodités</div>
       <p class="mkt-sub">Or, Pétrole, Argent, Gaz. Marchés cycliques avec forte saisonnalité et COT disponibles. Idéal en contexte macro inflationniste.</p>
@@ -1099,7 +1354,7 @@ footer {
         <span class="mkt-tag">BRENT</span><span class="mkt-tag">NAT.GAS</span><span class="mkt-tag">COPPER</span>
       </div>
     </div>
-    <div class="mkt">
+    <div class="mkt fade-up">
       <div class="mkt-icon">🪙</div>
       <div class="mkt-name">Crypto</div>
       <p class="mkt-sub">Bitcoin, Ethereum, altcoins majeurs. Cycles 4 ans, dominance BTC, corrélations Nasdaq. Analyse flux on-chain et sentiment.</p>
@@ -1111,28 +1366,30 @@ footer {
   </div>
 </section>
 
-<!-- ═══ BELIEFS ══════════════════════════════════════════════════════ -->
+<!-- ═══ PHILOSOPHIE ════════════════════════════════════════════════ -->
 <section id="beliefs">
   <div class="beliefs-inner">
-    <div class="section-label">Notre philosophie</div>
-    <h2>Ce qu'on croit.<br><span class="dim">Ce qu'on ne fera jamais.</span></h2>
+    <div class="section-header center">
+      <div class="section-eyebrow">Notre Philosophie</div>
+      <h2 class="section-h2">Ce qu'on croit.<br><span class="dim">Ce qu'on ne fera jamais.</span></h2>
+    </div>
     <div class="beliefs-grid">
-      <div class="belief">
+      <div class="belief fade-up">
         <div class="belief-icon">🧭</div>
         <div class="belief-title">Le contexte avant la conviction</div>
         <p class="belief-body">Avant d'ouvrir un trade, comprendre ce qui drive le marché. Un setup sans contexte macro, c'est jouer à pile ou face avec de meilleures probabilités.</p>
       </div>
-      <div class="belief">
+      <div class="belief fade-up">
         <div class="belief-icon">🏛️</div>
         <div class="belief-title">Penser comme un institutionnel</div>
         <p class="belief-body">Les gros joueurs laissent des traces dans les données COT, les flux dark pool, et la structure de marché. On lit ces données — pas les indicateurs retail.</p>
       </div>
-      <div class="belief belief-never">
+      <div class="belief belief-never fade-up">
         <div class="belief-icon">🚫</div>
         <div class="belief-title">On ne vend pas de signaux</div>
         <p class="belief-body">Jamais. Un signal sans compréhension crée de la dépendance, pas des traders. PTL t'enseigne à voir le marché toi-même — pas à copier aveuglément.</p>
       </div>
-      <div class="belief belief-never">
+      <div class="belief belief-never fade-up">
         <div class="belief-icon">🚫</div>
         <div class="belief-title">On ne promet pas de rendements</div>
         <p class="belief-body">Aucune performance passée ne garantit les résultats futurs. Le trading comporte des risques réels de perte. PTL t'arme — les décisions restent les tiennes.</p>
@@ -1143,59 +1400,70 @@ footer {
 
 <!-- ═══ REVIEWS ══════════════════════════════════════════════════════ -->
 <section id="reviews">
-  <div class="reviews-header">
-    <div class="section-label">La Communauté</div>
-    <h2>Ils tradent avec<br><span class="dim">Mansa Terminal.</span></h2>
+  <div class="section-header center">
+    <div class="section-eyebrow">La Communauté</div>
+    <h2 class="section-h2">Ils tradent avec<br><span class="dim">Mansa Terminal.</span></h2>
   </div>
   <div class="reviews-grid">
-    <div class="review">
+    <div class="review fade-up">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Enfin un terminal pensé pour nos stratégies. Le COT et le DMX intégrés changent complètement mon analyse — je vois exactement ce que font les institutionnels avant d'entrer."</p>
-      <div class="review-author">Koffi A.</div>
-      <div class="review-meta">Trader Forex · Paris</div>
+      <div>
+        <div class="review-author">Koffi A.</div>
+        <div class="review-meta">Trader Forex · Paris</div>
+      </div>
     </div>
-    <div class="review">
+    <div class="review fade-up">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Le screener actions US avec le Buffett Score m'a permis d'identifier NVDA bien avant le mouvement de +18%. Je n'utilise plus rien d'autre pour mes analyses fondamentales."</p>
-      <div class="review-author">Chloé M.</div>
-      <div class="review-meta">Trader Actions US · Lyon</div>
+      <div>
+        <div class="review-author">Chloé M.</div>
+        <div class="review-meta">Trader Actions US · Lyon</div>
+      </div>
     </div>
-    <div class="review">
+    <div class="review fade-up">
       <div class="review-stars">★★★★★</div>
-      <p class="review-text">"Structure Protocol est devenu ma stratégie principale. Mansa me montre les Order Blocks et les FVG sur tous les timeframes en un seul endroit — gain de temps énorme au quotidien."</p>
-      <div class="review-author">Théo B.</div>
-      <div class="review-meta">Trader Forex · Bruxelles</div>
+      <p class="review-text">"Structure Protocol est devenu ma stratégie principale. Mansa me montre les Order Blocks et les FVG sur tous les timeframes en un seul endroit — gain de temps énorme."</p>
+      <div>
+        <div class="review-author">Théo B.</div>
+        <div class="review-meta">Trader Forex · Bruxelles</div>
+      </div>
     </div>
-    <div class="review">
+    <div class="review fade-up">
       <div class="review-stars">★★★★★</div>
-      <p class="review-text">"Le module Banques Centrales est impressionnant. Je comprends enfin pourquoi certaines paires bougent avant même les news. La section COT avec le graphique visuel est parfaite."</p>
-      <div class="review-author">Isabelle M.</div>
-      <div class="review-meta">Trader Macro · Bordeaux</div>
+      <p class="review-text">"Le module Banques Centrales est impressionnant. Je comprends enfin pourquoi certaines paires bougent avant les news. La section COT avec le graphique visuel est parfaite."</p>
+      <div>
+        <div class="review-author">Isabelle M.</div>
+        <div class="review-meta">Trader Macro · Bordeaux</div>
+      </div>
     </div>
-    <div class="review">
+    <div class="review fade-up">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"J'utilise le backtest PTL Multi-TF chaque semaine pour valider mes setups. Les résultats sur 10 ans m'ont convaincu de rester discipliné sur la méthode. Outil indispensable."</p>
-      <div class="review-author">Lucas D.</div>
-      <div class="review-meta">Swing Trader · Toulouse</div>
+      <div>
+        <div class="review-author">Lucas D.</div>
+        <div class="review-meta">Swing Trader · Toulouse</div>
+      </div>
     </div>
-    <div class="review">
+    <div class="review fade-up">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"L'alerte prix en temps réel m'a sauvé plusieurs trades. Je configure mes niveaux Ichimoku et le terminal me notifie instantanément — même quand je ne suis pas devant l'écran."</p>
-      <div class="review-author">Nadia R.</div>
-      <div class="review-meta">Trader Forex · Marseille</div>
+      <div>
+        <div class="review-author">Nadia R.</div>
+        <div class="review-meta">Trader Forex · Marseille</div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ═══ PRICING ══════════════════════════════════════════════════════ -->
 <section id="pricing">
-  <div class="pricing-header">
-    <div class="section-label">Accès</div>
-    <h2>Commence maintenant.<br><span class="dim">Choisis ton accès.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;">Le terminal de base est gratuit. Les plans payants débloquent les données institutionnelles avancées.</p>
+  <div class="section-header center">
+    <div class="section-eyebrow">Accès</div>
+    <h2 class="section-h2">Commence maintenant.<br><span class="dim">Choisis ton accès.</span></h2>
+    <p class="section-sub">Le terminal de base est gratuit. Les plans payants débloquent les données institutionnelles avancées.</p>
   </div>
   <div class="pricing-grid">
-    <!-- FREE -->
     <div class="plan">
       <div class="plan-name">GRATUIT</div>
       <div class="plan-price"><sup>€</sup>0</div>
@@ -1213,7 +1481,6 @@ footer {
       </ul>
       <a href="terminal.html?auth=signup" class="btn-plan btn-plan-ghost">Créer un compte gratuit</a>
     </div>
-    <!-- PRO -->
     <div class="plan plan-featured">
       <div class="plan-badge">RECOMMANDÉ</div>
       <div class="plan-name">PRO</div>
@@ -1232,7 +1499,6 @@ footer {
       </ul>
       <a href="terminal.html?auth=signup&plan=pro" class="btn-plan btn-plan-main">Commencer avec Pro</a>
     </div>
-    <!-- ELITE -->
     <div class="plan">
       <div class="plan-name">ELITE</div>
       <div class="plan-price"><sup>€</sup>97</div>
@@ -1251,39 +1517,41 @@ footer {
       <a href="terminal.html?auth=signup&plan=elite" class="btn-plan btn-plan-ghost">Accès Elite</a>
     </div>
   </div>
-  <p class="plan-free-note">Déjà membre ? <a href="terminal.html?auth=login">Se connecter au terminal →</a></p>
+  <p class="plan-note">Déjà membre ? <a href="terminal.html?auth=login">Se connecter au terminal →</a></p>
 </section>
 
 <!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
 <section id="faq">
-  <div class="faq-header">
-    <div class="section-label">Questions fréquentes</div>
-    <h2>Ce que tu <span class="dim">veux savoir.</span></h2>
-  </div>
-  <div class="faq-list">
-    <div class="faq-item">
-      <div class="faq-q">C'est quoi Mansa Terminal exactement ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Mansa Terminal est un terminal de trading institutionnel construit autour des 4 stratégies Process Trading Life — Double Structure (M30/H8), Multi-TF (D1→H4→M15), SAM Swing Actions US et IVC Indices. Il centralise les données COT, DMX, force des devises, screener actions US, charts TradingView, backtests et journal de trades en un seul workspace.</div>
+  <div class="faq-inner">
+    <div class="section-header center">
+      <div class="section-eyebrow">Questions fréquentes</div>
+      <h2 class="section-h2">Ce que tu <span class="dim">veux savoir.</span></h2>
     </div>
-    <div class="faq-item">
-      <div class="faq-q">C'est quoi la différence avec Bloomberg ou Prime Terminal ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Bloomberg coûte $2000/mois et est conçu pour les gérants institutionnels. Prime Terminal propose des données macro génériques. Mansa Terminal est le seul terminal conçu spécifiquement pour les 4 stratégies PTL — Double Structure, Multi-TF, SAM et IVC — avec backtests intégrés, COT, DMX et données institutionnelles, à un prix accessible.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Les données sont-elles vraiment en temps réel ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Les charts TradingView, le Forex Heatmap, le Ticker Tape et les prix crypto (CoinGecko) sont en temps réel. Les données COT sont hebdomadaires (publication CFTC chaque vendredi). Le DMX est mis à jour toutes les heures. Les screeners actions sont mis à jour en fin de journée.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Faut-il avoir de l'expérience en trading pour utiliser le terminal ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Le terminal est conçu pour les traders qui ont des bases. Si tu découvres les concepts Ichimoku, Structure SMC ou COT, la communauté PTL et le canal Telegram t'accompagnent. Les stratégies sont documentées étape par étape dans le terminal lui-même.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Est-ce que PTL vend des signaux de trading ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Non. Jamais. PTL t'enseigne à analyser les marchés toi-même avec les 4 stratégies documentées et backtestées. Le terminal t'indique les setups potentiels selon les critères des stratégies, mais la décision de trader reste entièrement la tienne. Les signaux créent de la dépendance — le process crée des traders.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Comment résilier mon abonnement ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Tu peux résilier à tout moment depuis ton espace compte dans Mansa Terminal. Aucun engagement, aucune pénalité. Ton accès reste actif jusqu'à la fin de la période payée.</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">C'est quoi Mansa Terminal exactement ? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Mansa Terminal est un terminal de trading institutionnel construit autour des 4 stratégies Process Trading Life — Double Structure (M30/H8), Multi-TF (D1→H4→M15), SAM Swing Actions US et IVC Indices. Il centralise les données COT, DMX, force des devises, screener actions US, charts TradingView, backtests et journal de trades en un seul workspace.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">C'est quoi la différence avec Bloomberg ou Prime Terminal ? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Bloomberg coûte $2000/mois et est conçu pour les gérants institutionnels. Prime Terminal propose des données macro génériques. Mansa Terminal est le seul terminal conçu spécifiquement pour les 4 stratégies PTL — avec backtests intégrés, COT, DMX et données institutionnelles à un prix accessible.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Les données sont-elles vraiment en temps réel ? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Les charts TradingView, le Forex Heatmap, le Ticker Tape et les prix crypto (CoinGecko) sont en temps réel. Les données COT sont hebdomadaires (publication CFTC chaque vendredi). Le DMX est mis à jour toutes les heures. Les screeners actions sont mis à jour en fin de journée.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Faut-il avoir de l'expérience en trading pour utiliser le terminal ? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Le terminal est conçu pour les traders qui ont des bases en analyse technique. Si tu découvres les concepts Ichimoku, Structure SMC ou COT, la communauté PTL et le canal Telegram t'accompagnent. Les stratégies sont documentées étape par étape dans le terminal lui-même.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Est-ce que PTL vend des signaux de trading ? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Non. Jamais. PTL t'enseigne à analyser les marchés toi-même avec les 4 stratégies documentées et backtestées. Le terminal t'indique les setups potentiels selon les critères des stratégies, mais la décision de trader reste entièrement la tienne. Les signaux créent de la dépendance — le process crée des traders.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Comment résilier mon abonnement ? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Tu peux résilier à tout moment depuis ton espace compte dans Mansa Terminal. Aucun engagement, aucune pénalité. Ton accès reste actif jusqu'à la fin de la période payée.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1295,15 +1563,15 @@ footer {
     <div class="cta-eyebrow">REJOINDRE PROCESS TRADING LIFE</div>
     <div class="cta-title">Commence<br>aujourd'hui.</div>
     <p class="cta-sub">Accès immédiat à Mansa Terminal, aux 4 stratégies PTL backtestées, aux données institutionnelles. Gratuit pour commencer.</p>
-    <div class="hero-actions" style="justify-content:center">
+    <div class="hero-actions">
       <a href="terminal.html" class="btn-primary" style="font-size:14px;padding:16px 32px">Accéder au Terminal gratuitement</a>
       <a href="https://t.me/processtradinglife" target="_blank" class="btn-ghost" style="font-size:14px;padding:15px 28px">✈ Rejoindre Telegram</a>
     </div>
     <div class="cta-links">
-      <a href="https://discord.gg/processtradinglife" target="_blank" class="cta-link cta-link-discord">
+      <a href="https://discord.gg/processtradinglife" target="_blank" class="cta-link">
         <span>💬</span> Discord Privé PTL
       </a>
-      <a href="https://whop.com/trading-forex-life/" target="_blank" class="cta-link cta-link-whop">
+      <a href="https://whop.com/trading-forex-life/" target="_blank" class="cta-link">
         <span>⚡</span> Whop Community
       </a>
     </div>
@@ -1314,8 +1582,8 @@ footer {
 <footer>
   <div class="footer-top">
     <div>
-      <div class="footer-brand-mark">MANSA TERMINAL</div>
-      <div class="footer-brand-sub">Process Trading Life · Forex &amp; Actions US</div>
+      <div class="footer-brand">Mansa Terminal</div>
+      <div class="footer-sub">Process Trading Life · Forex &amp; Actions US</div>
     </div>
     <div class="footer-cols">
       <div>
@@ -1353,7 +1621,7 @@ footer {
 
 <!-- ═══ SCRIPTS ════════════════════════════════════════════════════════ -->
 <script>
-/* ── TICKER DATA ────────────────────────────────────────────────── */
+/* ── TICKER ─────────────────────────────────────────────────────── */
 var TDATA = [
   {s:'EUR/USD', p:1.0842, c:+0.0018, pct:+0.17},
   {s:'GBP/USD', p:1.2654, c:-0.0021, pct:-0.17},
@@ -1392,7 +1660,6 @@ setInterval(function() {
     it.p = parseFloat((it.p + chg).toFixed(it.p < 10 ? 5 : it.p < 100 ? 2 : 1));
     it.c = parseFloat((it.c + chg).toFixed(it.p < 10 ? 4 : 2));
     it.pct = parseFloat(((it.c / it.p) * 100).toFixed(2));
-    // Update demo price
     if (it.s === 'EUR/USD') {
       var dp = document.getElementById('dem-price');
       if (dp) dp.textContent = it.p.toFixed(4);
@@ -1400,7 +1667,7 @@ setInterval(function() {
       if (dc) {
         dc.textContent = (it.c >= 0 ? '+' : '') + it.pct.toFixed(2) + '%';
         dc.className = 'demo-chg ' + (it.c >= 0 ? 'up' : 'dn');
-        dc.style.background = it.c >= 0 ? 'rgba(0,204,122,.12)' : 'rgba(224,85,85,.12)';
+        dc.style.background = it.c >= 0 ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
       }
     }
   });
@@ -1418,21 +1685,18 @@ document.querySelectorAll('.faq-q').forEach(function(q) {
 });
 
 /* ── SCROLL FADE IN ──────────────────────────────────────────────── */
-var observer = new IntersectionObserver(function(entries) {
+var obs = new IntersectionObserver(function(entries) {
   entries.forEach(function(e) {
     if (e.isIntersecting) {
       e.target.style.animation = 'fadeUp .5s ease both';
       e.target.style.opacity = '1';
+      obs.unobserve(e.target);
     }
   });
 }, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(function(el) { obs.observe(el); });
 
-document.querySelectorAll('.strat, .mkt, .plan, .review, .tool-cell, .step, .belief').forEach(function(el) {
-  el.style.opacity = '0';
-  observer.observe(el);
-});
-
-/* ── COUNTER ANIMATION ───────────────────────────────────────────── */
+/* ── COUNTER ─────────────────────────────────────────────────────── */
 var counted = false;
 new IntersectionObserver(function(entries) {
   if (entries[0].isIntersecting && !counted) {
@@ -1442,17 +1706,17 @@ new IntersectionObserver(function(entries) {
     var n = 0, target = 587;
     var step = Math.ceil(target / 60);
     var t = setInterval(function() {
-      n += step;
-      if (n >= target) { n = target; clearInterval(t); }
+      n = Math.min(n + step, target);
       el.textContent = n.toLocaleString('fr-FR');
+      if (n >= target) clearInterval(t);
     }, 25);
   }
 }, { threshold: 0.5 }).observe(document.getElementById('hero'));
 
 /* ── REDUCED MOTION ──────────────────────────────────────────────── */
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  document.querySelectorAll('[style*="animation"]').forEach(function(el) {
-    el.style.animation = 'none';
+  document.querySelectorAll('.fade-up').forEach(function(el) {
+    el.style.opacity = '1'; el.style.animation = 'none';
   });
 }
 </script>
