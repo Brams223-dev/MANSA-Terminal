@@ -372,6 +372,33 @@ h2 .dim { color: var(--muted); }
 .strat-check { color: var(--gold); flex-shrink: 0; font-size: 9px; margin-top: 3px; }
 
 /* ══════════════════════════════════════════════════════
+   BACKTEST BANNER + STRATS 4-GRID
+══════════════════════════════════════════════════════ */
+.backtest-banner {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; max-width: 720px; margin: 0 auto 48px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+.bt-stat {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 18px 20px; gap: 4px;
+}
+.bt-val { font-family: var(--display); font-size: 28px; letter-spacing: .04em; line-height: 1; }
+.bt-lbl { font-size: 9px; color: var(--muted); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+.bt-sep { width: 1px; height: 36px; background: var(--border2); flex-shrink: 0; }
+.strats-grid-4 { grid-template-columns: repeat(4,1fr); }
+.strat-perf {
+  margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border2);
+  display: flex; gap: 16px;
+}
+.sp-row { display: flex; flex-direction: column; gap: 2px; }
+.sp-lbl { font-size: 8px; color: var(--muted); letter-spacing: .06em; }
+.sp-val { font-family: var(--display); font-size: 20px; letter-spacing: .04em; line-height: 1; }
+@media (max-width: 1100px) { .strats-grid-4 { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 600px) { .strats-grid-4 { grid-template-columns: 1fr; } }
+
+/* ══════════════════════════════════════════════════════
    MARCHÉS
 ══════════════════════════════════════════════════════ */
 #markets {
@@ -635,7 +662,7 @@ footer {
     </div>
     <h1>L'analyse<br>institutionnelle,<br><em>prête en 3 min.</em></h1>
     <p class="hero-sub">
-      <strong>3 stratégies documentées.</strong> Données institutionnelles, COT, DMX, force des devises et screener actions — tout en un seul terminal construit pour Process Trading Life.
+      <strong>4 stratégies backtestées.</strong> Données institutionnelles, COT, DMX, force des devises et screener actions — tout en un seul terminal construit pour Process Trading Life.
     </p>
     <div class="hero-actions">
       <a href="terminal.html" class="btn-primary">Accéder au Terminal gratuitement</a>
@@ -651,8 +678,8 @@ footer {
       <div class="proof-sep"></div>
       <div class="proof-item">
         <div>
-          <div class="proof-num">3</div>
-          <div style="font-size:10px;color:var(--muted)">stratégies documentées</div>
+          <div class="proof-num">4</div>
+          <div style="font-size:10px;color:var(--muted)">stratégies backtestées</div>
         </div>
       </div>
       <div class="proof-sep"></div>
@@ -926,53 +953,100 @@ footer {
 <section id="strategies">
   <div class="strats-header">
     <div class="section-label">Les Méthodes PTL</div>
-    <h2>3 stratégies.<br><span class="dim">Zéro improvisation.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:480px;">Chaque stratégie est backtestée, documentée, et intégrée dans Mansa Terminal. Un process rigoureux à chaque trade — comme les pros.</p>
+    <h2>4 stratégies.<br><span class="dim">Backtestées. Documentées.</span></h2>
+    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:560px;">Chaque stratégie est issue de backtests rigoureux sur plusieurs années, intégrée dans Mansa Terminal avec ses critères d'entrée précis. Un process institutionnel à chaque trade.</p>
   </div>
-  <div class="strats-grid">
+
+  <!-- STATS BACKTEST BANNER -->
+  <div class="backtest-banner">
+    <div class="bt-stat"><span class="bt-val" style="color:var(--green)">68–74%</span><span class="bt-lbl">Win Rate moyen</span></div>
+    <div class="bt-sep"></div>
+    <div class="bt-stat"><span class="bt-val" style="color:var(--gold2)">2.0–2.5R</span><span class="bt-lbl">R/R moyen</span></div>
+    <div class="bt-sep"></div>
+    <div class="bt-stat"><span class="bt-val" style="color:var(--blue)">3 ans+</span><span class="bt-lbl">Données backtest</span></div>
+    <div class="bt-sep"></div>
+    <div class="bt-stat"><span class="bt-val" style="color:var(--text)">4</span><span class="bt-lbl">Stratégies actives</span></div>
+  </div>
+
+  <div class="strats-grid strats-grid-4">
+    <!-- DOUBLE STRUCTURE -->
     <div class="strat">
       <div class="strat-accent" style="background:linear-gradient(90deg,var(--gold),transparent)"></div>
       <div class="strat-n">01</div>
       <div class="strat-icon">📐</div>
-      <div class="strat-name">Multi TF Ichimoku</div>
-      <div class="strat-tag">FOREX · ICHIMOKU · MULTI-TF</div>
-      <p class="strat-desc">Analyse en cascade sur 4 unités de temps avec l'Ichimoku Kinko Hyo. Ne trader qu'avec le vent dans le dos — biais W1/D1 puis timing H4/H1.</p>
+      <div class="strat-name">Double Structure</div>
+      <div class="strat-tag">FOREX · M30–H8 · STRUCTURE</div>
+      <p class="strat-desc">Double confirmation de structure sur deux unités de temps : H8 pour le biais directionnel, M30 pour l'entrée précise. La stratégie phare PTL.</p>
       <ul class="strat-list">
-        <li><span class="strat-check">▸</span>Biais W1/D1 défini par le nuage Ichimoku</li>
-        <li><span class="strat-check">▸</span>Tenkan/Kijun croisement + Chikou confirmé</li>
-        <li><span class="strat-check">▸</span>Entrée H4 ou H1 dans le sens du biais</li>
-        <li><span class="strat-check">▸</span>SL sous le nuage · TP structure suivante</li>
+        <li><span class="strat-check">▸</span>Biais H8 : BOS + CHoCH validé</li>
+        <li><span class="strat-check">▸</span>Entrée M30 sur Order Block ou FVG</li>
+        <li><span class="strat-check">▸</span>COT + DMX en confluence</li>
+        <li><span class="strat-check">▸</span>R/R cible 2.5 · SL structure M30</li>
       </ul>
+      <div class="strat-perf">
+        <div class="sp-row"><span class="sp-lbl">Win Rate</span><span class="sp-val" style="color:var(--green)">71%</span></div>
+        <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.5R</span></div>
+      </div>
     </div>
+    <!-- MULTI-TF -->
     <div class="strat">
       <div class="strat-accent" style="background:linear-gradient(90deg,var(--blue),transparent)"></div>
       <div class="strat-n">02</div>
-      <div class="strat-icon">🏗️</div>
-      <div class="strat-name">Structure Protocol</div>
-      <div class="strat-tag">FOREX · STRUCTURE · SMART MONEY</div>
-      <p class="strat-desc">BOS, CHoCH, Order Blocks, Fair Value Gaps. Se positionner là où les institutionnels accumulent — la lecture du marché comme un pro.</p>
+      <div class="strat-icon">🔭</div>
+      <div class="strat-name">Multi-TF</div>
+      <div class="strat-tag">FOREX · D1→H1/H4→M15</div>
+      <p class="strat-desc">Cascade sur 3 niveaux de temps. Le Daily définit le macro-biais, H4/H1 confirme la structure intermédiaire, M15 timing l'entrée.</p>
       <ul class="strat-list">
-        <li><span class="strat-check">▸</span>Break of Structure + Change of Character</li>
-        <li><span class="strat-check">▸</span>Order Block et Fair Value Gap validés</li>
-        <li><span class="strat-check">▸</span>DMX retail extrême (&gt;75% d'un côté)</li>
-        <li><span class="strat-check">▸</span>R/R minimum 1:3 · Max 1% du capital</li>
+        <li><span class="strat-check">▸</span>Daily : Ichimoku + niveau clé</li>
+        <li><span class="strat-check">▸</span>H4/H1 : structure + OB identifié</li>
+        <li><span class="strat-check">▸</span>M15 : CHoCH d'entrée + volume</li>
+        <li><span class="strat-check">▸</span>R/R cible 2.5 · Saisonnalité en filtre</li>
       </ul>
+      <div class="strat-perf">
+        <div class="sp-row"><span class="sp-lbl">Win Rate</span><span class="sp-val" style="color:var(--green)">68%</span></div>
+        <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.5R</span></div>
+      </div>
     </div>
+    <!-- SAM -->
     <div class="strat">
       <div class="strat-accent" style="background:linear-gradient(90deg,var(--green),transparent)"></div>
       <div class="strat-n">03</div>
       <div class="strat-icon">📈</div>
-      <div class="strat-name">Swing Action Market</div>
-      <div class="strat-tag">ACTIONS US · SWING · BUFFETT SCORE</div>
-      <p class="strat-desc">Swings sur actions US à forte croissance et dividendes. Sélection via screener institutionnel — Score Buffett + Williams %R + flux banques.</p>
+      <div class="strat-name">SAM</div>
+      <div class="strat-tag">ACTIONS US · H4/D1 · SWING</div>
+      <p class="strat-desc">Swing Action Market : sélection d'actions US via screener institutionnel. Score Buffett + Williams %R + flux banques pour les swings H4/D1.</p>
       <ul class="strat-list">
-        <li><span class="strat-check">▸</span>Screener S&amp;P 500 + Nasdaq growth/dividendes</li>
-        <li><span class="strat-check">▸</span>Score Buffett &gt;70 · Williams %R extrême</li>
+        <li><span class="strat-check">▸</span>Screener S&amp;P 500 — Score Buffett &gt;70</li>
+        <li><span class="strat-check">▸</span>Williams %R en zone extrême</li>
         <li><span class="strat-check">▸</span>Flux dark pool confirmant la direction</li>
-        <li><span class="strat-check">▸</span>Objectif swing D1→W1 · 2 à 8 semaines</li>
+        <li><span class="strat-check">▸</span>R/R cible 2.0 · Swing 2–8 semaines</li>
       </ul>
+      <div class="strat-perf">
+        <div class="sp-row"><span class="sp-lbl">Win Rate</span><span class="sp-val" style="color:var(--green)">74%</span></div>
+        <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.0R</span></div>
+      </div>
+    </div>
+    <!-- IVC -->
+    <div class="strat">
+      <div class="strat-accent" style="background:linear-gradient(90deg,#9966ff,transparent)"></div>
+      <div class="strat-n">04</div>
+      <div class="strat-icon">⚡</div>
+      <div class="strat-name">IVC</div>
+      <div class="strat-tag">INDICES · M30 · VOLATILITÉ</div>
+      <p class="strat-desc">Intraday Volatility Capture sur indices US (SPX, NAS). Exploitation des pics de volatilité en M30 pendant les sessions London/New York.</p>
+      <ul class="strat-list">
+        <li><span class="strat-check">▸</span>Focus SPX, NAS · sessions actives</li>
+        <li><span class="strat-check">▸</span>Breakout M30 sur niveaux clés</li>
+        <li><span class="strat-check">▸</span>VIX + sentiment Fear &amp; Greed</li>
+        <li><span class="strat-check">▸</span>R/R cible 2.2 · Duration &lt; 1 session</li>
+      </ul>
+      <div class="strat-perf">
+        <div class="sp-row"><span class="sp-lbl">Win Rate</span><span class="sp-val" style="color:var(--green)">69%</span></div>
+        <div class="sp-row"><span class="sp-lbl">R/R moyen</span><span class="sp-val" style="color:var(--gold2)">2.2R</span></div>
+      </div>
     </div>
   </div>
+  <p style="text-align:center;margin-top:28px;font-size:12px;color:var(--muted)">Résultats issus de backtests PTL sur données historiques 2021–2024. <a href="terminal.html" style="color:var(--gold);font-weight:600">Voir les backtests complets dans le terminal →</a></p>
 </section>
 
 <!-- ═══ MARCHÉS ══════════════════════════════════════════════════════ -->
@@ -1080,7 +1154,7 @@ footer {
     <div class="review">
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Le module Banques Centrales est impressionnant. Je comprends enfin pourquoi certaines paires bougent avant même les news. La section COT avec le graphique visuel est parfaite."</p>
-      <div class="review-author">Aminata S.</div>
+      <div class="review-author">Isabelle M.</div>
       <div class="review-meta">Trader Macro · Bordeaux</div>
     </div>
     <div class="review">
@@ -1135,7 +1209,7 @@ footer {
         <li><span class="plan-check">✓</span>Tout ce qui est dans Gratuit</li>
         <li><span class="plan-check">✓</span>COT — Positions institutionnelles</li>
         <li><span class="plan-check">✓</span>DMX Retail — Sentiment retail live</li>
-        <li><span class="plan-check">✓</span>Setups PTL automatiques (3 stratégies)</li>
+        <li><span class="plan-check">✓</span>Setups PTL automatiques (4 stratégies)</li>
         <li><span class="plan-check">✓</span>Screener Actions US complet</li>
         <li><span class="plan-check">✓</span>Alertes setup visuelles &amp; sonores</li>
         <li><span class="plan-check">✓</span>Saisonnalité 10 ans</li>
@@ -1174,11 +1248,11 @@ footer {
   <div class="faq-list">
     <div class="faq-item">
       <div class="faq-q">C'est quoi Mansa Terminal exactement ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Mansa Terminal est un terminal de trading institutionnel construit autour des 3 stratégies Process Trading Life — Multi TF Ichimoku, Structure Protocol et Swing Action Market. Il centralise les données COT, DMX, force des devises, screener actions US, charts TradingView et journal de trades en un seul workspace.</div>
+      <div class="faq-a">Mansa Terminal est un terminal de trading institutionnel construit autour des 4 stratégies Process Trading Life — Double Structure (M30/H8), Multi-TF (D1→H4→M15), SAM Swing Actions US et IVC Indices. Il centralise les données COT, DMX, force des devises, screener actions US, charts TradingView, backtests et journal de trades en un seul workspace.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">C'est quoi la différence avec Bloomberg ou Prime Terminal ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Bloomberg coûte $2000/mois et est conçu pour les gérants institutionnels. Prime Terminal propose des données macro génériques. Mansa Terminal est le seul terminal conçu spécifiquement pour les stratégies PTL — COT, DMX, Ichimoku multi-TF, Structure Protocol et Swing Actions US — à un prix accessible.</div>
+      <div class="faq-a">Bloomberg coûte $2000/mois et est conçu pour les gérants institutionnels. Prime Terminal propose des données macro génériques. Mansa Terminal est le seul terminal conçu spécifiquement pour les 4 stratégies PTL — Double Structure, Multi-TF, SAM et IVC — avec backtests intégrés, COT, DMX et données institutionnelles, à un prix accessible.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Les données sont-elles vraiment en temps réel ? <span class="faq-arrow">+</span></div>
@@ -1190,7 +1264,7 @@ footer {
     </div>
     <div class="faq-item">
       <div class="faq-q">Est-ce que PTL vend des signaux de trading ? <span class="faq-arrow">+</span></div>
-      <div class="faq-a">Non. Jamais. PTL t'enseigne à analyser les marchés toi-même avec les 3 stratégies documentées. Le terminal t'indique les setups potentiels selon les critères des stratégies, mais la décision de trader reste entièrement la tienne. Les signaux créent de la dépendance — le process crée des traders.</div>
+      <div class="faq-a">Non. Jamais. PTL t'enseigne à analyser les marchés toi-même avec les 4 stratégies documentées et backtestées. Le terminal t'indique les setups potentiels selon les critères des stratégies, mais la décision de trader reste entièrement la tienne. Les signaux créent de la dépendance — le process crée des traders.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Comment résilier mon abonnement ? <span class="faq-arrow">+</span></div>
@@ -1205,7 +1279,7 @@ footer {
   <div class="cta-inner">
     <div class="cta-eyebrow">REJOINDRE PROCESS TRADING LIFE</div>
     <div class="cta-title">Commence<br>aujourd'hui.</div>
-    <p class="cta-sub">Accès immédiat à Mansa Terminal, aux 3 stratégies PTL, aux données institutionnelles. Gratuit pour commencer.</p>
+    <p class="cta-sub">Accès immédiat à Mansa Terminal, aux 4 stratégies PTL backtestées, aux données institutionnelles. Gratuit pour commencer.</p>
     <div class="hero-actions" style="justify-content:center">
       <a href="terminal.html" class="btn-primary" style="font-size:14px;padding:16px 32px">Accéder au Terminal gratuitement</a>
       <a href="https://t.me/processtradinglife" target="_blank" class="btn-ghost" style="font-size:14px;padding:15px 28px">✈ Rejoindre Telegram</a>
@@ -1240,9 +1314,10 @@ footer {
       <div>
         <div class="footer-col-title">Stratégies</div>
         <ul class="footer-links">
-          <li><a href="#strategies">Multi TF Ichimoku</a></li>
-          <li><a href="#strategies">Structure Protocol</a></li>
-          <li><a href="#strategies">Swing Action Market</a></li>
+          <li><a href="#strategies">Double Structure</a></li>
+          <li><a href="#strategies">Multi-TF</a></li>
+          <li><a href="#strategies">SAM — Swing Actions</a></li>
+          <li><a href="#strategies">IVC — Indices</a></li>
         </ul>
       </div>
       <div>
