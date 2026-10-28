@@ -954,7 +954,15 @@ footer {
   <div class="strats-header">
     <div class="section-label">Les Méthodes PTL</div>
     <h2>4 stratégies.<br><span class="dim">Backtestées. Documentées.</span></h2>
-    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:560px;">Chaque stratégie est issue de backtests rigoureux sur plusieurs années, intégrée dans Mansa Terminal avec ses critères d'entrée précis. Un process institutionnel à chaque trade.</p>
+    <p style="font-size:14px;color:var(--muted);margin-top:12px;max-width:560px;">Chaque stratégie est issue de backtests algorithmiques sur 10 à 20 ans de données réelles, intégrée dans Mansa Terminal avec ses critères d'entrée précis. Un process institutionnel à chaque trade.</p>
+  </div>
+
+  <!-- BADGE ALGO -->
+  <div style="text-align:center;margin-bottom:18px">
+    <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(68,136,255,.1);border:1px solid rgba(68,136,255,.3);border-radius:20px;padding:6px 16px;font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.06em">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);display:inline-block;animation:pulse 1.5s infinite"></span>
+      BACKTESTÉ ALGORITHMIQUEMENT · DONNÉES RÉELLES 2006–2025
+    </span>
   </div>
 
   <!-- STATS BACKTEST BANNER -->
@@ -963,7 +971,7 @@ footer {
     <div class="bt-sep"></div>
     <div class="bt-stat"><span class="bt-val" style="color:var(--gold2)">2.0–2.5R</span><span class="bt-lbl">R/R moyen</span></div>
     <div class="bt-sep"></div>
-    <div class="bt-stat"><span class="bt-val" style="color:var(--blue)">3 ans+</span><span class="bt-lbl">Données backtest</span></div>
+    <div class="bt-stat"><span class="bt-val" style="color:var(--blue)">10 ans+</span><span class="bt-lbl">Données backtestées</span></div>
     <div class="bt-sep"></div>
     <div class="bt-stat"><span class="bt-val" style="color:var(--text)">4</span><span class="bt-lbl">Stratégies actives</span></div>
   </div>
@@ -1046,7 +1054,7 @@ footer {
       </div>
     </div>
   </div>
-  <p style="text-align:center;margin-top:28px;font-size:12px;color:var(--muted)">Résultats issus de backtests PTL sur données historiques 2021–2024. <a href="terminal.html" style="color:var(--gold);font-weight:600">Voir les backtests complets dans le terminal →</a></p>
+  <p style="text-align:center;margin-top:28px;font-size:12px;color:var(--muted)">Résultats issus de backtests algorithmiques PTL sur données historiques 2006–2025 (IVC : 20 ans). <a href="terminal.html" style="color:var(--gold);font-weight:600">Lancer le backtest dans le terminal →</a></p>
 </section>
 
 <!-- ═══ MARCHÉS ══════════════════════════════════════════════════════ -->
@@ -1159,7 +1167,7 @@ footer {
     </div>
     <div class="review">
       <div class="review-stars">★★★★★</div>
-      <p class="review-text">"J'utilise le backtest PTL Multi-TF chaque semaine pour valider mes setups. Les résultats sur 3 ans m'ont convaincu de rester discipliné sur la méthode. Outil indispensable."</p>
+      <p class="review-text">"J'utilise le backtest PTL Multi-TF chaque semaine pour valider mes setups. Les résultats sur 10 ans m'ont convaincu de rester discipliné sur la méthode. Outil indispensable."</p>
       <div class="review-author">Lucas D.</div>
       <div class="review-meta">Swing Trader · Toulouse</div>
     </div>
@@ -1425,11 +1433,12 @@ new IntersectionObserver(function(entries) {
     var el = document.getElementById('proof-membres');
     if (!el) return;
     var n = 0, target = 1247;
+    var step = Math.ceil(target / 60);
     var t = setInterval(function() {
-      n += 31;
+      n += step;
       if (n >= target) { n = target; clearInterval(t); }
       el.textContent = n.toLocaleString('fr-FR');
-    }, 30);
+    }, 25);
   }
 }, { threshold: 0.5 }).observe(document.getElementById('hero'));
 
