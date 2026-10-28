@@ -752,7 +752,7 @@ body{padding-top:22px;}
     <span class="tb-brand-crown">👑</span>
     <div>
       <span class="tb-brand-name">MANSA</span><span class="tb-brand-ver">PTL v4</span>
-      <div style="font-size:7px;color:var(--dim);letter-spacing:.06em;margin-top:1px">TERMINAL DE TRADING</div>
+      <div style="font-size:7px;color:var(--dim);letter-spacing:.06em;margin-top:1px">TERMINAL DE TRADING &nbsp;<span id="live-price-indicator" style="color:var(--dim);font-weight:700">● STATIC</span></div>
     </div>
   </div>
   <!-- TICKER SCROLL -->
@@ -10040,6 +10040,59 @@ renderScreener();
 renderSetups();
 nav('wei');
 addPanelTips();
+
+/* ── LIVE PRICES via Alpha Vantage ── */
+var _livePriceCache={};
+var _liveLastFetch=0;
+var _LIVE_PAIRS=[
+  {p:'EUR/USD',from:'EUR',to:'USD'},
+  {p:'GBP/USD',from:'GBP',to:'USD'},
+  {p:'USD/JPY',from:'USD',to:'JPY'},
+  {p:'XAU/USD',from:'XAU',to:'USD'},
+  {p:'AUD/USD',from:'AUD',to:'USD'},
+  {p:'USD/CHF',from:'USD',to:'CHF'},
+  {p:'NZD/USD',from:'NZD',to:'USD'},
+  {p:'USD/CAD',from:'USD',to:'CAD'},
+];
+function fetchLivePrices(){
+  var now=Date.now();
+  /* Alpha Vantage free = 25 calls/day — refresh toutes les 2h max */
+  if(now-_liveLastFetch<7200000)return;
+  _liveLastFetch=now;
+  var indicator=document.getElementById('live-price-indicator');
+  if(indicator)indicator.style.color='var(--gold)';
+  var done=0;
+  _LIVE_PAIRS.forEach(function(pair){
+    fetch('/api/alphavantage?function=CURRENCY_EXCHANGE_RATE&from_symbol='+pair.from+'&to_symbol='+pair.to)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var info=data['Realtime Currency Exchange Rate'];
+      if(info){
+        var bid=parseFloat(info['8. Bid Price'])||parseFloat(info['5. Exchange Rate'])||0;
+        var ask=parseFloat(info['9. Ask Price'])||bid+0.0002;
+        if(bid>0){
+          _livePriceCache[pair.p]={b:bid.toFixed(pair.p==='USD/JPY'?3:4),a:ask.toFixed(pair.p==='USD/JPY'?3:4)};
+          var fx=FX.find(function(f){return f.p===pair.p;});
+          if(fx){
+            fx.b=_livePriceCache[pair.p].b;
+            fx.a=_livePriceCache[pair.p].a;
+          }
+        }
+      }
+      done++;
+      if(done===_LIVE_PAIRS.length){
+        if(indicator){indicator.textContent='● LIVE';indicator.style.color='var(--green)';}
+        /* Refresh l'onglet actif si c'est marchés ou heatmap */
+        if(CURRENT_TAB==='wei')renderWei&&renderWei();
+        if(CURRENT_TAB==='heatmap')renderHeatmap();
+      }
+    }).catch(function(){done++;});
+  });
+}
+/* Lancer au démarrage avec délai pour ne pas bloquer le rendu */
+setTimeout(fetchLivePrices, 2000);
+/* Refresh auto toutes les 2h */
+setInterval(fetchLivePrices, 7200000);
 </script>
 
 <!-- ═══════════════════════════════════════════════════
