@@ -143,12 +143,19 @@ nav {
   position: relative; z-index: 2; max-width: 900px; margin: 0 auto; text-align: center;
 }
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 16px; border-radius: 20px; margin-bottom: 32px;
-  background: rgba(0,204,122,.08); border: 1px solid rgba(0,204,122,.2);
-  font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: .08em;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 22px; border-radius: 30px; margin-bottom: 32px;
+  background: rgba(0,204,122,.06);
+  border: 1px solid rgba(0,204,122,.25);
+  box-shadow: 0 0 20px rgba(0,204,122,.08);
+  font-size: 11px; font-weight: 700; color: var(--green);
+  letter-spacing: .14em; text-transform: uppercase;
 }
-.hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.2s infinite; }
+.hero-eyebrow-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  animation: pulse 1.2s infinite;
+  box-shadow: 0 0 8px var(--green);
+}
 h1 {
   font-family: var(--display); font-size: clamp(52px,8vw,96px); line-height: .95;
   letter-spacing: .02em; margin-bottom: 24px; color: var(--text);
@@ -646,7 +653,7 @@ footer {
     <a href="#strategies" class="nav-a">Stratégies</a>
     <a href="#pricing" class="nav-a">Accès</a>
     <a href="terminal.html?auth=login" class="nav-cta">Connexion</a>
-    <a href="terminal.html" class="nav-cta-main">Accéder au Terminal</a>
+    <a href="terminal.html" class="nav-cta-main">S'inscrire</a>
   </div>
 </nav>
 
@@ -658,7 +665,7 @@ footer {
   <div class="hero-inner">
     <div class="hero-eyebrow">
       <div class="hero-eyebrow-dot"></div>
-      Terminal live · Forex &amp; Actions US
+      Terminal live
     </div>
     <h1>L'analyse<br>institutionnelle,<br><em>prête en 3 min.</em></h1>
     <p class="hero-sub">
@@ -671,7 +678,7 @@ footer {
     <div class="hero-proof">
       <div class="proof-item">
         <div>
-          <div class="proof-num" id="proof-membres">1 247</div>
+          <div class="proof-num" id="proof-membres">587</div>
           <div style="font-size:10px;color:var(--muted)">traders actifs</div>
         </div>
       </div>
@@ -1432,7 +1439,7 @@ new IntersectionObserver(function(entries) {
     counted = true;
     var el = document.getElementById('proof-membres');
     if (!el) return;
-    var n = 0, target = 1247;
+    var n = 0, target = 587;
     var step = Math.ceil(target / 60);
     var t = setInterval(function() {
       n += step;
