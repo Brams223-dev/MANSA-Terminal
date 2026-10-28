@@ -990,19 +990,26 @@ body{padding-top:22px;}
 
 <div class="panel" id="p-crypto">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🪙</span><div><div class="p-title-text">CRYPTO — MARCHÉS NUMÉRIQUES</div><div class="p-title-sub">Top 10 · Prix · Cap · Volume</div></div></div>
-    <span class="badge badge-live">LIVE</span>
+    <div class="p-title-left"><span class="p-title-icon">🪙</span><div>
+      <div class="p-title-text">CRYPTO — MARCHÉS NUMÉRIQUES</div>
+      <div class="p-title-sub">Top 10 · Prix Live · Cap Market · Volume · Fear &amp; Greed · Corrélation Forex</div>
+    </div></div>
+    <div class="p-title-right" style="display:flex;align-items:center;gap:10px">
+      <span id="crypto-last-update" style="font-size:8px;color:var(--dim)">—</span>
+      <span class="badge badge-live">LIVE</span>
+    </div>
   </div>
   <div class="stat-row" id="crypto-stats"></div>
+  <div id="crypto-table"></div>
   <!-- TradingView Crypto Market Widget -->
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
+  <div style="margin-top:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
+    <div style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:.08em;padding:10px 12px 0">📊 CRYPTO MARKET SCREENER</div>
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-      {"width":"100%","height":490,"defaultColumn":"overview","screener_type":"crypto_mkt","displayCurrency":"USD","colorTheme":"dark","locale":"fr","isTransparent":true}</script>
+      {"width":"100%","height":400,"defaultColumn":"overview","screener_type":"crypto_mkt","displayCurrency":"USD","colorTheme":"dark","locale":"fr","isTransparent":true}</script>
     </div>
   </div>
-  <div id="crypto-table"></div>
 </div>
 
 <!-- Focus Forex & Actions US/EU - International -->
@@ -3102,10 +3109,20 @@ function renderCrypto(){
     +'</div>'
     +'</div>';
 
-  /* ── BLOC 2 : Niveaux HTF BTC + ETH ── */
+  /* ── BLOC 2 : Niveaux HTF BTC + ETH (prix live si disponibles) ── */
+  var btcPx = window._btcLive || 0;
+  var ethPx = window._ethLive || 0;
+  var btcFmt = btcPx > 0 ? '$'+btcPx.toLocaleString('fr-FR',{maximumFractionDigits:0}) : (CRYPTO[0]?'$'+CRYPTO[0].p:'—');
+  var ethFmt = ethPx > 0 ? '$'+ethPx.toLocaleString('fr-FR',{maximumFractionDigits:0}) : (CRYPTO[1]?'$'+CRYPTO[1].p:'—');
+  var btcSup = btcPx > 0 ? '$'+Math.round(btcPx*0.95).toLocaleString('fr-FR') : '$65 000';
+  var btcRes = btcPx > 0 ? '$'+Math.round(btcPx*1.055).toLocaleString('fr-FR') : '$72 000';
+  var ethSup = ethPx > 0 ? '$'+Math.round(ethPx*0.92).toLocaleString('fr-FR') : '$2 400';
+  var ethRes = ethPx > 0 ? '$'+Math.round(ethPx*1.07).toLocaleString('fr-FR') : '$2 800';
+  var btcBias = btcPx > 0 ? (CRYPTO[0] && CRYPTO[0].d > 0 ? 'HAUSSIER' : 'BAISSIER') : 'HAUSSIER';
+  var ethBias = ethPx > 0 ? (CRYPTO[1] && CRYPTO[1].d > 0 ? 'HAUSSIER' : 'NEUTRE') : 'NEUTRE';
   var htf='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
-  [{s:'BTC',p:'68 420',sup:'65 000',res:'72 000',bias:'HAUSSIER',col:'var(--green)'},
-   {s:'ETH',p:'2 620',sup:'2 400',res:'2 800',bias:'NEUTRE',col:'var(--gold)'}].forEach(function(d){
+  [{s:'BTC',p:btcFmt,sup:btcSup,res:btcRes,bias:btcBias,col:btcBias==='HAUSSIER'?'var(--green)':'#e05252'},
+   {s:'ETH',p:ethFmt,sup:ethSup,res:ethRes,bias:ethBias,col:ethBias==='HAUSSIER'?'var(--green)':'var(--gold)'}].forEach(function(d){
     htf+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
       +'<span style="font-size:13px;font-weight:800;color:var(--text)">'+d.s+'</span>'
@@ -10751,24 +10768,43 @@ function fetchCoinGeckoLive() {
 }
 
 function updateCryptoFromCG(data) {
-  var map = {
-    'BTC/USD': data.bitcoin, 'ETH/USD': data.ethereum, 'SOL/USD': data.solana,
-    'BNB/USD': data.bnb, 'XRP/USD': data.ripple, 'ADA/USD': data.cardano,
-    'AVAX/USD': data['avalanche-2'], 'DOT/USD': data.polkadot,
-    'LINK/USD': data.chainlink, 'UNI/USD': data.uniswap
+  // Map CoinGecko IDs → symboles CRYPTO[]
+  var cgMap = {
+    'BTC': data.bitcoin, 'ETH': data.ethereum, 'SOL': data.solana,
+    'BNB': data.bnb, 'XRP': data.ripple, 'ADA': data.cardano,
+    'AVAX': data['avalanche-2'], 'DOT': data.polkadot,
+    'LINK': data.chainlink, 'UNI': data.uniswap
   };
-  // Mettre à jour CRYPTO_DATA si disponible
-  if(typeof CRYPTO_DATA !== 'undefined') {
-    CRYPTO_DATA.forEach(function(c) {
-      var live = map[c.sym];
+  // Met à jour le tableau CRYPTO[] (variable réelle)
+  if(typeof CRYPTO !== 'undefined') {
+    CRYPTO.forEach(function(c) {
+      var live = cgMap[c.s];
       if(live && live.usd) {
-        c.price = live.usd;
-        c.chg24 = (live.usd_24h_change || 0).toFixed(2);
-        c.mcap = live.usd_market_cap ? (live.usd_market_cap/1e9).toFixed(1)+'B' : c.mcap;
-        c.vol24 = live.usd_24h_vol ? (live.usd_24h_vol/1e9).toFixed(2)+'B' : c.vol24;
+        // Prix formaté avec espaces pour lisibilité
+        var px = live.usd;
+        c.p = px >= 1000 ? px.toLocaleString('fr-FR',{maximumFractionDigits:0})
+              : px >= 1 ? px.toFixed(2)
+              : px.toFixed(4);
+        c.d = parseFloat((live.usd_24h_change || 0).toFixed(2));
+        if(live.usd_market_cap) c.cap = '$'+(live.usd_market_cap/1e9).toFixed(1)+'B';
+        if(live.usd_24h_vol)    c.vol = '$'+(live.usd_24h_vol/1e9).toFixed(2)+'B';
       }
     });
     if(typeof renderCrypto === 'function') renderCrypto();
+  }
+
+  // Met aussi à jour les niveaux HTF dynamiquement dans renderCrypto
+  if(data.bitcoin && data.bitcoin.usd) {
+    window._btcLive = data.bitcoin.usd;
+  }
+  if(data.ethereum && data.ethereum.usd) {
+    window._ethLive = data.ethereum.usd;
+  }
+  // Timestamp dernière mise à jour
+  var upEl = document.getElementById('crypto-last-update');
+  if(upEl) {
+    var now = new Date();
+    upEl.textContent = 'Mise à jour ' + now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   }
 }
 
