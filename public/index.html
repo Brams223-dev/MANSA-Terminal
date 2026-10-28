@@ -682,65 +682,95 @@ section { padding: 96px 5%; }
 #pricing { }
 #pricing .section-header { text-align: center; }
 #pricing .section-sub { margin: 0 auto; }
+.pricing-headline {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.pricing-headline h3 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.pricing-headline .ph-sub {
+  font-family: var(--serif);
+  font-size: clamp(22px, 3vw, 34px);
+  color: var(--muted);
+  font-style: italic;
+}
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(3,1fr);
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  overflow: hidden;
-  max-width: 860px;
+  gap: 12px;
+  max-width: 940px;
   margin: 0 auto;
 }
 .plan {
   background: var(--surface);
-  padding: 36px 28px;
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 28px 24px 24px;
   display: flex;
   flex-direction: column;
   position: relative;
 }
 .plan-featured {
   background: var(--surface2);
-  border: none;
+  border-color: var(--gold);
 }
 .plan-badge {
   position: absolute;
-  top: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 9px;
+  top: -13px;
+  right: 20px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   color: var(--black);
   background: var(--gold);
-  padding: 4px 14px;
-  border-radius: 0 0 6px 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
 }
-.plan-name { font-size: 10px; font-weight: 700; letter-spacing: .12em; color: var(--muted); margin-bottom: 16px; margin-top: 10px; }
+.plan-badge-green {
+  position: absolute;
+  top: -13px;
+  right: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: #fff;
+  background: var(--green);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.plan-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.plan-tagline { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
 .plan-price {
-  font-family: var(--serif);
-  font-size: 52px;
+  font-size: 56px;
+  font-weight: 700;
   line-height: 1;
   color: var(--text);
   margin-bottom: 2px;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
 }
-.plan-price sup { font-size: 22px; vertical-align: top; margin-top: 8px; font-family: var(--sans); }
-.plan-period { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.plan-billed { font-size: 10px; color: var(--faint); margin-bottom: 24px; }
-.plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 24px; }
-.plan-features li { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
-.plan-check { color: var(--green); flex-shrink: 0; font-size: 12px; }
+.plan-price sup { font-size: 24px; font-weight: 700; margin-top: 8px; }
+.plan-price .plan-mo { font-size: 18px; font-weight: 400; color: var(--muted); align-self: flex-end; margin-bottom: 4px; }
+.plan-billed { font-size: 11px; color: var(--muted); margin-bottom: 24px; }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 11px; flex: 1; margin-bottom: 24px; }
+.plan-features li { font-size: 13px; color: var(--muted); display: flex; gap: 9px; align-items: flex-start; line-height: 1.4; }
+.plan-check { color: var(--gold); flex-shrink: 0; font-size: 13px; }
+.plan-check-green { color: var(--green); flex-shrink: 0; font-size: 13px; }
 .plan-check-x { color: var(--faint); flex-shrink: 0; }
 .btn-plan {
   display: block;
   text-align: center;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 13px;
-  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 8px;
   transition: all .2s;
-  letter-spacing: .02em;
 }
 .btn-plan-main {
   background: var(--gold);
@@ -749,9 +779,10 @@ section { padding: 96px 5%; }
 .btn-plan-main:hover { background: var(--gold2); }
 .btn-plan-ghost {
   border: 1px solid var(--border2);
-  color: var(--muted);
+  color: var(--text);
+  background: transparent;
 }
-.btn-plan-ghost:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
+.btn-plan-ghost:hover { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.04); }
 .plan-note {
   text-align: center;
   margin-top: 20px;
@@ -1460,61 +1491,75 @@ footer {
 <section id="pricing">
   <div class="section-header center">
     <div class="section-eyebrow">Accès</div>
-    <h2 class="section-h2">Commence maintenant.<br><span class="dim">Choisis ton accès.</span></h2>
-    <p class="section-sub">Le terminal de base est gratuit. Les plans payants débloquent les données institutionnelles avancées.</p>
+  </div>
+  <div class="pricing-headline">
+    <h3>Commence chaque journée de trading préparé.</h3>
+    <div class="ph-sub">Le terminal complet est inclus dans chaque plan.</div>
   </div>
   <div class="pricing-grid">
+    <!-- MENSUEL -->
     <div class="plan">
-      <div class="plan-name">GRATUIT</div>
-      <div class="plan-price"><sup>€</sup>0</div>
-      <div class="plan-period">pour toujours</div>
-      <div class="plan-billed">Sans carte bancaire</div>
+      <div class="plan-name">Mensuel</div>
+      <div class="plan-tagline">Accès flexible</div>
+      <div class="plan-price"><sup>€</sup>49<span class="plan-mo">/mois</span></div>
+      <div class="plan-billed">Facturation mensuelle</div>
       <ul class="plan-features">
-        <li><span class="plan-check">✓</span>Mansa Terminal — accès complet</li>
-        <li><span class="plan-check">✓</span>Charts TradingView intégrés</li>
-        <li><span class="plan-check">✓</span>Sessions Forex live</li>
-        <li><span class="plan-check">✓</span>Calendrier économique</li>
-        <li><span class="plan-check">✓</span>Journal de trades (10 trades)</li>
-        <li><span class="plan-check-x">○</span><span style="color:var(--faint)">COT &amp; DMX avancés</span></li>
-        <li><span class="plan-check-x">○</span><span style="color:var(--faint)">Setups PTL automatiques</span></li>
-        <li><span class="plan-check-x">○</span><span style="color:var(--faint)">Screener Actions US</span></li>
-      </ul>
-      <a href="terminal.html?auth=signup" class="btn-plan btn-plan-ghost">Créer un compte gratuit</a>
-    </div>
-    <div class="plan plan-featured">
-      <div class="plan-badge">RECOMMANDÉ</div>
-      <div class="plan-name">PRO</div>
-      <div class="plan-price"><sup>€</sup>49</div>
-      <div class="plan-period">par mois</div>
-      <div class="plan-billed">Résiliable à tout moment</div>
-      <ul class="plan-features">
-        <li><span class="plan-check">✓</span>Tout ce qui est dans Gratuit</li>
-        <li><span class="plan-check">✓</span>COT — Positions institutionnelles</li>
-        <li><span class="plan-check">✓</span>DMX Retail — Sentiment retail live</li>
+        <li><span class="plan-check">✓</span>Tous les outils, tous les marchés</li>
+        <li><span class="plan-check">✓</span>COT &amp; DMX — smart money vs retail</li>
         <li><span class="plan-check">✓</span>Setups PTL automatiques (4 stratégies)</li>
         <li><span class="plan-check">✓</span>Screener Actions US complet</li>
-        <li><span class="plan-check">✓</span>Alertes setup visuelles &amp; sonores</li>
+        <li><span class="plan-check">✓</span>Force Devises — 8 devises majeures</li>
         <li><span class="plan-check">✓</span>Saisonnalité 10 ans</li>
+        <li><span class="plan-check">✓</span>Alertes setup visuelles &amp; sonores</li>
         <li><span class="plan-check">✓</span>Journal illimité + statistiques</li>
-      </ul>
-      <a href="terminal.html?auth=signup&plan=pro" class="btn-plan btn-plan-main">Commencer avec Pro</a>
-    </div>
-    <div class="plan">
-      <div class="plan-name">ELITE</div>
-      <div class="plan-price"><sup>€</sup>97</div>
-      <div class="plan-period">par mois</div>
-      <div class="plan-billed">Accès prioritaire aux nouvelles features</div>
-      <ul class="plan-features">
-        <li><span class="plan-check">✓</span>Tout ce qui est dans Pro</li>
-        <li><span class="plan-check">✓</span>Smart Money &amp; Dark Pool</li>
-        <li><span class="plan-check">✓</span>Force Devises avancée (8 paires)</li>
         <li><span class="plan-check">✓</span>Accès Discord Privé PTL</li>
-        <li><span class="plan-check">✓</span>Analyse COT avancée (6 mois)</li>
+        <li><span class="plan-check">✓</span>Sans engagement, résiliable à tout moment</li>
+      </ul>
+      <a href="terminal.html?auth=signup&plan=mensuel" class="btn-plan btn-plan-ghost">Accès mensuel</a>
+    </div>
+    <!-- 12 MOIS -->
+    <div class="plan plan-featured">
+      <div class="plan-badge">Le plus choisi</div>
+      <div class="plan-name">12 mois</div>
+      <div class="plan-tagline">Pour les traders actifs</div>
+      <div class="plan-price"><sup>€</sup>39<span class="plan-mo">/mois</span></div>
+      <div class="plan-billed">468 € facturés une fois par an</div>
+      <ul class="plan-features">
+        <li><span class="plan-check">✓</span>Tous les outils, tous les marchés</li>
+        <li><span class="plan-check">✓</span>COT &amp; DMX — smart money vs retail</li>
+        <li><span class="plan-check">✓</span>Setups PTL automatiques (4 stratégies)</li>
+        <li><span class="plan-check">✓</span>Screener Actions US complet</li>
+        <li><span class="plan-check">✓</span>Force Devises — 8 devises majeures</li>
+        <li><span class="plan-check">✓</span>Saisonnalité 10 ans</li>
+        <li><span class="plan-check">✓</span>Alertes setup visuelles &amp; sonores</li>
+        <li><span class="plan-check">✓</span>Journal illimité + statistiques</li>
+        <li><span class="plan-check">✓</span>Accès Discord Privé PTL</li>
+        <li><span class="plan-check">✓</span>Économise 120 € par an</li>
+        <li><span class="plan-check">✓</span>Offres membres exclusives</li>
+      </ul>
+      <a href="terminal.html?auth=signup&plan=annuel" class="btn-plan btn-plan-main">Accès 12 mois</a>
+    </div>
+    <!-- 24 MOIS -->
+    <div class="plan">
+      <div class="plan-badge-green">Meilleure valeur</div>
+      <div class="plan-name">24 mois</div>
+      <div class="plan-tagline">Pour les traders professionnels</div>
+      <div class="plan-price"><sup>€</sup>29<span class="plan-mo">/mois</span></div>
+      <div class="plan-billed">696 € facturés tous les 2 ans</div>
+      <ul class="plan-features">
+        <li><span class="plan-check">✓</span>Tous les outils, tous les marchés</li>
+        <li><span class="plan-check">✓</span>COT &amp; DMX — smart money vs retail</li>
+        <li><span class="plan-check">✓</span>Setups PTL automatiques (4 stratégies)</li>
+        <li><span class="plan-check">✓</span>Screener Actions US complet</li>
+        <li><span class="plan-check">✓</span>Force Devises — 8 devises majeures</li>
+        <li><span class="plan-check">✓</span>Saisonnalité 10 ans</li>
+        <li><span class="plan-check">✓</span>Smart Money &amp; Dark Pool</li>
         <li><span class="plan-check">✓</span>Support prioritaire</li>
         <li><span class="plan-check">✓</span>Early access nouvelles fonctions</li>
         <li><span class="plan-check">✓</span>Sessions live avec Ghost (1x/mois)</li>
+        <li><span class="plan-check">✓</span>Offres membres exclusives</li>
       </ul>
-      <a href="terminal.html?auth=signup&plan=elite" class="btn-plan btn-plan-ghost">Accès Elite</a>
+      <a href="terminal.html?auth=signup&plan=biennal" class="btn-plan btn-plan-ghost">Accès 24 mois</a>
     </div>
   </div>
   <p class="plan-note">Déjà membre ? <a href="terminal.html?auth=login">Se connecter au terminal →</a></p>
