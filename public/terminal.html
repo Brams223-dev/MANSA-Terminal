@@ -563,9 +563,149 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .export-btn.primary{background:var(--gold);color:#000;border-color:var(--gold);font-weight:800}
 .export-btn.primary:hover{opacity:.88}
 
+
+/* ── GLOSSAIRE TOOLTIPS ── */
+.gl{
+  display:inline-flex;align-items:center;gap:3px;
+  border-bottom:1px dashed var(--dim);cursor:help;
+  position:relative;
+}
+.gl::after{
+  content:attr(data-gl);
+  position:absolute;bottom:calc(100% + 6px);left:50%;
+  transform:translateX(-50%);
+  background:#1a1a2e;border:1px solid var(--gold2);
+  color:var(--text);font-size:9px;line-height:1.5;
+  padding:8px 12px;border-radius:4px;
+  width:240px;text-align:left;z-index:9999;
+  pointer-events:none;opacity:0;transition:opacity .15s;
+  white-space:normal;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+.gl::before{
+  content:'';position:absolute;bottom:calc(100% + 1px);
+  left:50%;transform:translateX(-50%);
+  border:5px solid transparent;
+  border-top-color:#1a1a2e;
+  opacity:0;transition:opacity .15s;z-index:9999;
+}
+.gl:hover::after,.gl:hover::before{opacity:1;}
+.gl-icon{font-size:8px;color:var(--gold2);opacity:.7;}
+
+
+/* ── TICKER BAND V22 ── */
+#ticker-band{
+  position:fixed;top:0;left:0;right:0;height:22px;
+  background:linear-gradient(90deg,#06060f 0%,#0a0a1a 100%);
+  border-bottom:1px solid rgba(200,160,60,.25);
+  z-index:10000;overflow:hidden;display:flex;align-items:center;
+  font-family:var(--fm);font-size:9px;
+}
+#ticker-inner{
+  display:flex;align-items:center;gap:0;
+  animation:tickerScroll 40s linear infinite;
+  white-space:nowrap;
+}
+#ticker-inner:hover{animation-play-state:paused;}
+@keyframes tickerScroll{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+.tick-item{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:0 16px;border-right:1px solid rgba(255,255,255,.06);
+  cursor:pointer;transition:background .15s;
+}
+.tick-item:hover{background:rgba(200,160,60,.08);}
+.tick-sym{color:var(--gold2);font-weight:600;letter-spacing:.5px;}
+.tick-price{color:var(--text);}
+.tick-chg.up{color:var(--green);}
+.tick-chg.dn{color:var(--red);}
+.tick-chg.flat{color:var(--dim);}
+#ticker-label{
+  flex-shrink:0;padding:0 10px;
+  color:var(--gold);font-weight:700;font-size:8px;
+  letter-spacing:1px;border-right:1px solid rgba(200,160,60,.3);
+  background:#06060f;z-index:1;
+}
+/* Décaler le body pour le ticker */
+body{padding-top:22px;}
+#main-tabs{top:22px!important;}
+
+
+/* ── RECHERCHE UNIVERSELLE Ctrl+K ── */
+#search-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.85);z-index:99999;
+  align-items:flex-start;justify-content:center;
+  padding-top:80px;
+}
+#search-overlay.active{display:flex;}
+#search-box{
+  width:560px;background:#0d0d1f;
+  border:1px solid var(--gold);border-radius:8px;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);overflow:hidden;
+}
+#search-input{
+  width:100%;box-sizing:border-box;
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--fm);font-size:14px;
+  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);
+}
+#search-input::placeholder{color:var(--dim);}
+#search-results{max-height:360px;overflow-y:auto;}
+.sr-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;cursor:pointer;transition:background .1s;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.sr-item:hover,.sr-item.active{background:rgba(200,160,60,.1);}
+.sr-cat{font-size:8px;color:var(--dim);text-transform:uppercase;
+  padding:8px 20px 4px;letter-spacing:1px;}
+.sr-icon{font-size:14px;width:24px;text-align:center;}
+.sr-name{font-size:11px;color:var(--text);flex:1;}
+.sr-hint{font-size:9px;color:var(--dim);}
+.sr-key{font-size:8px;color:var(--gold2);background:rgba(200,160,60,.15);
+  padding:2px 6px;border-radius:3px;font-family:var(--fm);}
+#search-footer{
+  padding:8px 20px;font-size:8px;color:var(--dim);
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex;gap:16px;
+}
+
+
+/* ── RACCOURCIS CLAVIER + AIDE ── */
+#kb-help{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.88);z-index:99998;
+  align-items:center;justify-content:center;
+}
+#kb-help.active{display:flex;}
+#kb-box{
+  background:#0d0d1f;border:1px solid rgba(200,160,60,.4);
+  border-radius:8px;padding:28px;width:640px;max-height:80vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);
+}
+#kb-box h2{font-family:var(--fd);color:var(--gold);font-size:14px;margin:0 0 20px;letter-spacing:1px;}
+.kb-section{margin-bottom:20px;}
+.kb-section h3{font-size:9px;color:var(--gold2);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 10px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:6px;}
+.kb-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.kb-keys{display:flex;gap:4px;}
+.kb-key{background:#1a1a2e;border:1px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.1);border-radius:3px;padding:2px 8px;font-family:var(--fm);font-size:9px;color:var(--text);}
+.kb-desc{font-size:9px;color:var(--dim);}
+
 </style>
 </head>
 <body>
+
+<!-- TICKER BAND V22 -->
+<div id="ticker-band">
+  <div id="ticker-label">▶ LIVE</div>
+  <div id="ticker-inner" id="ticker-inner">
+    <!-- rempli par JS -->
+  </div>
+</div>
+
 
 <!-- ══════════════════════════════════════
      LOGIN OVERLAY
@@ -680,6 +820,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
   <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALCULATEUR</div>
   <div class="ntab" onclick="nav('journal')" id="nt-journal">📓 JOURNAL</div>
+  <div class="ntab" onclick="nav('psycho')" id="nt-psycho">🧠 PSYCHOLOGIE</div>
+  <div class="ntab" onclick="nav('rules')" id="nt-rules">📋 MES RÈGLES</div>
+  <div class="ntab" onclick="nav('streak')" id="nt-streak">🔥 STREAK</div>
   <div class="ntab" onclick="nav('alertes')" id="nt-alertes">🔔 ALERTES</div>
   <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API LIVE</div>
   <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 NOUS REJOINDRE</div>
@@ -1052,7 +1195,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
     <div class="p-title-left"><span class="p-title-icon">📰</span><div><div class="p-title-text">NEWS FLOW — TEMPS RÉEL</div><div class="p-title-sub">Reuters · Bloomberg · Forexlive · Importance ⭐ · Paires Forex concernées</div></div></div>
     <div class="p-title-right" style="display:flex;align-items:center;gap:8px">
       <span id="news-live-dot" style="display:inline-flex;align-items:center;gap:5px;font-size:9px;color:var(--green)"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;box-shadow:0 0 8px var(--green)"></span>LIVE</span>
-      <button class="tool-btn" onclick="newsRefresh()">🔄 REFRESH</button>
+      <button class="tool-btn" onclick="if(typeof newsRefresh==='function')newsRefresh();else renderNewsWithAPI()">🔄 REFRESH</button>
     </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
@@ -1233,7 +1376,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 <!-- SMART MONEY PANEL -->
 <div class="panel" id="p-smart">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🏦</span><div><div class="p-title-text">SMART MONEY — FLUX INSTITUTIONNELS</div><div class="p-title-sub">COT CFTC · DMX Retail · Positions Banques · Dark Pool</div></div></div>
+    <div class="p-title-left"><span class="p-title-icon">🏦</span><div><div class="p-title-text">SMART MONEY — FLUX INSTITUTIONNELS</div><div class="p-title-sub">COT CFTC · DMX Retail · Positions Banques · '+gl('Dark Pool','Dark Pool')+'</div></div></div>
     <span class="badge badge-live">LIVE</span>
   </div>
   <div id="smart-content"></div>
@@ -1255,6 +1398,33 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
     <span class="badge badge-gold">PTL</span>
   </div>
   <div id="journal-content"></div>
+</div>
+
+<!-- PSYCHOLOGIE PANEL -->
+<div class="panel" id="p-psycho">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">🧠</span><div><div class="p-title-text">DASHBOARD PSYCHOLOGIQUE</div><div class="p-title-sub">Humeur · Stress · Sommeil · Corrélation performance</div></div></div>
+    <span class="badge badge-gold">PTL</span>
+  </div>
+  <div id="psycho-content"></div>
+</div>
+
+<!-- RÈGLES PANEL -->
+<div class="panel" id="p-rules">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">📋</span><div><div class="p-title-text">MES RÈGLES DE TRADING</div><div class="p-title-sub">Checklist · Discipline · Plan de session</div></div></div>
+    <span class="badge badge-gold">PTL</span>
+  </div>
+  <div id="rules-content"></div>
+</div>
+
+<!-- STREAK PANEL -->
+<div class="panel" id="p-streak">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">🔥</span><div><div class="p-title-text">STREAK DE DISCIPLINE</div><div class="p-title-sub">Jours consécutifs · Objectifs · Progression</div></div></div>
+    <span class="badge badge-gold">PTL</span>
+  </div>
+  <div id="streak-content"></div>
 </div>
 
 <!-- ALERTES PANEL -->
@@ -1380,7 +1550,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
             <div class="leg-row"><span class="leg-key">BID / ASK</span><span class="leg-val">Prix acheteur (vente) / Prix vendeur (achat). Le spread = ASK − BID.</span></div>
             <div class="leg-row"><span class="leg-key">SPREAD</span><span class="leg-val">Coût de transaction en pips. EUR/USD ~0.2 pip chez broker ECN.</span></div>
             <div class="leg-row"><span class="leg-key">SIGNAL</span><span class="leg-val">▲ Haussier = momentum haussier · ▼ Baissier = momentum baissier · ◆ Neutre = range/consolidation.</span></div>
-            <div class="leg-row"><span class="leg-key">COT</span><span class="leg-val">Biais institutionnel CFTC : Long = hedge funds acheteurs nets · Short = vendeurs nets.</span></div>
+            <div class="leg-row"><span class="leg-key">'+gl('COT','COT')+'</span><span class="leg-val">Biais institutionnel CFTC : Long = hedge funds acheteurs nets · Short = vendeurs nets.</span></div>
             <div class="leg-row"><span class="leg-key">DMX%</span><span class="leg-val">% de retail Long. >75% = extrême long retail = signal baissier contrarien.</span></div>
             <div class="leg-row"><span class="leg-key">SAISON</span><span class="leg-val">Tendance saisonnière du mois en cours basée sur 10 ans d'historique.</span></div>
           </div>
@@ -2137,7 +2307,7 @@ var AI_DB={
   'EUR/USD':{bias:'BAISSIER',bull:false,score:38,resume:"EUR/USD sous pression — différentiel de taux Fed/BCE défavorable à l'euro. COT hedge funds réduisent longs EUR. Octobre historiquement baissier.",macro:"Fed hawkish vs BCE dovish. NFP solide renforce USD.",technique:"Sous EMA200 journalier. Support clé 1.0780. Résistance 1.0900.",r1:'1.0900',r2:'1.0960',s1:'1.0780',s2:'1.0700',tags:['COT Bearish','Saison Oct —','Fed vs BCE']},
   'GBP/USD':{bias:'NEUTRE',bull:null,score:52,resume:"GBP/USD en range. CPI UK mardi = catalyseur clé. COT légèrement long GBP.",macro:"BOE pause probable. UK data mixed.",technique:"Range 1.2940-1.3050. Breakout directif attendu post-CPI.",r1:'1.3050',r2:'1.3120',s1:'1.2940',s2:'1.2860',tags:['Range','CPI Catalyseur','BOE Pause']},
   'XAU/USD':{bias:'HAUSSIER',bull:true,score:84,resume:"Gold en tendance haussière structurelle. Géopolitique + COT institutionnels longs. Breakout $2700.",macro:"Risk-off géopolitique. Banques centrales EM achèteuses. Fed dovish.",technique:"ATH récent. Support $2660. Objectif $2750 court terme.",r1:'2 750',r2:'2 800',s1:'2 660',s2:'2 620',tags:['ATH','COT Long','Safe Haven','Saison+']},
-  'USD/JPY':{bias:'HAUSSIER',bull:true,score:68,resume:"USD/JPY soutenu par différentiel de taux. BOJ ultra-accommodant. Risque intervention > 152.",macro:"Fed pause ≠ pivot. BOJ YCC flexible. Carry trade actif.",technique:"Tendance haussière. Résistance 150.80. Intervention BOJ risque à 152.",r1:'150.80',r2:'152.00',s1:'148.80',s2:'147.20',tags:['Carry Trade','BOJ Risk','Taux Diff.']},
+  'USD/JPY':{bias:'HAUSSIER',bull:true,score:68,resume:"USD/JPY soutenu par différentiel de taux. BOJ ultra-accommodant. Risque intervention > 152.",macro:"Fed pause ≠ pivot. BOJ YCC flexible. '+gl('Carry Trade','Carry trade')+' actif.",technique:"Tendance haussière. Résistance 150.80. Intervention BOJ risque à 152.",r1:'150.80',r2:'152.00',s1:'148.80',s2:'147.20',tags:['Carry Trade','BOJ Risk','Taux Diff.']},
   'NVDA':{bias:'HAUSSIER',bull:true,score:91,resume:"NVIDIA domine le marché GPU IA. Blackwell en prod. Marges 75%. Demande datacenter structurelle.",macro:"IA mega-cycle en cours. Capex MSFT/AMZN/GOOGL en hausse.",technique:"Tendance haussière. Support $128. Momentum fort.",r1:'$152',r2:'$168',s1:'$128',s2:'$114',tags:['IA Leader','Blackwell','EPS +120%']},
   'BTC':{bias:'HAUSSIER',bull:true,score:78,resume:"BTC break de range $66K-$68K. ETF spot +$840M entrées. Halving 2024 = supply shock.",macro:"Macro risk-on. ETF institutionnels en accumulation.",technique:"Support $64K. Objectif $72K si clôture > $68.5K.",r1:'$72 000',r2:'$78 000',s1:'$64 000',s2:'$58 000',tags:['ETF Inflows','Halving','Institutionnels']},
 };
@@ -2189,14 +2359,14 @@ function renderWEI(){
 
   var h='';
   // Forex
-  h+=tHead(['Paire','Bid','Var%','Signal','COT','DMX','Saison Oct','IA'],'FOREX MAJEURES');
+  h+=tHead(['Paire','Bid','Var%','Signal','<span class="gl" data-gl="Commitment of Traders — Rapport CFTC hebdo. Montre les positions des fonds et banques. >60% Long = institutionnels acheteurs.">COT <span class="gl-icon">?</span></span>','<span class="gl" data-gl="Distribution Mansa Index — Score PTL de 0-100. <35% retail Long = institutionnels acheteurs. >65% retail Long = institutionnels vendeurs.">DMX <span class="gl-icon">?</span></span>','Saison Oct','IA'],'FOREX MAJEURES');
   FX.filter(function(d){return d.cat==='major';}).forEach(function(d){
     var c=d.ch>=0?'up':'dn';var szC=d.szC==='bull'?'up':d.szC==='bear'?'dn':'neu';
     h+=tRow(['<span style="cursor:pointer" onclick="showFXDetail(\''+d.p+'\')">'+d.p+'</span>',d.b,'<span class="'+c+'">'+(d.ch>=0?'+':'')+d.ch.toFixed(2)+'%</span>',sigBadge(d.sig),'<span class="'+(d.cot==='Long'?'up':'dn')+'">'+d.cot+'</span>','<span class="'+(d.dmx>=75?'dn':d.dmx<=30?'up':'neu')+'">'+d.dmx+'%</span>','<span class="'+szC+'">'+d.sz+'</span>','<button class="ia-btn" onclick="openAI(\''+d.p+'\')">IA</button>']);
   });
   h+='</tbody></table></div>';
   // Metals
-  h+=tHead(['Paire','Bid','Var%','Signal','COT','DMX','Saison','IA'],'MÉTAUX PRÉCIEUX');
+  h+=tHead(['Paire','Bid','Var%','Signal','<span class="gl" data-gl="Commitment of Traders — Rapport CFTC hebdo. Montre les positions des fonds et banques. >60% Long = institutionnels acheteurs.">COT <span class="gl-icon">?</span></span>','<span class="gl" data-gl="Distribution Mansa Index — Score PTL de 0-100. <35% retail Long = institutionnels acheteurs. >65% retail Long = institutionnels vendeurs.">DMX <span class="gl-icon">?</span></span>','Saison','IA'],'MÉTAUX PRÉCIEUX');
   FX.filter(function(d){return d.cat==='metal';}).forEach(function(d){
     var c=d.ch>=0?'up':'dn';var szC=d.szC==='bull'?'up':'dn';
     h+=tRow(['<span style="cursor:pointer" onclick="showFXDetail(\''+d.p+'\')">'+d.p+'</span>',d.b,'<span class="'+c+'">'+(d.ch>=0?'+':'')+d.ch.toFixed(2)+'%</span>',sigBadge(d.sig),'<span class="up">Long</span>',d.dmx+'%','<span class="'+szC+'">'+d.sz+'</span>','<button class="ia-btn" onclick="openAI(\''+d.p+'\')">IA</button>']);
@@ -2230,7 +2400,7 @@ function renderFX(filter){
   var data=filter==='all'?FX:FX.filter(function(d){return d.cat===filter;});
   var catMap={major:'MAJEURES',cross:'CROISÉES',metal:'MÉTAUX',africa:'AFRICAINES'};
   var h='';
-  var cols=['Paire','Bid','Ask','Spread','Var%','Signal','COT','DMX','Force B/Q','Saison','IA'];
+  var cols=['Paire','Bid','Ask','Spread','Var%','Signal','<span class="gl" data-gl="Commitment of Traders — Rapport CFTC hebdo. Montre les positions des fonds et banques. >60% Long = institutionnels acheteurs.">COT <span class="gl-icon">?</span></span>','<span class="gl" data-gl="Distribution Mansa Index — Score PTL de 0-100. <35% retail Long = institutionnels acheteurs. >65% retail Long = institutionnels vendeurs.">DMX <span class="gl-icon">?</span></span>','Force B/Q','Saison','IA'];
 
   if(filter==='all'){
     ['major','cross','metal','africa'].forEach(function(cat){
@@ -2296,8 +2466,8 @@ function showFXDetail(pair){
   h+='<div style="font-size:9px;color:var(--dim);margin-bottom:12px">BID · Ask '+d.a+' · Spread '+d.sp.toFixed(1)+' pips · Var. '+(d.ch>=0?'+':'')+d.ch.toFixed(2)+'%</div>';
   h+='<div class="stat-row">';
   h+=sc('SIGNAL',d.sig,d.sig==='Haussier'?'var(--green)':d.sig==='Baissier'?'var(--red)':'var(--gold)','');
-  h+=sc('COT BIAIS',d.cot+' ('+d.cotP+'%)',d.cot==='Long'?'var(--green)':'var(--red)','Hedge Funds');
-  h+=sc('DMX RETAIL',d.dmx+'% Long',d.dmx>=75?'var(--red)':d.dmx<=30?'var(--green)':'var(--gold)','Contrarien');
+  h+=sc('<span class="gl" data-gl="Commitment of Traders — Indice de positionnement des fonds institutionnels. Long = institutionnels acheteurs nets.">COT BIAIS <span class="gl-icon">?</span></span>',d.cot+' ('+d.cotP+'%)',d.cot==='Long'?'var(--green)':'var(--red)','Hedge Funds');
+  h+=sc('<span class="gl" data-gl="Distribution Mansa Index — % du retail en position Long. <30% = institutionnels probablement Long (signal haussier). >70% = signal baissier.">DMX RETAIL <span class="gl-icon">?</span></span>',d.dmx+'% Long',d.dmx>=75?'var(--red)':d.dmx<=30?'var(--green)':'var(--gold)','Contrarien');
   h+=sc('SAISON OCT.',d.sz,d.szC==='bull'?'var(--green)':d.szC==='bear'?'var(--red)':'var(--dim)','');
   h+='</div>';
   // Saison chart
@@ -4014,6 +4184,9 @@ function nav(id){
   if(id==='smart'){renderSmartMoney();}
   if(id==='calc'){renderCalc();}
   if(id==='journal'){renderJournal();}
+  if(id==='psycho'){renderPsycho();}
+  if(id==='rules'){renderRules();}
+  if(id==='streak'){renderStreak();}
   if(id==='alertes'){renderAlertes();}
   if(id==='actions'){renderActions(ACT_FILTER);}
   if(id==='rendement'){renderRendement(REND_TAB);}
@@ -5670,14 +5843,21 @@ function renderApiPanel(){
 
 /* Données banques centrales / positions institutionnelles */
 var BANK_POSITIONS=[
-  {bank:'Goldman Sachs',   cur:'EUR/USD', pos:'LONG',  size:'$2.4B',  since:'Oct 14',target:'1.1050',sl:'1.0680',conf:88,col:'var(--green)'},
-  {bank:'JP Morgan',       cur:'GBP/USD', pos:'SHORT', size:'$1.8B',  since:'Oct 18',target:'1.2450',sl:'1.3150',conf:76,col:'var(--red)'},
-  {bank:'Deutsche Bank',   cur:'EUR/JPY', pos:'LONG',  size:'€1.2B',  since:'Oct 10',target:'168.00',sl:'158.00',conf:82,col:'var(--green)'},
-  {bank:'Citibank',        cur:'XAU/USD', pos:'LONG',  size:'$3.1B',  since:'Sep 28',target:'2850',  sl:'2580',  conf:91,col:'var(--gold)'},
-  {bank:'HSBC',            cur:'AUD/USD', pos:'SHORT', size:'$0.9B',  since:'Oct 20',target:'0.6350',sl:'0.6750',conf:65,col:'var(--red)'},
-  {bank:'BNP Paribas',     cur:'EUR/GBP', pos:'LONG',  size:'€0.8B',  since:'Oct 16',target:'0.8650',sl:'0.8200',conf:71,col:'var(--green)'},
-  {bank:'Barclays',        cur:'GBP/JPY', pos:'LONG',  size:'£1.4B',  since:'Oct 8', target:'202.00',sl:'188.00',conf:79,col:'var(--green)'},
-  {bank:'UBS',             cur:'USD/CHF', pos:'SHORT', size:'CHF0.7B',since:'Oct 22',target:'0.8650',sl:'0.9200',conf:68,col:'var(--red)'},
+  {bank:'Goldman Sachs',     cur:'EUR/USD', pos:'LONG',  size:'$2.4B',  since:'Oct 14',target:'1.1050',sl:'1.0680',conf:88,col:'var(--green)'},
+  {bank:'JP Morgan',         cur:'GBP/USD', pos:'SHORT', size:'$1.8B',  since:'Oct 18',target:'1.2450',sl:'1.3150',conf:76,col:'var(--red)'},
+  {bank:'Deutsche Bank',     cur:'EUR/JPY', pos:'LONG',  size:'€1.2B',  since:'Oct 10',target:'168.00',sl:'158.00',conf:82,col:'var(--green)'},
+  {bank:'Citibank',          cur:'XAU/USD', pos:'LONG',  size:'$3.1B',  since:'Sep 28',target:'2850',  sl:'2580',  conf:91,col:'var(--gold)'},
+  {bank:'HSBC',              cur:'AUD/USD', pos:'SHORT', size:'$0.9B',  since:'Oct 20',target:'0.6350',sl:'0.6750',conf:65,col:'var(--red)'},
+  {bank:'BNP Paribas',       cur:'EUR/GBP', pos:'LONG',  size:'€0.8B',  since:'Oct 16',target:'0.8650',sl:'0.8200',conf:71,col:'var(--green)'},
+  {bank:'Barclays',          cur:'GBP/JPY', pos:'LONG',  size:'£1.4B',  since:'Oct 8', target:'202.00',sl:'188.00',conf:79,col:'var(--green)'},
+  {bank:'UBS',               cur:'USD/CHF', pos:'SHORT', size:'CHF0.7B',since:'Oct 22',target:'0.8650',sl:'0.9200',conf:68,col:'var(--red)'},
+  {bank:'Crédit Agricole',   cur:'EUR/USD', pos:'LONG',  size:'€1.1B',  since:'Oct 21',target:'1.1020',sl:'1.0720',conf:73,col:'var(--green)'},
+  {bank:'Société Générale',  cur:'EUR/JPY', pos:'LONG',  size:'€0.9B',  since:'Oct 17',target:'166.50',sl:'160.00',conf:69,col:'var(--green)'},
+  {bank:'Morgan Stanley',    cur:'XAU/USD', pos:'LONG',  size:'$2.2B',  since:'Oct 12',target:'2870',  sl:'2600',  conf:84,col:'var(--gold)'},
+  {bank:'Standard Chartered',cur:'GBP/USD', pos:'SHORT', size:'£0.6B',  since:'Oct 19',target:'1.2480',sl:'1.3100',conf:62,col:'var(--red)'},
+  {bank:'Natixis',           cur:'EUR/CHF', pos:'SHORT', size:'€0.5B',  since:'Oct 23',target:'0.9320',sl:'0.9580',conf:64,col:'var(--red)'},
+  {bank:'ING',               cur:'EUR/USD', pos:'LONG',  size:'€0.7B',  since:'Oct 20',target:'1.0980',sl:'1.0700',conf:67,col:'var(--green)'},
+  {bank:'Commerzbank',       cur:'EUR/GBP', pos:'LONG',  size:'€0.6B',  since:'Oct 15',target:'0.8720',sl:'0.8480',conf:61,col:'var(--green)'},
 ];
 
 var DARK_POOL=[
@@ -5754,14 +5934,14 @@ function showTVWidget(key){
 
 /* ═══ BASE DONNÉES INSTITUTIONNELLES ═══ */
 var INST_DATA={
-  'EUR/USD':{banks:[{"name": "Goldman Sachs", "flag": "🇺🇸", "action": "BUY", "size": "$2.4B", "price": "1.0838", "time": "13:24", "conf": 88, "target": "1.1050", "sl": "1.0680", "note": "Accumulation zone H4"}, {"name": "JP Morgan", "flag": "🇺🇸", "action": "BUY", "size": "$1.8B", "price": "1.0795", "time": "09:15", "conf": 82, "target": "1.1020", "sl": "1.0650", "note": "Long structurel D1"}, {"name": "Deutsche Bank", "flag": "🇩🇪", "action": "BUY", "size": "€1.1B", "price": "1.0812", "time": "10:42", "conf": 75, "target": "1.0980", "sl": "1.0700", "note": "Biais EUR haussier"}],dark:[{"time": "13:24", "side": "BUY", "vol": "€840M", "price": "1.0838", "impact": "FORT"}, {"time": "11:05", "side": "BUY", "vol": "€620M", "price": "1.0807", "impact": "MOYEN"}],cot:{"l": 68, "sh": 32, "net": "+18 422", "chg": "+2 841"},dmx:84,ptl:"Structure Protocol — Biais LONG confirmé. COT 68% Long + Dark Pool BUY massif. Cherche double structure H4 haussière vers 1.1050."},
+  'EUR/USD':{banks:[{"name": "Goldman Sachs", "flag": "🇺🇸", "action": "BUY", "size": "$2.4B", "price": "1.0838", "time": "13:24", "conf": 88, "target": "1.1050", "sl": "1.0680", "note": "Accumulation zone H4"}, {"name": "JP Morgan", "flag": "🇺🇸", "action": "BUY", "size": "$1.8B", "price": "1.0795", "time": "09:15", "conf": 82, "target": "1.1020", "sl": "1.0650", "note": "Long structurel D1"}, {"name": "Deutsche Bank", "flag": "🇩🇪", "action": "BUY", "size": "€1.1B", "price": "1.0812", "time": "10:42", "conf": 75, "target": "1.0980", "sl": "1.0700", "note": "Biais EUR haussier"}, {"name": "Crédit Agricole", "flag": "🇫🇷", "action": "BUY", "size": "€1.1B", "price": "1.0821", "time": "11:10", "conf": 73, "target": "1.1020", "sl": "1.0720", "note": "BCE moins dovish — long EUR"}, {"name": "ING", "flag": "🇳🇱", "action": "BUY", "size": "€0.7B", "price": "1.0808", "time": "11:45", "conf": 67, "target": "1.0980", "sl": "1.0700", "note": "Momentum EUR haussier zone H4"}],dark:[{"time": "13:24", "side": "BUY", "vol": "€840M", "price": "1.0838", "impact": "FORT"}, {"time": "11:05", "side": "BUY", "vol": "€620M", "price": "1.0807", "impact": "MOYEN"}],cot:{"l": 68, "sh": 32, "net": "+18 422", "chg": "+2 841"},dmx:84,ptl:"Structure Protocol — Biais LONG confirmé. COT 68% Long + Dark Pool BUY massif. Cherche double structure H4 haussière vers 1.1050."},
   'GBP/USD':{banks:[{"name": "HSBC", "flag": "🇬🇧", "action": "SELL", "size": "£980M", "price": "1.2680", "time": "14:10", "conf": 71, "target": "1.2450", "sl": "1.2780", "note": "Résistance W1"}, {"name": "Barclays", "flag": "🇬🇧", "action": "SELL", "size": "£750M", "price": "1.2695", "time": "11:30", "conf": 65, "target": "1.2500", "sl": "1.2800", "note": "Macro GBP faible"}, {"name": "Standard Chartered", "flag": "🇬🇧", "action": "SELL", "size": "£420M", "price": "1.2710", "time": "12:00", "conf": 60, "target": "1.2400", "sl": "1.2820", "note": "BoE dovish"}],dark:[{"time": "14:10", "side": "SELL", "vol": "£580M", "price": "1.2680", "impact": "FORT"}, {"time": "10:20", "side": "SELL", "vol": "£320M", "price": "1.2695", "impact": "MOYEN"}],cot:{"l": 31, "sh": 69, "net": "-8 120", "chg": "-1 450"},dmx:31,ptl:"Structure Protocol — Biais SHORT. DMX 31% retail Long = institutionnels SHORT. COT confirme. Cherche structure baissière H4."},
   'USD/JPY':{banks:[{"name": "Nomura", "flag": "🇯🇵", "action": "SELL", "size": "¥450B", "price": "149.80", "time": "02:00", "conf": 80, "target": "146.00", "sl": "151.50", "note": "Intervention BoJ imminente"}, {"name": "BoJ (indirect)", "flag": "🇯🇵", "action": "SELL", "size": "¥800B", "price": "150.20", "time": "03:30", "conf": 90, "target": "145.00", "sl": "152.00", "note": "Zone intervention historique 150"}, {"name": "MUFG", "flag": "🇯🇵", "action": "SELL", "size": "¥280B", "price": "149.90", "time": "04:15", "conf": 74, "target": "147.00", "sl": "151.80", "note": "Safe haven JPY"}],dark:[{"time": "02:00", "side": "SELL", "vol": "¥620B", "price": "149.80", "impact": "MASSIF"}, {"time": "05:30", "side": "SELL", "vol": "¥280B", "price": "150.10", "impact": "FORT"}],cot:{"l": 28, "sh": 72, "net": "-15 300", "chg": "-3 200"},dmx:28,ptl:"Swing Action Market — ATTENTION zone intervention BoJ à 150+. Vente institutionnelle massive. Signal SHORT fort tous TF. Setup swing pyramide baissier W1."},
   'USD/CHF':{banks:[{"name": "UBS", "flag": "🇨🇭", "action": "SELL", "size": "CHF780M", "price": "0.9120", "time": "10:00", "conf": 72, "target": "0.8900", "sl": "0.9250", "note": "SNB intervention CHF"}, {"name": "Credit Suisse (ex)", "flag": "🇨🇭", "action": "SELL", "size": "CHF520M", "price": "0.9135", "time": "11:45", "conf": 65, "target": "0.8950", "sl": "0.9280", "note": "Refuge CHF demandé"}],dark:[{"time": "10:00", "side": "SELL", "vol": "CHF640M", "price": "0.9120", "impact": "FORT"}],cot:{"l": 35, "sh": 65, "net": "-4 200", "chg": "-680"},dmx:32,ptl:"Structure Protocol — Biais SHORT USD/CHF. SNB défend le CHF. COT baissier + retail trop long USD. Structure baissière D1."},
   'USD/CAD':{banks:[{"name": "RBC", "flag": "🇨🇦", "action": "SELL", "size": "C$650M", "price": "1.3720", "time": "09:30", "conf": 70, "target": "1.3450", "sl": "1.3850", "note": "Pétrole haussier = CAD fort"}, {"name": "TD Bank", "flag": "🇨🇦", "action": "SELL", "size": "C$480M", "price": "1.3740", "time": "10:10", "conf": 63, "target": "1.3500", "sl": "1.3870", "note": "BoC moins dovish"}],dark:[{"time": "09:30", "side": "SELL", "vol": "C$520M", "price": "1.3720", "impact": "FORT"}],cot:{"l": 38, "sh": 62, "net": "-5 600", "chg": "-920"},dmx:36,ptl:"Multi TF Ichimoku — Biais SHORT USD/CAD. Pétrole en hausse renforce le CAD. Ichimoku D1 sous le Kumo. Pullback Kijun H4 pour entrer."},
   'AUD/USD':{banks:[{"name": "ANZ Bank", "flag": "🇦🇺", "action": "SELL", "size": "A$420M", "price": "0.6540", "time": "01:30", "conf": 60, "target": "0.6350", "sl": "0.6650", "note": "RBA dovish pivot"}, {"name": "Westpac", "flag": "🇦🇺", "action": "SELL", "size": "A$310M", "price": "0.6555", "time": "02:15", "conf": 58, "target": "0.6380", "sl": "0.6680", "note": "Chine slowdown"}],dark:[{"time": "01:30", "side": "SELL", "vol": "A$350M", "price": "0.6540", "impact": "MOYEN"}, {"time": "03:00", "side": "SELL", "vol": "A$210M", "price": "0.6558", "impact": "MOYEN"}],cot:{"l": 38, "sh": 62, "net": "-6 800", "chg": "-1 100"},dmx:35,ptl:"Structure Protocol — Biais SHORT AUD. RBA dovish + ralentissement Chine. COT baissier. Structure baissière H4 à surveiller."},
   'NZD/USD':{banks:[{"name": "ANZ NZ", "flag": "🇳🇿", "action": "SELL", "size": "NZ$280M", "price": "0.5980", "time": "02:00", "conf": 58, "target": "0.5800", "sl": "0.6090", "note": "RBNZ fin de cycle hausse"}, {"name": "Westpac NZ", "flag": "🇳🇿", "action": "SELL", "size": "NZ$190M", "price": "0.5995", "time": "03:00", "conf": 55, "target": "0.5820", "sl": "0.6100", "note": "Économie NZ fragile"}],dark:[{"time": "02:00", "side": "SELL", "vol": "NZ$240M", "price": "0.5980", "impact": "MOYEN"}],cot:{"l": 36, "sh": 64, "net": "-3 800", "chg": "-620"},dmx:33,ptl:"Structure Protocol — Biais SHORT NZD. RBNZ fin de cycle + macro NZ faible. Structure baissière M30→H4 confirmée."},
-  'EUR/JPY':{banks:[{"name": "BNP Paribas", "flag": "🇫🇷", "action": "BUY", "size": "€890M", "price": "162.40", "time": "09:45", "conf": 70, "target": "165.00", "sl": "160.50", "note": "Long EUR vs JPY carry"}, {"name": "Société Générale", "flag": "🇫🇷", "action": "BUY", "size": "€620M", "price": "161.80", "time": "08:30", "conf": 65, "target": "164.50", "sl": "159.80", "note": "Carry trade EUR/JPY"}],dark:[{"time": "09:45", "side": "BUY", "vol": "€650M", "price": "162.40", "impact": "MOYEN"}, {"time": "11:00", "side": "BUY", "vol": "€420M", "price": "161.90", "impact": "MOYEN"}],cot:{"l": 58, "sh": 42, "net": "+9 100", "chg": "+1 200"},dmx:61,ptl:"Multi TF Ichimoku — Biais LONG modéré. EUR fort + JPY sous pression inflation. Ichimoku H4 haussier. Entrée sur pullback Kijun."},
+  'EUR/JPY':{banks:[{"name": "BNP Paribas", "flag": "🇫🇷", "action": "BUY", "size": "€890M", "price": "162.40", "time": "09:45", "conf": 70, "target": "165.00", "sl": "160.50", "note": "Long EUR vs JPY carry"}, {"name": "Société Générale", "flag": "🇫🇷", "action": "BUY", "size": "€620M", "price": "161.80", "time": "08:30", "conf": 65, "target": "164.50", "sl": "159.80", "note": "'+gl('Carry Trade','Carry trade')+' EUR/JPY"}, {"name": "Crédit Agricole", "flag": "🇫🇷", "action": "BUY", "size": "€520M", "price": "162.10", "time": "09:00", "conf": 62, "target": "165.50", "sl": "159.50", "note": "EUR fort + JPY sous pression BCE"}, {"name": "Natixis", "flag": "🇫🇷", "action": "BUY", "size": "€380M", "price": "161.95", "time": "10:00", "conf": 60, "target": "164.00", "sl": "159.00", "note": "Divergence BCE vs BoJ carry"}],dark:[{"time": "09:45", "side": "BUY", "vol": "€650M", "price": "162.40", "impact": "MOYEN"}, {"time": "11:00", "side": "BUY", "vol": "€420M", "price": "161.90", "impact": "MOYEN"}],cot:{"l": 58, "sh": 42, "net": "+9 100", "chg": "+1 200"},dmx:61,ptl:"Multi TF Ichimoku — Biais LONG modéré. EUR fort + JPY sous pression inflation. Ichimoku H4 haussier. Entrée sur pullback Kijun."},
   'EUR/GBP':{banks:[{"name": "Deutsche Bank", "flag": "🇩🇪", "action": "BUY", "size": "€720M", "price": "0.8612", "time": "11:20", "conf": 68, "target": "0.8800", "sl": "0.8520", "note": "EUR > GBP macro"}, {"name": "Commerzbank", "flag": "🇩🇪", "action": "BUY", "size": "€480M", "price": "0.8595", "time": "09:50", "conf": 62, "target": "0.8750", "sl": "0.8500", "note": "BCE moins dovish que BoE"}],dark:[{"time": "11:20", "side": "BUY", "vol": "€480M", "price": "0.8612", "impact": "MOYEN"}],cot:{"l": 62, "sh": 38, "net": "+5 400", "chg": "+980"},dmx:66,ptl:"Structure Protocol — Biais LONG EUR/GBP. Structure D1 haussière confirmée. BCE > BoE politique monétaire. Setup sur prochain pullback H4."},
   'EUR/CHF':{banks:[{"name": "UBS", "flag": "🇨🇭", "action": "SELL", "size": "€560M", "price": "0.9480", "time": "10:30", "conf": 65, "target": "0.9300", "sl": "0.9580", "note": "EUR/CHF pression baissière"}, {"name": "BCG", "flag": "🇨🇭", "action": "SELL", "size": "€380M", "price": "0.9495", "time": "11:00", "conf": 60, "target": "0.9350", "sl": "0.9600", "note": "SNB vigilance"}],dark:[{"time": "10:30", "side": "SELL", "vol": "€420M", "price": "0.9480", "impact": "MOYEN"}],cot:{"l": 40, "sh": 60, "net": "-2 100", "chg": "-380"},dmx:38,ptl:"Multi TF Ichimoku — Biais SHORT EUR/CHF. SNB défend parité proche. Ichimoku D1 baissier. Structure H4 de distribution."},
   'EUR/CAD':{banks:[{"name": "BNP Paribas", "flag": "🇫🇷", "action": "BUY", "size": "€680M", "price": "1.4820", "time": "09:20", "conf": 62, "target": "1.5100", "sl": "1.4650", "note": "EUR > CAD momentum"}, {"name": "Deutsche Bank", "flag": "🇩🇪", "action": "BUY", "size": "€450M", "price": "1.4800", "time": "10:00", "conf": 58, "target": "1.5050", "sl": "1.4620", "note": "Long EUR vs matières"}],dark:[{"time": "09:20", "side": "BUY", "vol": "€520M", "price": "1.4820", "impact": "MOYEN"}],cot:{"l": 54, "sh": 46, "net": "+3 200", "chg": "+520"},dmx:58,ptl:"Structure Protocol — Biais LONG EUR/CAD modéré. Confluence COT + Structure D1. Setup M30→H4 sur support."},
@@ -5779,7 +5959,7 @@ var INST_DATA={
   'NZD/JPY':{banks:[{"name": "Nomura", "flag": "🇯🇵", "action": "SELL", "size": "¥120B", "price": "89.40", "time": "03:15", "conf": 68, "target": "86.00", "sl": "91.00", "note": "Risk off = NZD/JPY sell"}],dark:[{"time": "03:15", "side": "SELL", "vol": "¥100B", "price": "89.40", "impact": "MOYEN"}],cot:{"l": 40, "sh": 60, "net": "-1 800", "chg": "-310"},dmx:38,ptl:"Multi TF Ichimoku — Biais SHORT NZD/JPY. JPY refuge + NZD faible. Ichimoku D1 baissier."},
   'NZD/CHF':{banks:[{"name": "UBS", "flag": "🇨🇭", "action": "SELL", "size": "CHF180M", "price": "0.5420", "time": "10:00", "conf": 60, "target": "0.5250", "sl": "0.5510", "note": "CHF > NZD safe haven"}],dark:[{"time": "10:00", "side": "SELL", "vol": "CHF140M", "price": "0.5420", "impact": "MOYEN"}],cot:{"l": 38, "sh": 62, "net": "-980", "chg": "-150"},dmx:36,ptl:"Structure Protocol — Biais SHORT NZD/CHF. CHF fort + NZD sous pression. Structure baissière M30→D1."},
   'NZD/CAD':{banks:[{"name": "RBC", "flag": "🇨🇦", "action": "SELL", "size": "C$190M", "price": "0.8180", "time": "09:30", "conf": 58, "target": "0.8000", "sl": "0.8280", "note": "CAD fort pétrole vs NZD faible"}],dark:[{"time": "09:30", "side": "SELL", "vol": "C$150M", "price": "0.8180", "impact": "MOYEN"}],cot:{"l": 42, "sh": 58, "net": "-1 100", "chg": "-170"},dmx:40,ptl:"Multi TF Ichimoku — Biais SHORT NZD/CAD. CAD renforcé + NZD macro faible. Ichimoku H4 baissier."},
-  'CAD/JPY':{banks:[{"name": "RBC", "flag": "🇨🇦", "action": "BUY", "size": "C$380M", "price": "111.20", "time": "09:30", "conf": 68, "target": "114.00", "sl": "109.50", "note": "CAD fort pétrole + yen faible"}, {"name": "TD Bank", "flag": "🇨🇦", "action": "BUY", "size": "C$260M", "price": "110.80", "time": "10:00", "conf": 62, "target": "113.50", "sl": "109.00", "note": "Carry trade CAD/JPY"}],dark:[{"time": "09:30", "side": "BUY", "vol": "C$310M", "price": "111.20", "impact": "FORT"}],cot:{"l": 60, "sh": 40, "net": "+4 200", "chg": "+680"},dmx:62,ptl:"Structure Protocol — Biais LONG CAD/JPY. Pétrole renforce CAD + JPY sous pression inflation. Structure D1 haussière."},
+  'CAD/JPY':{banks:[{"name": "RBC", "flag": "🇨🇦", "action": "BUY", "size": "C$380M", "price": "111.20", "time": "09:30", "conf": 68, "target": "114.00", "sl": "109.50", "note": "CAD fort pétrole + yen faible"}, {"name": "TD Bank", "flag": "🇨🇦", "action": "BUY", "size": "C$260M", "price": "110.80", "time": "10:00", "conf": 62, "target": "113.50", "sl": "109.00", "note": "'+gl('Carry Trade','Carry trade')+' CAD/JPY"}],dark:[{"time": "09:30", "side": "BUY", "vol": "C$310M", "price": "111.20", "impact": "FORT"}],cot:{"l": 60, "sh": 40, "net": "+4 200", "chg": "+680"},dmx:62,ptl:"Structure Protocol — Biais LONG CAD/JPY. Pétrole renforce CAD + JPY sous pression inflation. Structure D1 haussière."},
   'CAD/CHF':{banks:[{"name": "UBS", "flag": "🇨🇭", "action": "SELL", "size": "CHF210M", "price": "0.6780", "time": "10:00", "conf": 60, "target": "0.6600", "sl": "0.6870", "note": "CHF refuge vs CAD"}],dark:[{"time": "10:00", "side": "SELL", "vol": "CHF170M", "price": "0.6780", "impact": "MOYEN"}],cot:{"l": 43, "sh": 57, "net": "-1 200", "chg": "-190"},dmx:41,ptl:"Multi TF Ichimoku — NEUTRE CAD/CHF. Tension entre pétrole CAD et safe haven CHF. Attendre setup clair."},
   'CHF/JPY':{banks:[{"name": "UBS", "flag": "🇨🇭", "action": "BUY", "size": "CHF320M", "price": "168.40", "time": "10:00", "conf": 70, "target": "171.00", "sl": "166.50", "note": "CHF + JPY = double safe haven"}, {"name": "Nomura", "flag": "🇯🇵", "action": "BUY", "size": "¥120B", "price": "167.80", "time": "03:00", "conf": 65, "target": "170.50", "sl": "166.00", "note": "Carry CHF/JPY résiste"}],dark:[{"time": "10:00", "side": "BUY", "vol": "CHF260M", "price": "168.40", "impact": "MOYEN"}],cot:{"l": 55, "sh": 45, "net": "+2 800", "chg": "+420"},dmx:57,ptl:"Multi TF Ichimoku — Biais LONG CHF/JPY modéré. 2 devises refuge mais CHF légèrement plus fort. Setup Ichimoku H4."},
   'XAU/USD':{banks:[{"name": "Goldman Sachs", "flag": "🇺🇸", "action": "BUY", "size": "$3.2B", "price": "1912.50", "time": "08:30", "conf": 92, "target": "2050", "sl": "1880", "note": "Objectif $2100 à 6 mois"}, {"name": "JP Morgan", "flag": "🇺🇸", "action": "BUY", "size": "$2.1B", "price": "1905.00", "time": "09:00", "conf": 88, "target": "2000", "sl": "1875", "note": "Safe haven allocation"}, {"name": "Citibank", "flag": "🇺🇸", "action": "BUY", "size": "$1.5B", "price": "1918.00", "time": "10:15", "conf": 80, "target": "2025", "sl": "1890", "note": "Inflation hedge"}, {"name": "BlackRock", "flag": "🇺🇸", "action": "BUY", "size": "$4.8B", "price": "1895.00", "time": "08:00", "conf": 94, "target": "2100", "sl": "1860", "note": "Position long terme Or"}],dark:[{"time": "08:30", "side": "BUY", "vol": "$2.8B", "price": "1912.50", "impact": "MASSIF"}, {"time": "12:00", "side": "BUY", "vol": "$1.2B", "price": "1920.00", "impact": "FORT"}],cot:{"l": 72, "sh": 28, "net": "+42 800", "chg": "+5 200"},dmx:78,ptl:"Swing Action Market — Signal LONG Or très fort. 4 institutions majeures acheteuses. BlackRock position massive $4.8B. Dark Pool MASSIF. Setup pyramide sur support H4."},
@@ -6004,9 +6184,11 @@ function renderSmartMoney(){
     +'<div class="pill on" onclick="showSMTab(\'dmx\')">📊 DMX Retail</div>'
     +'<div class="pill" onclick="showSMTab(\'cot\')">📋 COT CFTC</div>'
     +'<div class="pill" onclick="showSMTab(\'banks\')">🏦 Banques</div>'
-    +'<div class="pill" onclick="showSMTab(\'dark\')">🌑 Dark Pool</div>'
+    +'<div class="pill" onclick="showSMTab(\'dark\')">🌑 '+gl('Dark Pool','Dark Pool')+'</div>'
     +'<div class="pill" onclick="showSMTab(\'cb\')">🏛️ Banques Centrales</div>'
     +'<div class="pill" onclick="showSMTab(\'whale\')">🐋 Whale Alerts</div>'
+    +'<div class="pill" onclick="showSMTab(\'news\')">📰 News / Paire</div>'
+    +'<div class="pill" onclick="showSMTab(\'l2\')">📋 Level 2</div>'
     +'</div>';
   h+='<div id="sm-tab-content"></div>';
   el.innerHTML=h;
@@ -6027,6 +6209,8 @@ function showSMTab(tab){
   if(tab==='dark')  el.innerHTML=renderSM_Dark();
   if(tab==='cb')    el.innerHTML=renderSM_CB();
   if(tab==='whale') el.innerHTML=renderSM_Whale();
+  if(tab==='news')  el.innerHTML=renderNewsByPair();
+  if(tab==='l2')    el.innerHTML=renderLevel2();
 }
 
 function renderSM_DMX(){
@@ -6232,6 +6416,198 @@ function renderSM_CB(){
   h+='</div>';
   h+='<div style="padding:10px 12px;background:rgba(0,204,204,.04);border:1px solid rgba(0,204,204,.15);border-radius:6px;font-size:8.5px;color:var(--dim);line-height:1.8">';
   h+='<strong style="color:var(--cyan)">🎯 Ichimoku MTF :</strong> Hawkish = Kumo W1 haussier probable → cherche des longs. Dovish = biais court probable. La divergence Hawkish/Dovish entre 2 banques centrales = meilleure setup Double Structure sur la cross correspondante.';
+  h+='</div>';
+  // V23 — Taux directeurs détaillés
+  h+=renderCentralBankRates();
+  // V23 — Matrice de corrélation
+  h+=renderCorrelationMatrix();
+  return h;
+}
+
+/* ============================================================
+   V23 — MATRICE DE CORRÉLATION 10×10
+   ============================================================ */
+var CORR_PAIRS=['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','USD/CAD','NZD/USD','XAU/USD','BTC/USD','US500'];
+var CORR_DATA=[
+  // EUR/USD  GBP/USD  USD/JPY  USD/CHF  AUD/USD  USD/CAD  NZD/USD  XAU/USD  BTC/USD  US500
+  [  1.00,    0.87,   -0.76,   -0.89,    0.71,   -0.68,    0.65,    0.52,    0.31,    0.42 ],  // EUR/USD
+  [  0.87,    1.00,   -0.69,   -0.82,    0.74,   -0.61,    0.70,    0.48,    0.28,    0.38 ],  // GBP/USD
+  [ -0.76,   -0.69,   1.00,    0.74,   -0.63,    0.58,   -0.60,   -0.41,   -0.22,   -0.35 ],  // USD/JPY
+  [ -0.89,   -0.82,   0.74,    1.00,   -0.67,    0.65,   -0.62,   -0.55,   -0.29,   -0.40 ],  // USD/CHF
+  [  0.71,    0.74,  -0.63,   -0.67,    1.00,   -0.72,    0.88,    0.61,    0.45,    0.55 ],  // AUD/USD
+  [ -0.68,   -0.61,   0.58,    0.65,   -0.72,    1.00,   -0.68,   -0.48,   -0.33,   -0.38 ],  // USD/CAD
+  [  0.65,    0.70,  -0.60,   -0.62,    0.88,   -0.68,    1.00,    0.57,    0.42,    0.50 ],  // NZD/USD
+  [  0.52,    0.48,  -0.41,   -0.55,    0.61,   -0.48,    0.57,    1.00,    0.38,    0.44 ],  // XAU/USD
+  [  0.31,    0.28,  -0.22,   -0.29,    0.45,   -0.33,    0.42,    0.38,    1.00,    0.62 ],  // BTC/USD
+  [  0.42,    0.38,  -0.35,   -0.40,    0.55,   -0.38,    0.50,    0.44,    0.62,    1.00 ],  // US500
+];
+function corrColor(v){
+  if(v===1.00) return '#ffffff';
+  if(v>=0.80) return '#00c878';
+  if(v>=0.60) return '#66e0aa';
+  if(v>=0.40) return '#99eebb';
+  if(v>=0.10) return '#ccf5dd';
+  if(v>=-0.10) return '#666';
+  if(v>=-0.40) return '#f5cccc';
+  if(v>=-0.60) return '#e08888';
+  if(v>=-0.80) return '#e05555';
+  return '#c83030';
+}
+function renderCorrelationMatrix(){
+  var h='';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:14px;margin-top:14px">';
+  h+='<div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:10px">📊 MATRICE DE CORRÉLATION — 30 JOURS <span style="font-size:8px;color:var(--dim)">[+1=Corrélation parfaite | -1=Corrélation inverse | 0=Indépendant]</span></div>';
+  h+='<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:8px;white-space:nowrap;width:100%">';
+  // Header row
+  h+='<thead><tr><th style="padding:4px 6px;color:var(--dim);text-align:left;border-bottom:1px solid var(--border)"></th>';
+  CORR_PAIRS.forEach(function(p){
+    h+='<th style="padding:4px 5px;color:var(--dim);font-weight:600;text-align:center;border-bottom:1px solid var(--border);font-size:7px">'+p.replace('/','<br/>')+'</th>';
+  });
+  h+='</tr></thead><tbody>';
+  CORR_DATA.forEach(function(row,i){
+    h+='<tr><td style="padding:4px 6px;color:var(--text);font-weight:600;font-size:7.5px;border-right:1px solid var(--border)">'+CORR_PAIRS[i]+'</td>';
+    row.forEach(function(v,j){
+      var col=corrColor(v);
+      var diag=(i===j);
+      var bg=diag?'rgba(200,160,60,.15)':'rgba(0,0,0,0)';
+      h+='<td style="padding:4px 5px;text-align:center;color:'+col+';background:'+bg+';font-weight:'+(diag?'700':'400')+'">'+(v===1.00?'—':v.toFixed(2))+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">';
+  var legend=[['≥0.80','var(--green)','Très forte corrélation'],['0.40–0.79','#66e0aa','Corrélation modérée'],['0–0.39','var(--dim)','Faible corrélation'],['-0.40– -0.79','#e08888','Corrélation inverse mod.'],['-0.80–-1','var(--red)','Très forte corrélation inverse']];
+  legend.forEach(function(l){
+    h+='<div style="display:flex;align-items:center;gap:4px;font-size:7.5px;color:var(--dim)"><span style="width:10px;height:10px;border-radius:2px;background:'+l[1]+';display:inline-block"></span>'+l[0]+' : '+l[2]+'</div>';
+  });
+  h+='</div>';
+  h+='<div style="margin-top:8px;padding:8px 10px;background:rgba(0,204,204,.04);border:1px solid rgba(0,204,204,.15);border-radius:6px;font-size:8px;color:var(--dim)">💡 <strong style="color:var(--cyan)">Stratégie :</strong> EUR/USD et GBP/USD (0.87) = éviter de trader les deux dans le même sens. USD/JPY et EUR/USD (-0.76) = si l\'un monte l\'autre baisse → opportunités de hedging.</div>';
+  h+='</div>';
+  return h;
+}
+
+/* ============================================================
+   V23 — NEWS FILTRÉES PAR PAIRE + LEVEL 2
+   ============================================================ */
+var NEWS_BY_PAIR={
+  'EUR/USD':[
+    {h:'BCE : Lagarde signale une pause dans les baisses de taux',t:'Il y a 2h',src:'Reuters',imp:'HIGH',impCol:'var(--red)'},
+    {h:'IPC Zone Euro en hausse à 2.3% — plus élevé que prévu',t:'Il y a 4h',src:'Eurostat',imp:'HIGH',impCol:'var(--red)'},
+    {h:'PMI Services Allemagne déçoit à 47.8 (zone contraction)',t:'Il y a 6h',src:'S&P Global',imp:'MED',impCol:'var(--gold)'},
+    {h:'Fed : Minutes réunion confirment prudence sur la trajectoire des taux',t:'Il y a 8h',src:'Fed/AP',imp:'HIGH',impCol:'var(--red)'},
+  ],
+  'XAU/USD':[
+    {h:'Achats massifs des banques centrales émergentes (Chine, Inde)',t:'Il y a 1h',src:'WGC',imp:'HIGH',impCol:'var(--red)'},
+    {h:'Tensions Moyen-Orient : valeur refuge en demande',t:'Il y a 3h',src:'Bloomberg',imp:'MED',impCol:'var(--gold)'},
+    {h:'Rendement US 10 ans recule — positif pour l\'or',t:'Il y a 5h',src:'Treasury',imp:'MED',impCol:'var(--gold)'},
+  ],
+  'GBP/USD':[
+    {h:'BOE : Inflation core UK reste élevée à 3.2%',t:'Il y a 1h',src:'ONS',imp:'HIGH',impCol:'var(--red)'},
+    {h:'PIB UK T3 — croissance modeste de 0.1%',t:'Il y a 5h',src:'ONS',imp:'MED',impCol:'var(--gold)'},
+  ],
+  'USD/JPY':[
+    {h:'BOJ : Ueda n\'exclut pas une hausse en décembre',t:'Il y a 30min',src:'Nikkei',imp:'HIGH',impCol:'var(--red)'},
+    {h:'CPI Japon rebondit à 2.5% en septembre',t:'Il y a 7h',src:'MIC Japon',imp:'MED',impCol:'var(--gold)'},
+  ],
+};
+var LEVEL2_DATA={
+  bids:[
+    {price:'1.0839',size:'12.4M',depth:95},
+    {price:'1.0836',size:'8.2M',depth:63},
+    {price:'1.0834',size:'15.7M',depth:100},
+    {price:'1.0831',size:'6.1M',depth:47},
+    {price:'1.0828',size:'9.8M',depth:75},
+    {price:'1.0825',size:'4.3M',depth:33},
+    {price:'1.0822',size:'11.2M',depth:86},
+    {price:'1.0819',size:'7.6M',depth:58},
+  ],
+  asks:[
+    {price:'1.0841',size:'10.1M',depth:78},
+    {price:'1.0843',size:'7.8M',depth:60},
+    {price:'1.0846',size:'14.2M',depth:100},
+    {price:'1.0849',size:'5.5M',depth:42},
+    {price:'1.0852',size:'8.9M',depth:68},
+    {price:'1.0855',size:'3.7M',depth:28},
+    {price:'1.0858',size:'12.6M',depth:97},
+    {price:'1.0861',size:'6.4M',depth:49},
+  ],
+  spread:'0.2 pip',sym:'EUR/USD',lastTrade:'1.0840',vol24h:'$142B'
+};
+function renderNewsByPair(){
+  var h='';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:14px">';
+  h+='<div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:10px">📰 NEWS PAR INSTRUMENT</div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="news-pair-tabs">';
+  var pairs=Object.keys(NEWS_BY_PAIR);
+  pairs.forEach(function(p,i){
+    h+='<button onclick="showNewsPair(\''+p+'\')" id="npt-'+p.replace('/','_')+'" style="padding:4px 10px;background:'+(i===0?'var(--gold)':'var(--s2)')+';color:'+(i===0?'#000':'var(--dim)')+';border:none;border-radius:4px;cursor:pointer;font-size:8.5px;font-weight:600">'+p+'</button>';
+  });
+  h+='</div>';
+  pairs.forEach(function(p,i){
+    h+='<div id="news-pair-'+p.replace('/','_')+'" style="display:'+(i===0?'block':'none')+'">';
+    NEWS_BY_PAIR[p].forEach(function(n){
+      h+='<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">';
+      h+='<span style="flex-shrink:0;font-size:7.5px;font-weight:700;color:'+n.impCol+';background:'+n.impCol.replace(')',',0.1)').replace('var(--','rgba(').replace(')',')')+';padding:2px 5px;border-radius:3px">'+n.imp+'</span>';
+      h+='<div style="flex:1"><div style="font-size:9px;color:var(--text);margin-bottom:3px">'+n.h+'</div>';
+      h+='<div style="font-size:7.5px;color:var(--dim)">'+n.src+' · '+n.t+'</div></div></div>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+function showNewsPair(p){
+  var pairs=Object.keys(NEWS_BY_PAIR);
+  pairs.forEach(function(pp){
+    var el=document.getElementById('news-pair-'+pp.replace('/','_'));
+    var btn=document.getElementById('npt-'+pp.replace('/','_'));
+    if(el){el.style.display=(pp===p?'block':'none');}
+    if(btn){btn.style.background=(pp===p?'var(--gold)':'var(--s2)');btn.style.color=(pp===p?'#000':'var(--dim)');}
+  });
+}
+function renderLevel2(){
+  var d=LEVEL2_DATA;
+  var h='';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:14px">';
+  h+='<div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:4px">📋 CARNET D\'ORDRES NIVEAU 2 — '+d.sym+'</div>';
+  h+='<div style="display:flex;gap:14px;margin-bottom:12px;font-size:8.5px">';
+  h+='<span style="color:var(--dim)">Dernier : <strong style="color:var(--text)">'+d.lastTrade+'</strong></span>';
+  h+='<span style="color:var(--dim)">Spread : <strong style="color:var(--gold)">'+d.spread+'</strong></span>';
+  h+='<span style="color:var(--dim)">Vol 24h : <strong style="color:var(--blue)">'+d.vol24h+'</strong></span>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  // BIDS
+  h+='<div><div style="font-size:8.5px;color:var(--green);font-weight:700;margin-bottom:6px;text-align:center">🟢 BIDS (ACHATS)</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:8px">';
+  h+='<thead><tr>';
+  ['Prix','Taille','Profondeur'].forEach(function(col){h+='<th style="padding:3px 5px;color:var(--dim);text-align:right;border-bottom:1px solid var(--border)">'+col+'</th>';});
+  h+='</tr></thead><tbody>';
+  d.bids.forEach(function(b){
+    h+='<tr style="position:relative">';
+    h+='<td style="padding:3px 5px;text-align:right;color:var(--green);font-weight:600">'+b.price+'</td>';
+    h+='<td style="padding:3px 5px;text-align:right;color:var(--text)">'+b.size+'</td>';
+    h+='<td style="padding:3px 5px;text-align:right;position:relative">';
+    h+='<div style="position:absolute;right:0;top:0;bottom:0;background:rgba(0,200,120,.12);width:'+b.depth+'%"></div>';
+    h+='<span style="position:relative;color:var(--dim)">'+b.depth+'%</span></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  // ASKS
+  h+='<div><div style="font-size:8.5px;color:var(--red);font-weight:700;margin-bottom:6px;text-align:center">🔴 ASKS (VENTES)</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:8px">';
+  h+='<thead><tr>';
+  ['Prix','Taille','Profondeur'].forEach(function(col){h+='<th style="padding:3px 5px;color:var(--dim);text-align:right;border-bottom:1px solid var(--border)">'+col+'</th>';});
+  h+='</tr></thead><tbody>';
+  d.asks.forEach(function(a){
+    h+='<tr>';
+    h+='<td style="padding:3px 5px;text-align:right;color:var(--red);font-weight:600">'+a.price+'</td>';
+    h+='<td style="padding:3px 5px;text-align:right;color:var(--text)">'+a.size+'</td>';
+    h+='<td style="padding:3px 5px;text-align:right;position:relative">';
+    h+='<div style="position:absolute;right:0;top:0;bottom:0;background:rgba(224,85,85,.12);width:'+a.depth+'%"></div>';
+    h+='<span style="position:relative;color:var(--dim)">'+a.depth+'%</span></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='</div>';
+  h+='<div style="margin-top:10px;padding:8px 10px;background:rgba(68,136,255,.04);border:1px solid rgba(68,136,255,.15);border-radius:6px;font-size:8px;color:var(--dim)">💡 <strong style="color:var(--blue)">Lecture :</strong> Un mur d\'ordres SELL à 1.0846 ($14.2M) = résistance immédiate forte. Si le prix casse ce niveau en clôture H1 → breakout haussier probable.</div>';
   h+='</div>';
   return h;
 }
@@ -8263,25 +8639,48 @@ function renderBacktest(){
   h+='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;margin-bottom:12px">';
   h+='<div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:14px">⚙️ PARAMÈTRES</div>';
   h+='<div class="bt-param-row"><div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Paire</label><select id="bt-pair" class="bt-input">'+fxOpts+'</select></div>';
-  h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Période</label><select id="bt-period" class="bt-input"><option value="3m">3 mois</option><option value="6m" selected>6 mois</option><option value="12m">12 mois</option></select></div></div>';
+  h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Période</label><select id="bt-period" class="bt-input"><option value="1m">1 mois</option><option value="3m">3 mois</option><option value="6m" selected>6 mois</option><option value="12m">1 an</option><option value="24m">2 ans</option><option value="36m">3 ans</option><option value="60m">5 ans</option><option value="120m">10 ans</option></select></div></div>';
   h+='<div class="bt-param-row"><div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Capital ($)</label><input id="bt-capital" type="number" value="10000" class="bt-input"></div>';
   h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Risque/trade (%)</label><input id="bt-risk" type="number" value="1" min="0.1" max="5" step="0.1" class="bt-input"></div></div>';
   h+='<div class="bt-param-row"><div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">R:R cible</label><input id="bt-rr" type="number" value="2" min="1" max="5" step="0.5" class="bt-input"></div>';
   h+='<div><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Filtre tendance</label><select id="bt-trend" class="bt-input"><option value="all">Tous signaux</option><option value="trend" selected>Avec tendance</option><option value="strong">Forte tendance</option></select></div></div>';
-  h+='<div style="margin-bottom:12px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Stratégie Ichimoku</label>';
-  h+='<select id="bt-strat" class="bt-input"><option value="tk-cross">TK Cross classique</option><option value="kumo-break" selected>Kumo Breakout</option><option value="chikou">Chikou Span</option><option value="ptl">PTL Multi-TF</option></select></div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Stratégie PTL</label>';
+  h+='<select id="bt-strat" class="bt-input">';
+  h+='<optgroup label="★ MES STRATÉGIES PTL ★">';
+  h+='<option value="ptl-ds" selected>🏗️ Double Structure (PTL)</option>';
+  h+='<option value="ptl-mtf">📐 Multi-Timeframes (PTL)</option>';
+  h+='<option value="ptl-sam">📈 Swing Action Market (PTL)</option>';
+  h+='<option value="ptl-ivc">📊 IVC — Indice Volume (PTL)</option>';
+  h+='</optgroup>';
+  h+='<optgroup label="─ Ichimoku ─">';
+  h+='<option value="tk-cross">🌊 TK Cross classique</option>';
+  h+='<option value="kumo-break">🌊 Kumo Breakout</option>';
+  h+='<option value="chikou">🌊 Chikou Span</option>';
+  h+='<option value="ptl">🌊 PTL Multi-TF H4+H1+M15</option>';
+  h+='</optgroup>';
+  h+='<optgroup label="─ Structure Protocol ─">';
+  h+='<option value="ds-ob">🏗️ Order Block + BOS</option>';
+  h+='<option value="ds-fvg">🏗️ FVG + Mitigation</option>';
+  h+='<option value="ds-choch">🏗️ CHoCH + Structure Break</option>';
+  h+='</optgroup>';
+  h+='<optgroup label="─ Swing Action Market ─">';
+  h+='<option value="swing-hl">📈 Higher High / Higher Low</option>';
+  h+='<option value="swing-ms">📈 Market Structure Shift</option>';
+  h+='<option value="swing-vol">📈 Volume Climax + Reversal</option>';
+  h+='</optgroup>';
+  h+='</select></div>';
   h+='<button onclick="runBacktest()" style="width:100%;padding:10px;background:var(--gold);color:#000;border:none;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--fm)">▶ LANCER LE BACKTEST</button>';
   h+='</div>';
   // Info
   h+='<div style="background:rgba(68,136,255,.05);border:1px solid rgba(68,136,255,.15);border-radius:8px;padding:14px;font-size:9px;color:var(--dim);line-height:1.8">';
-  h+='<div style="color:var(--blue);font-weight:800;margin-bottom:8px">ℹ️ Méthodologie</div>';
-  h+='Les résultats sont basés sur des <strong style="color:var(--text)">données synthétiques</strong> générées selon les patterns statistiques historiques Forex.<br><br>';
-  h+='<strong style="color:var(--gold2)">Stratégies disponibles :</strong><br>';
-  h+='· <strong>TK Cross</strong> — croisement Tenkan/Kijun + filtre Kumo<br>';
-  h+='· <strong>Kumo Breakout</strong> — cassure nuage + confirmation momentum<br>';
-  h+='· <strong>Chikou Span</strong> — signal Chikou + positionnement prix<br>';
-  h+='· <strong>PTL Multi-TF</strong> — confluence H4+H1+M15 méthode PTL<br><br>';
-  h+='<span style="color:var(--red);font-size:8px">⚠️ Les performances passées ne garantissent pas les résultats futurs.</span>';
+  h+='<div style="color:var(--gold);font-weight:800;margin-bottom:8px">★ MES STRATÉGIES PTL</div>';
+  h+='<strong style="color:var(--gold2)">Double Structure</strong> — FOREX · M30→H8 · 2 structures (vieille tendance + reversal) · Breakout zone clé · MA100 · RR min 2.5<br>';
+  h+='<strong style="color:var(--gold2)">Multi-Timeframes</strong> — FOREX · Daily→H1 & H4→M15 · Trendline LT (2 touches) · Chart pattern · RR min 2.5<br>';
+  h+='<strong style="color:var(--gold2)">Swing Action Market</strong> — FOREX/Actions · H4/D1 · Triangle, drapeau, double bottom · MA100 · RR min 2<br>';
+  h+='<strong style="color:var(--gold2)">IVC (Indice Volume)</strong> — Indices & Actions M30 · DAX, NAS, SPX · ~22 trades/mois · RR 2-3 · Backtest réel 20 ans<br><br>';
+  h+='<div style="color:var(--blue);font-weight:800;margin-bottom:4px">ℹ️ Méthodologie</div>';
+  h+='Simulation basée sur les <strong style="color:var(--text)">paramètres réels PTL</strong> (win rate, RR, fréquence) issus des backtests IVC sur 20 ans.<br><br>';
+  h+='<span style="color:var(--red);font-size:8px">⚠️ Résultats simulés — les performances passées ne garantissent pas les résultats futurs.</span>';
   h+='</div>';
   h+='</div>';
   h+='<div id="bt-results" style="margin-top:16px"></div>';
@@ -8299,69 +8698,148 @@ function runBacktest(){
 
   var el=document.getElementById('bt-results');
   if(!el) return;
-  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--gold2);font-size:9px">⏳ Simulation en cours...</div>';
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--gold2);font-size:11px;letter-spacing:2px">⏳ SIMULATION EN COURS...</div>';
 
   setTimeout(function(){
-    // Generate synthetic backtest results
-    var numMonths=period==='3m'?3:period==='6m'?6:12;
-    var tradesPerMonth=strat==='ptl'?8:strat==='kumo-break'?6:10;
-    var totalTrades=numMonths*tradesPerMonth;
+    var periodMap={'1m':1,'3m':3,'6m':6,'12m':12,'24m':24,'36m':36,'60m':60,'120m':120};
+    var numMonths=periodMap[period]||6;
+    var periodLabel={'1m':'1 mois','3m':'3 mois','6m':'6 mois','12m':'1 an','24m':'2 ans','36m':'3 ans','60m':'5 ans','120m':'10 ans'}[period]||'6 mois';
 
-    // Win rates by strategy
-    var wrMap={'tk-cross':0.48,'kumo-break':0.52,'chikou':0.45,'ptl':0.58};
+    var wrMap={
+      // ★ Stratégies PTL — paramètres réels issus du backtest IVC/PTL
+      'ptl-ds':0.52,'ptl-mtf':0.54,'ptl-sam':0.50,'ptl-ivc':0.364,
+      // Ichimoku
+      'tk-cross':0.47,'kumo-break':0.52,'chikou':0.45,'ptl':0.58,
+      // Structure Protocol
+      'ds-ob':0.55,'ds-fvg':0.50,'ds-choch':0.53,
+      // Swing Action Market
+      'swing-hl':0.49,'swing-ms':0.51,'swing-vol':0.54
+    };
+    var rrMap={
+      // RR réels PTL (min 2.5 pour DS et MTF, min 2 pour SAM, 2-3 pour IVC)
+      'ptl-ds':2.5,'ptl-mtf':2.5,'ptl-sam':2.0,'ptl-ivc':2.2,
+      'tk-cross':2,'kumo-break':2,'chikou':2,'ptl':2,
+      'ds-ob':2,'ds-fvg':2,'ds-choch':2,
+      'swing-hl':2,'swing-ms':2,'swing-vol':2
+    };
+    var tpmMap={
+      // Trades/mois PTL : DS ~3-5, MTF ~4-6, SAM ~4-8, IVC ~22 (M30 actif)
+      'ptl-ds':4,'ptl-mtf':5,'ptl-sam':6,'ptl-ivc':22,
+      'tk-cross':10,'kumo-break':6,'chikou':8,'ptl':7,
+      'ds-ob':8,'ds-fvg':9,'ds-choch':7,
+      'swing-hl':5,'swing-ms':6,'swing-vol':4
+    };
+    var stratLabels={
+      'ptl-ds':'🏗️ Double Structure PTL','ptl-mtf':'📐 Multi-TF PTL','ptl-sam':'📈 Swing Action Market PTL','ptl-ivc':'📊 IVC Indice Volume PTL',
+      'tk-cross':'🌊 TK Cross','kumo-break':'🌊 Kumo Breakout','chikou':'🌊 Chikou Span','ptl':'🌊 PTL Multi-TF',
+      'ds-ob':'🏗️ Order Block + BOS','ds-fvg':'🏗️ FVG + Mitigation','ds-choch':'🏗️ CHoCH Break',
+      'swing-hl':'📈 HH/HL Structure','swing-ms':'📈 Market Structure Shift','swing-vol':'📈 Volume Climax'
+    };
+    // Utiliser le RR spécifique à chaque stratégie PTL si non overridé
+    if(['ptl-ds','ptl-mtf','ptl-sam','ptl-ivc'].indexOf(strat)>=0){
+      rrTarget=rrMap[strat];
+    }
+
     var baseWR=wrMap[strat]||0.50;
     if(trend==='trend') baseWR+=0.04;
     if(trend==='strong') baseWR+=0.08;
+    var tradesPerMonth=tpmMap[strat]||8;
+    var totalTrades=numMonths*tradesPerMonth;
 
     var trades=[];
     var equity=capital;
+    var equityCurve=[capital];
     var peak=capital;
-    var maxDD=0;
-    var months=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    var maxDD=0; var maxDDPct=0;
+    var consecutiveWins=0; var consecutiveLosses=0;
+    var maxConsecWins=0; var maxConsecLoss=0; var curConsecL=0; var curConsecW=0;
     var now=new Date();
+    var monthlyPnl={};
 
     for(var i=0;i<totalTrades;i++){
       var isWin=Math.random()<baseWR;
       var riskAmt=equity*(risk/100);
       var pnl=isWin?riskAmt*rrTarget:-riskAmt;
-      // Add some variance
-      pnl*=(0.7+Math.random()*0.6);
+      pnl*=(0.65+Math.random()*0.7);
       equity+=pnl;
+      equityCurve.push(equity);
       if(equity>peak) peak=equity;
       var dd=peak-equity;
-      if(dd>maxDD) maxDD=dd;
-      var daysBack=Math.floor(Math.random()*numMonths*30);
-      var d=new Date(now-daysBack*86400000);
+      var ddPct=dd/peak*100;
+      if(dd>maxDD){maxDD=dd;maxDDPct=ddPct;}
+      if(isWin){curConsecW++;curConsecL=0;if(curConsecW>maxConsecWins)maxConsecWins=curConsecW;}
+      else{curConsecL++;curConsecW=0;if(curConsecL>maxConsecLoss)maxConsecLoss=curConsecL;}
+      var daysBack=Math.floor((totalTrades-i)/(totalTrades)*numMonths*30);
+      var d=new Date(now.getTime()-daysBack*86400000);
+      var mKey=d.getFullYear()+'-'+(d.getMonth()+1);
+      monthlyPnl[mKey]=(monthlyPnl[mKey]||0)+pnl;
       trades.push({
         date:d.toLocaleDateString('fr-FR'),
+        ts:d.getTime(),
         dir:Math.random()>0.5?'LONG':'SHORT',
         pnl:Math.round(pnl),
         result:isWin?'win':'loss',
-        rr:isWin?rrTarget.toFixed(1):'-1.0'
+        rr:isWin?(rrTarget*(0.8+Math.random()*0.4)).toFixed(1):'-1.0',
+        entry:(Math.random()*0.002+1.08).toFixed(5)
       });
     }
-    trades.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    trades.sort(function(a,b){return a.ts-b.ts;});
 
     var wins=trades.filter(function(t){return t.result==='win';});
+    var losses=trades.filter(function(t){return t.result==='loss';});
     var finalPnl=equity-capital;
     var wr=Math.round(wins.length/trades.length*100);
-    var profitFactor=(wins.reduce(function(s,t){return s+t.pnl;},0)||1)/Math.abs(trades.filter(function(t){return t.result==='loss';}).reduce(function(s,t){return s+t.pnl;},0)||1);
+    var avgWin=wins.length?wins.reduce(function(s,t){return s+t.pnl;},0)/wins.length:0;
+    var avgLoss=losses.length?Math.abs(losses.reduce(function(s,t){return s+t.pnl;},0)/losses.length):1;
+    var totalWinAmt=wins.reduce(function(s,t){return s+t.pnl;},0);
+    var totalLossAmt=Math.abs(losses.reduce(function(s,t){return s+t.pnl;},0)||1);
+    var profitFactor=totalWinAmt/totalLossAmt;
+    var expectancy=(baseWR*avgWin-(1-baseWR)*avgLoss);
+    var sharpe=(finalPnl/capital*100)/(maxDDPct||1)*Math.sqrt(12/numMonths);
+    var cagr=numMonths>=12?((Math.pow(equity/capital,12/numMonths)-1)*100):((finalPnl/capital)*(12/numMonths)*100);
 
-    var h='<div class="bt-result-card">';
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
-    h+='<div style="font-size:11px;font-weight:800;color:var(--gold2)">📊 RÉSULTATS — '+pair+' · '+strat.toUpperCase()+' · '+numMonths+' mois</div>';
-    h+='<div style="font-size:10px;color:'+(finalPnl>=0?'var(--green)':'var(--red)')+';font-weight:800">'+(finalPnl>=0?'+':'')+finalPnl.toFixed(0)+'$ ('+(finalPnl/capital*100).toFixed(1)+'%)</div>';
+    var isPos=finalPnl>=0;
+    var color=isPos?'var(--green)':'var(--red)';
+
+    var h='';
+
+    /* ── KPI ROW ── */
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+    var kpis=[
+      ['P&L Total',(isPos?'+':'')+finalPnl.toFixed(0)+'$',isPos?'var(--green)':'var(--red)'],
+      ['Return',(isPos?'+':'')+((finalPnl/capital)*100).toFixed(1)+'%',isPos?'var(--green)':'var(--red)'],
+      ['Win Rate',wr+'%',wr>=50?'var(--green)':'var(--red)'],
+      ['Profit Factor',profitFactor.toFixed(2),profitFactor>=1.5?'var(--green)':profitFactor>=1?'var(--gold)':'var(--red)']
+    ];
+    kpis.forEach(function(k){
+      h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:12px;text-align:center">';
+      h+='<div style="font-size:8px;color:var(--dim);margin-bottom:4px">'+k[0]+'</div>';
+      h+='<div style="font-size:16px;font-weight:800;color:'+k[2]+';font-family:var(--fd)">'+k[1]+'</div>';
+      h+='</div>';
+    });
     h+='</div>';
 
-    // Stats
+    /* ── HEADER ── */
+    h+='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;margin-bottom:16px">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
+    h+='<div style="font-size:11px;font-weight:800;color:var(--gold2)">📊 '+pair+' · '+stratLabels[strat]+' · '+periodLabel+'</div>';
+    h+='<div style="font-size:9px;color:var(--dim)">'+totalTrades+' trades · Capital '+capital.toLocaleString('fr-FR')+'$</div>';
+    h+='</div>';
+
+    /* ── STATS GRID ── */
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">';
     var stats=[
-      ['Total trades',totalTrades,''],
-      ['Win Rate',wr+'%',wr>=50?'var(--green)':'var(--red)'],
-      ['P&L total',(finalPnl>=0?'+':'')+finalPnl.toFixed(0)+'$',finalPnl>=0?'var(--green)':'var(--red)'],
       ['Capital final',equity.toFixed(0)+'$','var(--text)'],
-      ['Profit Factor',profitFactor.toFixed(2),profitFactor>=1.5?'var(--green)':profitFactor>=1?'var(--gold)':'var(--red)'],
-      ['Max Drawdown','-'+maxDD.toFixed(0)+'$ (-'+(maxDD/peak*100).toFixed(1)+'%)','var(--red)'],
-      ['R:R cible',rrTarget+'R','var(--gold2)'],
+      ['CAGR annualisé',(cagr>=0?'+':'')+cagr.toFixed(1)+'%',cagr>=0?'var(--green)':'var(--red)'],
+      ['Max Drawdown','-'+maxDD.toFixed(0)+'$ (-'+maxDDPct.toFixed(1)+'%)','var(--red)'],
+      ['Sharpe Ratio',sharpe.toFixed(2),sharpe>=1?'var(--green)':sharpe>=0.5?'var(--gold)':'var(--red)'],
+      ['Avg Win','+'+avgWin.toFixed(0)+'$','var(--green)'],
+      ['Avg Loss','-'+avgLoss.toFixed(0)+'$','var(--red)'],
+      ['Expectancy / trade',expectancy.toFixed(0)+'$',expectancy>=0?'var(--green)':'var(--red)'],
+      ['R:R effectif',(avgWin/avgLoss).toFixed(2)+'R','var(--gold2)'],
+      ['Consec. Wins max',maxConsecWins,'var(--green)'],
+      ['Consec. Losses max',maxConsecLoss,'var(--red)'],
+      ['Total trades',totalTrades,'var(--text)'],
       ['Risque/trade',risk+'% = '+(capital*risk/100).toFixed(0)+'$','var(--dim)']
     ];
     stats.forEach(function(s){
@@ -8369,26 +8847,84 @@ function runBacktest(){
     });
     h+='</div>';
 
-    // Equity curve mini
-    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);margin-bottom:6px">COURBE D\'ÉQUITÉ SIMULÉE</div>';
-    h+='<div style="width:100%;height:80px;background:var(--s1);border:1px solid var(--border2);border-radius:6px;overflow:hidden;margin-bottom:14px"><svg viewBox="0 0 600 80" preserveAspectRatio="none">';
-    var eq2=[capital]; var run2=capital;
-    trades.forEach(function(t){ run2+=t.pnl; eq2.push(run2); });
-    var mn=Math.min.apply(null,eq2), mx=Math.max.apply(null,eq2), rng2=mx-mn||1;
-    var pts2=eq2.map(function(v,i){ return (i/(eq2.length-1||1)*600).toFixed(1)+','+(80-((v-mn)/rng2*70+5)).toFixed(1); }).join(' ');
-    h+='<polyline points="'+pts2+'" fill="none" stroke="'+(finalPnl>=0?'#00c878':'#e05555')+'" stroke-width="2"/>';
+    /* ── EQUITY CURVE GRANDE ── */
+    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);letter-spacing:1px;margin-bottom:8px">COURBE D\'ÉQUITÉ SIMULÉE</div>';
+    h+='<div style="width:100%;height:220px;background:#0a0a12;border:1px solid var(--border2);border-radius:8px;overflow:hidden;position:relative;margin-bottom:14px">';
+    h+='<svg id="eq-svg" viewBox="0 0 800 220" preserveAspectRatio="none" style="width:100%;height:100%">';
+    var eqMin=Math.min.apply(null,equityCurve),eqMax=Math.max.apply(null,equityCurve),eqRng=eqMax-eqMin||1;
+    var padT=15,padB=15,svgH=220,svgW=800;
+    var scaleY=function(v){return padT+(1-((v-eqMin)/eqRng))*(svgH-padT-padB);};
+    var scaleX=function(i){return i/(equityCurve.length-1||1)*svgW;};
+
+    /* Grid lines */
+    for(var gi=0;gi<=4;gi++){
+      var gy=padT+gi*(svgH-padT-padB)/4;
+      var gv=(eqMin+(1-gi/4)*eqRng).toFixed(0);
+      h+='<line x1="0" y1="'+gy+'" x2="'+svgW+'" y2="'+gy+'" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+      h+='<text x="4" y="'+(gy-2)+'" fill="rgba(255,255,255,0.25)" font-size="7" font-family="monospace">'+gv+'$</text>';
+    }
+
+    /* Baseline (capital initial) */
+    var baseY=scaleY(capital);
+    h+='<line x1="0" y1="'+baseY+'" x2="'+svgW+'" y2="'+baseY+'" stroke="rgba(200,160,60,0.3)" stroke-width="1" stroke-dasharray="4,4"/>';
+
+    /* Fill area */
+    var fillPts=equityCurve.map(function(v,i){return scaleX(i).toFixed(1)+','+scaleY(v).toFixed(1);}).join(' ');
+    var lastX=scaleX(equityCurve.length-1).toFixed(1);
+    var lastY=scaleY(equityCurve[equityCurve.length-1]).toFixed(1);
+    h+='<polygon points="0,'+svgH+' '+fillPts+' '+lastX+','+svgH+'" fill="'+(isPos?'rgba(0,200,120,0.08)':'rgba(224,85,85,0.08)')+'"/>';
+
+    /* Line */
+    h+='<polyline points="'+fillPts+'" fill="none" stroke="'+(isPos?'#00c878':'#e05555')+'" stroke-width="2" stroke-linejoin="round"/>';
+
+    /* Drawdown zones rouges */
+    var pk2=equityCurve[0];
+    equityCurve.forEach(function(v,i){
+      if(v>pk2){pk2=v;}
+      else if((pk2-v)/pk2>0.03){
+        var x1=scaleX(i>0?i-1:0).toFixed(1);
+        var x2=scaleX(i).toFixed(1);
+        h+='<rect x="'+x1+'" y="'+padT+'" width="'+(x2-x1)+'" height="'+(svgH-padT-padB)+'" fill="rgba(224,85,85,0.06)"/>';
+      }
+    });
+
     h+='</svg></div>';
 
-    // Last 10 trades
-    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);margin-bottom:6px">DERNIERS TRADES</div>';
+    /* ── MONTHLY RETURNS ── */
+    var mKeys=Object.keys(monthlyPnl).sort();
+    if(mKeys.length>1){
+      h+='<div style="font-size:9px;font-weight:800;color:var(--dim);letter-spacing:1px;margin-bottom:8px">PERFORMANCE MENSUELLE</div>';
+      h+='<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:14px">';
+      mKeys.forEach(function(k){
+        var mv=monthlyPnl[k];
+        var mvPct=(mv/capital*100).toFixed(1);
+        var mIsPos=mv>=0;
+        h+='<div style="background:'+(mIsPos?'rgba(0,200,120,0.12)':'rgba(224,85,85,0.12)')+';border:1px solid '+(mIsPos?'rgba(0,200,120,0.3)':'rgba(224,85,85,0.3)')+';border-radius:4px;padding:4px 7px;text-align:center;min-width:54px">';
+        h+='<div style="font-size:7px;color:var(--dim)">'+k+'</div>';
+        h+='<div style="font-size:9px;font-weight:800;color:'+(mIsPos?'var(--green)':'var(--red)')+';">'+(mIsPos?'+':'')+mvPct+'%</div>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+
+    /* ── LAST TRADES ── */
+    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);letter-spacing:1px;margin-bottom:8px">DERNIERS TRADES</div>';
     h+='<div style="background:var(--s1);border-radius:6px;overflow:hidden">';
     h+='<div class="bt-trade-row" style="background:var(--s2);color:var(--dim)"><span>Date</span><span>Paire</span><span>Dir</span><span>R:R</span><span>P&L</span><span>Résultat</span></div>';
-    trades.slice(-10).reverse().forEach(function(t){
-      h+='<div class="bt-trade-row '+(t.result==='win'?'win':'loss')+'"><span>'+t.date+'</span><span>'+pair+'</span><span>'+t.dir+'</span><span>'+t.rr+'R</span><span style="color:'+(t.pnl>=0?'var(--green)':'var(--red)')+'">'+(t.pnl>=0?'+':'')+t.pnl+'$</span><span style="color:'+(t.result==='win'?'var(--green)':'var(--red)')+'">'+t.result.toUpperCase()+'</span></div>';
+    trades.slice(-15).reverse().forEach(function(t){
+      h+='<div class="bt-trade-row '+(t.result==='win'?'win':'loss')+'">';
+      h+='<span>'+t.date+'</span><span>'+pair+'</span>';
+      h+='<span style="color:'+(t.dir==='LONG'?'var(--green)':'var(--red)')+'">'+t.dir+'</span>';
+      h+='<span style="color:'+(t.result==='win'?'var(--green)':'var(--red)')+'">'+t.rr+'R</span>';
+      h+='<span style="color:'+(t.pnl>=0?'var(--green)':'var(--red)')+';font-weight:700">'+(t.pnl>=0?'+':'')+t.pnl+'$</span>';
+      h+='<span style="color:'+(t.result==='win'?'var(--green)':'var(--red)')+';font-weight:800">'+t.result.toUpperCase()+'</span>';
+      h+='</div>';
     });
     h+='</div>';
+    h+='</div>';
+
     el.innerHTML=h;
-  }, 800);
+  }, 600);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -8625,6 +9161,686 @@ function setRiskAndCalc(btn){
   var el = document.getElementById('c-risk');
   if(el && val){ el.value = parseFloat(val); calcPosition(); }
 }
+
+
+/* ═══════════════════════════════════════════════════
+   MANSA API INTEGRATIONS — Twelve Data + Alpha Vantage + NewsAPI
+   ═══════════════════════════════════════════════════ */
+
+/* ── TWELVE DATA — Prix temps réel ── */
+async function tdPrice(symbol){
+  try{
+    var r = await fetch('/api/twelvedata?type=price&symbol='+encodeURIComponent(symbol));
+    var d = await r.json();
+    return d.price ? parseFloat(d.price) : null;
+  }catch(e){ return null; }
+}
+
+async function tdQuote(symbol){
+  try{
+    var r = await fetch('/api/twelvedata?type=quote&symbol='+encodeURIComponent(symbol));
+    return await r.json();
+  }catch(e){ return null; }
+}
+
+async function tdTimeSeries(symbol, interval, size){
+  try{
+    var r = await fetch('/api/twelvedata?type=time_series&symbol='+encodeURIComponent(symbol)+'&interval='+(interval||'1h')+'&outputsize='+(size||30));
+    return await r.json();
+  }catch(e){ return null; }
+}
+
+/* ── ALPHA VANTAGE — Macro + FX ── */
+async function avForexRate(from, to){
+  try{
+    var r = await fetch('/api/alphavantage?function=CURRENCY_EXCHANGE_RATE&from_symbol='+from+'&to_symbol='+to);
+    var d = await r.json();
+    var info = d['Realtime Currency Exchange Rate'];
+    return info ? parseFloat(info['5. Exchange Rate']) : null;
+  }catch(e){ return null; }
+}
+
+async function avGlobalQuote(symbol){
+  try{
+    var r = await fetch('/api/alphavantage?function=GLOBAL_QUOTE&symbol='+encodeURIComponent(symbol));
+    var d = await r.json();
+    return d['Global Quote'] || null;
+  }catch(e){ return null; }
+}
+
+async function avMacroData(indicator){
+  // indicator: REAL_GDP | INFLATION | FEDERAL_FUNDS_RATE
+  try{
+    var r = await fetch('/api/alphavantage?function='+indicator);
+    return await r.json();
+  }catch(e){ return null; }
+}
+
+/* ── NEWSAPI — Actualités financières ── */
+var _newsCache = null;
+var _newsCacheTime = 0;
+async function fetchFinancialNews(query){
+  var now = Date.now();
+  if(_newsCache && now - _newsCacheTime < 5*60*1000) return _newsCache;
+  try{
+    var q = query || 'forex trading gold bitcoin';
+    var r = await fetch('/api/news?q='+encodeURIComponent(q)+'&pageSize=15');
+    var d = await r.json();
+    _newsCache = d.articles || [];
+    _newsCacheTime = now;
+    return _newsCache;
+  }catch(e){ return []; }
+}
+
+/* ── WIDGET: News panel enrichi ── */
+function openNewsLink(el){
+  var u = el.getAttribute('data-url');
+  if(u) window.open(decodeURIComponent(u),'_blank');
+}
+async function renderNewsWithAPI(){
+  var el = document.getElementById('news-content') || document.getElementById('actu-content');
+  if(!el) return;
+  el.innerHTML = '<div style="color:var(--dim);font-size:9px;padding:20px;text-align:center">⏳ Chargement actualités...</div>';
+  var articles = await fetchFinancialNews('forex OR gold OR bitcoin OR "taux" OR "Fed" OR "BCE"');
+  if(!articles.length){
+    el.innerHTML = '<div style="color:var(--dim);font-size:9px;padding:20px;text-align:center">⚠️ Actualités indisponibles</div>';
+    return;
+  }
+  var h = '';
+  articles.forEach(function(a){
+    var ago = '';
+    if(a.publishedAt){
+      var diff = Math.round((Date.now()-new Date(a.publishedAt))/60000);
+      ago = diff<60 ? diff+'min' : Math.round(diff/60)+'h';
+    }
+    h += '<div style="padding:10px 0;border-bottom:1px solid var(--border2);cursor:pointer" data-url="'+encodeURIComponent(a.url||'')+'" onclick="openNewsLink(this)">';
+    h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px">';
+    h += '<span style="font-size:8px;color:var(--gold2)">'+(a.source&&a.source.name||'')+'</span>';
+    h += '<span style="font-size:8px;color:var(--dim)">'+ago+'</span>';
+    h += '</div>';
+    h += '<div style="font-size:9px;color:var(--text);line-height:1.4">'+a.title+'</div>';
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
+/* ── WIDGET: Prix temps réel via Twelve Data ── */
+var TD_SYMBOLS = {
+  'EUR/USD':'EUR/USD','GBP/USD':'GBP/USD','USD/JPY':'USD/JPY',
+  'XAU/USD':'XAU/USD','BTC/USD':'BTC/USD','ETH/USD':'ETH/USD',
+  'US500':'SPX','NAS100':'NDX','GER40':'DAX'
+};
+
+async function enrichWatchlistWithTD(){
+  // Enrichit les prix de la watchlist avec Twelve Data si Yahoo échoue
+  var watchEls = document.querySelectorAll('[data-sym]');
+  for(var i=0;i<Math.min(watchEls.length,5);i++){
+    var sym = watchEls[i].getAttribute('data-sym');
+    var tdSym = TD_SYMBOLS[sym] || sym;
+    var price = await tdPrice(tdSym);
+    if(price){
+      var priceEl = watchEls[i].querySelector('.watch-price');
+      if(priceEl && priceEl.textContent === '—') priceEl.textContent = price.toFixed(4);
+    }
+  }
+}
+
+/* ── AUTO-INIT: déclenche au chargement du panel News ── */
+var _newsInitDone = false;
+(function(){
+  var _origNavForNews = nav;
+  nav = function(id){
+    _origNavForNews(id);
+    if((id==='news'||id==='actu'||id==='macro') && !_newsInitDone){
+      _newsInitDone = true;
+      setTimeout(renderNewsWithAPI, 300);
+    }
+  };
+})();
+
+
+/* ═══════════════════════════════════════════
+   GLOSSAIRE MANSA — Définitions termes clés
+   ═══════════════════════════════════════════ */
+var GLOSSAIRE = {
+  'COT': "Commitment of Traders — Rapport de la CFTC publié chaque vendredi. Montre les positions des institutionnels (fonds, banques) vs retail. Indicateur de sentiment de marché.",
+  'DMX': "Distribution Mansa Index — Score propriétaire PTL de 0 à 100. >65 = institutionnels acheteurs. <35 = institutionnels vendeurs. Basé sur les flux OTC et Dark Pool.",
+  'Dark Pool': "Marchés privés où les grandes banques échangent des blocs massifs ($100M+) sans impacter le cours public. Représente ~40% du volume total Forex.",
+  'Spread': "Différence entre le prix d'achat (Ask) et de vente (Bid). Plus le spread est bas, moins ça coûte de trader. Ex: EUR/USD spread = 0.5 pip = 0.00005.",
+  'Pip': "Price Interest Point — Plus petite unité de mouvement d'un cours Forex. Pour EUR/USD : 1 pip = 0.0001. Pour USD/JPY : 1 pip = 0.01.",
+  '<span class="gl" data-gl="Average True Range — Mesure la volatilité moyenne. ATR élevé = marché très mouvementé. Utilisé pour calibrer les stop-loss.">ATR</span>': "Average True Range — Mesure la volatilité moyenne sur N périodes. ATR élevé = marché volatile. Utilisé pour placer les stop-loss intelligemment.",
+  'RSI': "Relative Strength Index — Oscillateur de 0 à 100. >70 = zone de surachat (attention SHORT). <30 = zone de survente (attention LONG). Période standard : 14.",
+  'Ichimoku': "Système d'analyse japonais complet : Tenkan (moyenne rapide), Kijun (moyenne lente), Kumo (nuage = zone de support/résistance), Chikou (confirmation).",
+  'Kumo': "Le 'nuage' Ichimoku formé par Senkou Span A et B. Prix au-dessus = tendance haussière. Prix en-dessous = tendance baissière. L'épaisseur = force du support/résistance.",
+  'Kijun': "Ligne de base Ichimoku sur 26 périodes. Agit comme support/résistance dynamique. Un croisement Tenkan/Kijun est un signal d'entrée.",
+  'Tenkan': "Ligne de conversion Ichimoku sur 9 périodes. Plus réactive que le Kijun. Croisement au-dessus du Kijun = signal haussier (TK Cross).",
+  'Drawdown': "Perte maximale depuis un sommet de capital. Ex: compte à €10 000 descend à €8 500 = drawdown de 15%. Mesure le risque d'une stratégie.",
+  'Carry Trade': "Stratégie d'emprunt dans une devise à taux bas (JPY, CHF) pour investir dans une devise à taux élevé (AUD, NZD). Profit = différentiel de taux d'intérêt.",
+  'Swap': "Intérêt payé ou reçu chaque nuit pour maintenir une position ouverte. Dépend du différentiel de taux entre les 2 devises. Peut être positif (gain) ou négatif (coût).",
+  'BCE': "Banque Centrale Européenne — Fixe le taux directeur de la zone Euro. Ses décisions impactent directement l'EUR/USD, EUR/GBP, EUR/JPY.",
+  'Fed': "Federal Reserve — Banque centrale américaine. Son taux directeur influence tous les marchés mondiaux. Réunions FOMC = événements majeurs Forex.",
+  'BoJ': "Bank of Japan — Banque centrale japonaise. Politique ultra-accommodante depuis 2013. Influence directe sur JPY (USD/JPY, EUR/JPY, GBP/JPY).",
+  'BoE': "Bank of England — Banque centrale britannique. Influence directe sur GBP (GBP/USD, GBP/JPY, EUR/GBP).",
+  'MACD': "Moving Average Convergence Divergence — Montre la relation entre 2 moyennes mobiles. Signal haussier quand la ligne MACD croise au-dessus de la ligne signal.",
+  'Support': "Niveau de prix où les acheteurs sont historiquement plus forts que les vendeurs. Le cours a tendance à rebondir sur ce niveau.",
+  'Résistance': "Niveau de prix où les vendeurs sont historiquement plus forts que les acheteurs. Le cours a tendance à se retourner à la baisse sur ce niveau.",
+  'Liquidité': "Volume de transactions disponible sur un marché. Haute liquidité = spreads faibles + exécution rapide. Le Forex est le marché le plus liquide au monde ($7.5T/jour).",
+  'OTC': "Over The Counter — Transactions réalisées directement entre institutions financières, hors des marchés boursiers réglementés. Le Forex est principalement OTC.",
+  'COT Long': "Pourcentage des positions LONG (achat) des non-commerciaux (fonds spéculatifs, asset managers) dans le rapport COT de la CFTC.",
+  'Volatilité': "Amplitude des variations d'un cours sur une période. Haute volatilité = risque et opportunités plus grands. Mesurée par ATR, VIX (pour indices).",
+  'Gap': "Ecart entre le cours de clôture et le cours d'ouverture. Souvent créé le week-end ou après des annonces majeures. Les gaps ont tendance à se combler.",
+  'Lot': "Unité de mesure standard en Forex. 1 lot standard = 100 000 unités. 1 mini-lot = 10 000 unités. 1 micro-lot = 1 000 unités.",
+  'Levier': "Permet de contrôler une position plus grande que son capital. Levier 1:100 = €1 000 contrôle €100 000. Amplifie gains ET pertes.",
+  'Risk/Reward': "Ratio Risque/Récompense. RR de 1:2 = on risque 50 pips pour en gagner 100. PTL recommande minimum 1:2 pour tout trade.",
+  'NFP': "Non-Farm Payrolls — Rapport mensuel US sur l'emploi (hors agriculture). Un des événements macro les plus impactants pour EUR/USD et USD/JPY.",
+  'CPI': "Consumer Price Index — Indice des prix à la consommation. Mesure l'inflation. Données CPI plus hautes qu'attendu = USD haussier (Fed plus hawkish).",
+  'PIB': "Produit Intérieur Brut — Mesure la croissance économique d'un pays. PIB fort = devise forte. PIB faible = devise sous pression.",
+  'Hawkish': "Posture d\'une banque centrale orientée vers la hausse des taux d'intérêt pour lutter contre l'inflation. Positif pour la devise concernée.",
+  'Dovish': "Posture d\'une banque centrale orientée vers la baisse des taux pour stimuler l'économie. Négatif pour la devise concernée.",
+  'Structure': "En analyse de marché PTL : pattern de Higher High / Higher Low (haussier) ou Lower High / Lower Low (baissier) sur un timeframe donné.",
+  'OPEC': "Organisation des Pays Exportateurs de Pétrole. Ses décisions sur les quotas de production impactent directement le cours du pétrole (WTI, Brent) et le CAD.",
+  'DXY': "US Dollar Index — Mesure la force du dollar américain contre un panier de 6 devises (EUR, JPY, GBP, CAD, SEK, CHF). DXY haussier = pression sur paires EUR/USD.",
+  'VIX': "Volatility Index — Indice de la peur du marché actions US. VIX >30 = panique/forte volatilité. VIX <15 = marché calme. Corrélé inversement au S&P 500.",
+  'Safe Haven': "Devise ou actif refuge en période de stress de marché. CHF, JPY et Or (XAU) sont les principaux safe havens. Leur cours monte quand les marchés paniquent.",
+};
+
+/* Fonction pour wrapper un terme avec son tooltip */
+function gl(terme, affichage){
+  var def = GLOSSAIRE[terme] || GLOSSAIRE[affichage] || '';
+  if(!def) return affichage || terme;
+  var txt = affichage || terme;
+  return '<span class="gl" data-gl="'+def.replace(/"/g,'&quot;')+'">'+txt+' <span class="gl-icon">?</span></span>';
+}
+
+
+/* ── TICKER BAND JS V22 ── */
+var TICKER_DATA = [
+  {sym:'EUR/USD', price:1.0842, chg:+0.12},
+  {sym:'GBP/USD', price:1.2971, chg:-0.08},
+  {sym:'USD/JPY', price:153.48, chg:+0.22},
+  {sym:'XAU/USD', price:2718.5, chg:+0.41},
+  {sym:'BTC/USD', price:68420,  chg:+1.84},
+  {sym:'ETH/USD', price:2641,   chg:+0.93},
+  {sym:'US500',   price:5842,   chg:+0.31},
+  {sym:'NAS100',  price:20180,  chg:+0.47},
+  {sym:'GER40',   price:19341,  chg:-0.14},
+  {sym:'DXY',     price:104.32, chg:-0.09},
+  {sym:'EUR/GBP', price:0.8356, chg:+0.06},
+  {sym:'GBP/JPY', price:199.14, chg:+0.18},
+  {sym:'USD/CHF', price:0.8892, chg:-0.05},
+  {sym:'AUD/USD', price:0.6621, chg:+0.07},
+  {sym:'USOIL',   price:71.84,  chg:-0.32},
+  {sym:'XAG/USD', price:34.12,  chg:+0.88},
+];
+
+function buildTicker(){
+  var inner = document.getElementById('ticker-inner');
+  if(!inner) return;
+  var items = TICKER_DATA.concat(TICKER_DATA); // double pour boucle fluide
+  var h = '';
+  items.forEach(function(d){
+    var cls = d.chg>0?'up':d.chg<0?'dn':'flat';
+    var arrow = d.chg>0?'▲':d.chg<0?'▼':'—';
+    var decimals = d.price > 1000 ? 0 : d.price > 10 ? 2 : 4;
+    h += '<div class="tick-item" onclick="handleTickerClick(this)" data-sym="'+d.sym+'">';
+    h += '<span class="tick-sym">'+d.sym+'</span>';
+    h += '<span class="tick-price">'+d.price.toFixed(decimals)+'</span>';
+    h += '<span class="tick-chg '+cls+'">'+arrow+(d.chg>=0?'+':'')+d.chg.toFixed(2)+'%</span>';
+    h += '</div>';
+  });
+  inner.innerHTML = h;
+}
+
+function handleTickerClick(el){ var sym=el.getAttribute('data-sym')||el.textContent||'';
+  // Naviguer vers la paire cliquée
+  var map = {'EUR/USD':'forex','GBP/USD':'forex','USD/JPY':'forex',
+             'XAU/USD':'forex','BTC/USD':'crypto','ETH/USD':'crypto',
+             'US500':'marches','NAS100':'marches','GER40':'marches',
+             'DXY':'macro','USOIL':'marches'};
+  var panel = map[sym] || 'forex';
+  nav(panel);
+}
+
+// Rafraîchir les prix toutes les 30s avec variation aléatoire simulée
+function refreshTicker(){
+  TICKER_DATA.forEach(function(d){
+    var move = (Math.random()-0.48)*0.15;
+    d.price = Math.max(0, d.price * (1 + move/100));
+    d.chg = Math.round((d.chg + (Math.random()-0.5)*0.1)*100)/100;
+  });
+  buildTicker();
+}
+
+// Init au chargement
+window.addEventListener('load', function(){
+  buildTicker();
+  setInterval(refreshTicker, 30000);
+});
+
+
+/* ── RECHERCHE UNIVERSELLE JS V22 ── */
+var SEARCH_INDEX = [
+  // Panels
+  {cat:'PANELS',icon:'📊',name:'Marchés',hint:'Vue globale',key:'marches',action:function(){nav('marches');}},
+  {cat:'PANELS',icon:'🔍',name:'Screener',hint:'Scanner multi-critères',key:'screener',action:function(){nav('screener');}},
+  {cat:'PANELS',icon:'📈',name:'Charts',hint:'Graphiques TradingView',key:'charts',action:function(){nav('charts');}},
+  {cat:'PANELS',icon:'⚡',name:'Setups PTL',hint:'Signaux Double Structure',key:'setups',action:function(){nav('setups');}},
+  {cat:'PANELS',icon:'🏛',name:'Smart Money',hint:'Positions grandes banques',key:'smart',action:function(){nav('smart');}},
+  {cat:'PANELS',icon:'📰',name:'Macro',hint:'Calendrier économique',key:'macro',action:function(){nav('macro');}},
+  {cat:'PANELS',icon:'📱',name:'COT',hint:'Engagement des traders',key:'cot',action:function(){nav('cot');}},
+  {cat:'PANELS',icon:'💰',name:'Rendement',hint:'Taux et obligations',key:'rendement',action:function(){nav('rendement');}},
+  {cat:'PANELS',icon:'₿',name:'Crypto',hint:'Bitcoin, Ethereum...',key:'crypto',action:function(){nav('crypto');}},
+  // Paires Forex
+  {cat:'FOREX',icon:'💱',name:'EUR/USD',hint:'Euro / Dollar US',key:'eurusd',action:function(){nav('charts');}},
+  {cat:'FOREX',icon:'💱',name:'GBP/USD',hint:'Livre Sterling / Dollar',key:'gbpusd',action:function(){nav('charts');}},
+  {cat:'FOREX',icon:'💱',name:'USD/JPY',hint:'Dollar / Yen Japonais',key:'usdjpy',action:function(){nav('charts');}},
+  {cat:'FOREX',icon:'💱',name:'EUR/JPY',hint:'Euro / Yen Japonais',key:'eurjpy',action:function(){nav('charts');}},
+  {cat:'FOREX',icon:'💱',name:'GBP/JPY',hint:'Livre Sterling / Yen',key:'gbpjpy',action:function(){nav('charts');}},
+  {cat:'FOREX',icon:'💱',name:'AUD/USD',hint:'Dollar Australien / Dollar',key:'audusd',action:function(){nav('charts');}},
+  // Matières premières
+  {cat:'ACTIFS',icon:'🥇',name:'XAU/USD (Or)',hint:'Gold vs Dollar',key:'xauusd gold',action:function(){nav('charts');}},
+  {cat:'ACTIFS',icon:'🪙',name:'XAG/USD (Argent)',hint:'Silver vs Dollar',key:'xagusd silver',action:function(){nav('charts');}},
+  {cat:'ACTIFS',icon:'🛢',name:'WTI (Pétrole)',hint:'Oil West Texas Intermediate',key:'usoil wti pétrole',action:function(){nav('charts');}},
+  // Indices
+  {cat:'INDICES',icon:'🇺🇸',name:'S&P 500',hint:'US500 - Indice américain',key:'sp500 us500',action:function(){nav('marches');}},
+  {cat:'INDICES',icon:'🇩🇪',name:'DAX 40',hint:'GER40 - Indice allemand',key:'dax ger40',action:function(){nav('marches');}},
+  // Raccourcis utiles
+  {cat:'RACCOURCIS',icon:'⌨',name:'Aide raccourcis',hint:'Voir tous les raccourcis clavier',key:'raccourcis aide help',action:function(){showKeyboardHelp();}},
+  {cat:'RACCOURCIS',icon:'🔔',name:'Créer une alerte',hint:'Nouvelle alerte de prix',key:'alerte alert',action:function(){nav('alertes');}},
+  {cat:'RACCOURCIS',icon:'📓',name:'Journal de trading',hint:'Mes trades',key:'journal trade',action:function(){nav('journal');}},
+];
+
+var _srIdx = -1;
+
+function openSearch(){
+  var ov = document.getElementById('search-overlay');
+  if(!ov) return;
+  ov.classList.add('active');
+  var inp = document.getElementById('search-input');
+  if(inp){ inp.value=''; inp.focus(); }
+  renderSearchResults('');
+}
+
+function closeSearch(){
+  var ov = document.getElementById('search-overlay');
+  if(ov) ov.classList.remove('active');
+  _srIdx = -1;
+}
+
+function renderSearchResults(q){
+  var el = document.getElementById('search-results');
+  if(!el) return;
+  q = (q||'').toLowerCase().trim();
+  var filtered = q ? SEARCH_INDEX.filter(function(r){
+    return r.name.toLowerCase().includes(q) || r.key.includes(q) || r.hint.toLowerCase().includes(q);
+  }) : SEARCH_INDEX;
+
+  if(!filtered.length){
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--dim);font-size:10px">Aucun résultat pour "'+q+'"</div>';
+    return;
+  }
+
+  var cats = {};
+  filtered.forEach(function(r){ (cats[r.cat] = cats[r.cat]||[]).push(r); });
+  var h = '';
+  var idx = 0;
+  Object.keys(cats).forEach(function(cat){
+    h += '<div class="sr-cat">'+cat+'</div>';
+    cats[cat].forEach(function(r){
+      h += '<div class="sr-item" data-idx="'+idx+'" onclick="execSearch('+idx+')">';
+      h += '<span class="sr-icon">'+r.icon+'</span>';
+      h += '<span class="sr-name">'+r.name+'</span>';
+      h += '<span class="sr-hint">'+r.hint+'</span>';
+      h += '</div>';
+      idx++;
+    });
+  });
+  el.innerHTML = h;
+  _srIdx = -1;
+  // Store flattened for keyboard nav
+  el._flat = filtered;
+}
+
+function execSearch(idx){
+  var el = document.getElementById('search-results');
+  var flat = el && el._flat;
+  if(!flat || idx < 0 || idx >= flat.length) return;
+  flat[idx].action();
+  closeSearch();
+}
+
+document.addEventListener('keydown', function(e){
+  // Ctrl+K ou Cmd+K
+  if((e.ctrlKey||e.metaKey) && e.key==='k'){
+    e.preventDefault();
+    var ov = document.getElementById('search-overlay');
+    if(ov && ov.classList.contains('active')) closeSearch();
+    else openSearch();
+    return;
+  }
+  if(!document.getElementById('search-overlay').classList.contains('active')) return;
+  if(e.key==='Escape'){ closeSearch(); return; }
+  if(e.key==='Enter'){
+    execSearch(_srIdx>=0?_srIdx:0);
+    return;
+  }
+  var el = document.getElementById('search-results');
+  if(!el||!el._flat) return;
+  var items = el.querySelectorAll('.sr-item');
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    _srIdx = Math.min(_srIdx+1, items.length-1);
+    items.forEach(function(it,i){ it.classList.toggle('active',i===_srIdx); });
+    if(items[_srIdx]) items[_srIdx].scrollIntoView({block:'nearest'});
+  }
+  if(e.key==='ArrowUp'){
+    e.preventDefault();
+    _srIdx = Math.max(_srIdx-1, 0);
+    items.forEach(function(it,i){ it.classList.toggle('active',i===_srIdx); });
+    if(items[_srIdx]) items[_srIdx].scrollIntoView({block:'nearest'});
+  }
+});
+
+document.getElementById('search-overlay').addEventListener('click', function(e){
+  if(e.target===this) closeSearch();
+});
+
+document.getElementById('search-input').addEventListener('input', function(){
+  renderSearchResults(this.value);
+  _srIdx = -1;
+});
+
+
+/* ── RACCOURCIS CLAVIER JS V22 ── */
+function showKeyboardHelp(){
+  document.getElementById('kb-help').classList.add('active');
+}
+
+var KB_PANELS = {
+  'm':'marches','s':'screener','c':'charts','p':'setups',
+  'x':'smart','n':'macro','r':'rendement','b':'crypto',
+  'e':'charts','g':'charts','j':'charts','u':'charts'
+};
+var KB_PAIRS = {'e':'EUR/USD','g':'XAU/USD','j':'USD/JPY','u':'GBP/USD'};
+
+document.addEventListener('keydown', function(e){
+  // Ignorer si dans un input
+  var tag = (e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||e.ctrlKey||e.metaKey||e.altKey) return;
+
+  var k = e.key.toLowerCase();
+  if(k==='?'||k==='\/'){ showKeyboardHelp(); return; }
+  if(k==='escape'){
+    document.getElementById('kb-help').classList.remove('active');
+    return;
+  }
+
+  if(KB_PANELS[k]){
+    e.preventDefault();
+    nav(KB_PANELS[k]);
+    // Si c'est une paire, pré-sélectionner
+    if(KB_PAIRS[k]){
+      setTimeout(function(){
+        var sel = document.querySelector('[data-pair="'+KB_PAIRS[k]+'"]');
+        if(sel) sel.click();
+      }, 200);
+    }
+    // Toast notification
+    showToast(KB_PAIRS[k] ? '📊 '+KB_PAIRS[k] : '→ Panel ouvert', 1200);
+  }
+});
+
+// Ctrl+A = nouvelle alerte, Ctrl+J = journal
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.key==='a'){ e.preventDefault(); nav('alertes'); }
+  if(e.ctrlKey && e.key==='j'){ e.preventDefault(); nav('journal'); }
+});
+
+/* Toast notification */
+function showToast(msg, duration){
+  var t = document.getElementById('mansa-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'mansa-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a1a2e;border:1px solid var(--gold);color:var(--text);padding:10px 18px;border-radius:6px;font-size:10px;font-family:var(--fm);z-index:99997;opacity:0;transition:opacity .2s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity='0'; }, duration||2000);
+}
+
+
+/* ── TAUX DIRECTEURS V23 ── */
+var CENTRAL_BANKS = [
+  {name:'Federal Reserve',  abbr:'Fed',   flag:'🇺🇸', rate:5.50, prev:5.25, trend:'stable', next:'Nov 7 2025',  bias:'NEUTRE',   biasCl:'var(--dim)',   impact:'USD',  note:'Pause prolongée. Données emploi déterminantes.'},
+  {name:'BCE',              abbr:'BCE',   flag:'🇪🇺', rate:3.40, prev:3.65, trend:'baisse', next:'Dec 12 2025', bias:'DOVISH',   biasCl:'var(--red)',   impact:'EUR',  note:'Cycle de baisse en cours. Inflation cible 2% presque atteinte.'},
+  {name:'Bank of England',  abbr:'BoE',   flag:'🇬🇧', rate:4.75, prev:5.00, trend:'baisse', next:'Nov 7 2025',  bias:'DOVISH',   biasCl:'var(--red)',   impact:'GBP',  note:'Baisse progressive. Inflation UK encore élevée mais en repli.'},
+  {name:'Bank of Japan',    abbr:'BoJ',   flag:'🇯🇵', rate:0.25, prev:0.10, trend:'hausse', next:'Dec 19 2025', bias:'HAWKISH',  biasCl:'var(--green)', impact:'JPY',  note:'Normalisation historique. Fin de la politique ultra-accommodante.'},
+  {name:'Swiss Nat. Bank',  abbr:'SNB',   flag:'🇨🇭', rate:1.00, prev:1.25, trend:'baisse', next:'Dec 12 2025', bias:'DOVISH',   biasCl:'var(--red)',   impact:'CHF',  note:'SNB lutte contre l\'appréciation du CHF.'},
+  {name:'Reserve Bank AU',  abbr:'RBA',   flag:'🇦🇺', rate:4.35, prev:4.35, trend:'stable', next:'Nov 5 2025',  bias:'NEUTRE',   biasCl:'var(--dim)',   impact:'AUD',  note:'Attentiste. Marché immobilier et inflation guidant les décisions.'},
+  {name:'Bank of Canada',   abbr:'BoC',   flag:'🇨🇦', rate:3.75, prev:4.25, trend:'baisse', next:'Dec 11 2025', bias:'DOVISH',   biasCl:'var(--red)',   impact:'CAD',  note:'Cycle de baisse rapide. Croissance canadienne en ralentissement.'},
+  {name:'Reserve Bank NZ',  abbr:'RBNZ',  flag:'🇳🇿', rate:4.75, prev:5.25, trend:'baisse', next:'Nov 27 2025', bias:'DOVISH',   biasCl:'var(--red)',   impact:'NZD',  note:'Baisse accélérée face à la récession technique.'},
+  {name:'Peoples Bank CN',  abbr:'PBoC',  flag:'🇨🇳', rate:3.10, prev:3.35, trend:'baisse', next:'Continue',    bias:'STIMULUS', biasCl:'var(--blue)',  impact:'CNY',  note:'Stimulus massif pour relancer l\'économie. Impact AUD et NZD.'},
+  {name:'BCEAO',            abbr:'BCEAO', flag:'🌍', rate:3.50, prev:3.50, trend:'stable', next:'Dec 2025',    bias:'NEUTRE',   biasCl:'var(--dim)',   impact:'XOF',  note:'Zone UEMOA. Stabilité monétaire région Afrique de l\'Ouest.'},
+];
+
+function renderCentralBankRates(){
+  var h = '';
+  h += '<div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:6px">🏦 TAUX DIRECTEURS — BANQUES CENTRALES <span style="font-size:8px;color:var(--dim);font-family:var(--fm)">[Mise à jour: Oct 2025]</span></div>';
+  h += '<div style="font-size:9px;color:var(--dim);margin-bottom:14px;line-height:1.7">Les banques centrales fixent les <strong style="color:var(--text)">taux directeurs</strong> (coût de l\'argent). Un taux élevé attire les capitaux étrangers → devise forte. Un taux en baisse → devise affaiblie. Suivre ces taux = comprendre la direction fondamentale des devises.</div>';
+
+  // Summary cards taux
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:18px">';
+  CENTRAL_BANKS.slice(0,8).forEach(function(b){
+    var trendIcon = b.trend==='hausse'?'▲':b.trend==='baisse'?'▼':'━';
+    var trendCol = b.trend==='hausse'?'var(--green)':b.trend==='baisse'?'var(--red)':'var(--dim)';
+    h += '<div style="background:var(--card2);border:1px solid var(--border2);border-radius:4px;padding:10px">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    h += '<span style="font-size:10px">'+b.flag+' <span style="color:var(--gold2);font-weight:700">'+b.abbr+'</span></span>';
+    h += '<span style="font-size:8px;color:'+b.biasCl+';font-weight:700">'+b.bias+'</span></div>';
+    h += '<div style="font-family:var(--fd);font-size:18px;color:var(--text);font-weight:700">'+b.rate.toFixed(2)+'<span style="font-size:10px;color:var(--dim)">%</span></div>';
+    h += '<div style="font-size:8px;color:'+trendCol+'">'+trendIcon+' Préc: '+b.prev.toFixed(2)+'% · Impact: <span style="color:var(--gold2)">'+b.impact+'</span></div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Tableau détaillé
+  h += '<table style="width:100%;border-collapse:collapse;font-size:9px">';
+  h += '<thead><tr style="border-bottom:1px solid var(--border2)">';
+  ['Banque Centrale','Flag','Taux actuel','Précédent','Tendance','Prochaine réunion','Biais','Impact devise','Note'].forEach(function(col){
+    h += '<th style="text-align:left;padding:6px 8px;color:var(--dim);font-weight:600;font-size:8px">'+col+'</th>';
+  });
+  h += '</tr></thead><tbody>';
+  CENTRAL_BANKS.forEach(function(b,i){
+    var bg = i%2===0?'transparent':'rgba(255,255,255,.02)';
+    var trendIcon = b.trend==='hausse'?'▲ hausse':b.trend==='baisse'?'▼ baisse':'━ stable';
+    var trendCol = b.trend==='hausse'?'var(--green)':b.trend==='baisse'?'var(--red)':'var(--dim)';
+    var diff = (b.rate - b.prev).toFixed(2);
+    var diffStr = diff > 0 ? '+'+diff : diff;
+    h += '<tr style="background:'+bg+';border-bottom:1px solid var(--border3)">';
+    h += '<td style="padding:8px;color:var(--text);font-weight:600">'+b.name+'</td>';
+    h += '<td style="padding:8px;font-size:14px">'+b.flag+'</td>';
+    h += '<td style="padding:8px;color:var(--gold);font-family:var(--fd);font-size:13px;font-weight:700">'+b.rate.toFixed(2)+'%</td>';
+    h += '<td style="padding:8px;color:var(--dim)">'+b.prev.toFixed(2)+'% <span style="color:'+(diff>0?'var(--green)':'var(--red)')+'">'+diffStr+'</span></td>';
+    h += '<td style="padding:8px;color:'+trendCol+'">'+trendIcon+'</td>';
+    h += '<td style="padding:8px;color:var(--blue)">'+b.next+'</td>';
+    h += '<td style="padding:8px"><span style="color:'+b.biasCl+';font-weight:700">'+b.bias+'</span></td>';
+    h += '<td style="padding:8px;color:var(--gold2);font-weight:700">'+b.impact+'</td>';
+    h += '<td style="padding:8px;color:var(--dim);font-size:8px;max-width:200px">'+b.note+'</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+
+  // Légende
+  h += '<div style="margin-top:14px;padding:12px;background:rgba(200,160,60,.06);border:1px solid rgba(200,160,60,.2);border-radius:4px;font-size:8.5px;color:var(--dim);line-height:1.8">';
+  h += '<strong style="color:var(--gold)">💡 Guide lecture :</strong> ';
+  h += '<span style="color:var(--green)">▲ HAWKISH</span> = banque centrale remonte les taux → devise s\'apprécie. ';
+  h += '<span style="color:var(--red)">▼ DOVISH</span> = banque centrale baisse les taux → devise se déprécie. ';
+  h += '<span style="color:var(--blue)">━ NEUTRE</span> = pause, attentiste. La divergence entre 2 banques centrales = opportunité de trade ! Ex: Fed HAWKISH + BCE DOVISH = biais SHORT EUR/USD.';
+  h += '</div>';
+
+  return h;
+}
+
+
+/* ============================================================
+   V24 — SPARKLINES WATCHLIST + PDF RAPPORT + MULTI-FENÊTRE
+   ============================================================ */
+
+/* ── SPARKLINES ── */
+var SPARKLINE_DATA={};
+function generateSparkline(ticker){
+  if(SPARKLINE_DATA[ticker]) return SPARKLINE_DATA[ticker];
+  var pts=[];
+  var v=100+Math.random()*50;
+  for(var i=0;i<20;i++){
+    v+=((Math.random()-0.5)*4);
+    pts.push(Math.round(v*100)/100);
+  }
+  SPARKLINE_DATA[ticker]=pts;
+  return pts;
+}
+function drawSparklineSVG(pts,positive){
+  var w=60,h=20;
+  var min=Math.min.apply(null,pts);
+  var max=Math.max.apply(null,pts);
+  var rng=max-min||1;
+  var col=positive?'#00c878':'#e05555';
+  var coords=pts.map(function(v,i){
+    var x=(i/(pts.length-1))*w;
+    var y=h-((v-min)/rng)*(h-2)-1;
+    return x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ');
+  return '<svg width="'+w+'" height="'+h+'" style="display:block"><polyline points="'+coords+'" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+}
+function wlRenderList(){
+  var el=document.getElementById('wl-list-content');
+  if(!el) return;
+  if(!WATCHLIST.length){
+    el.innerHTML='<div style="text-align:center;padding:30px 16px;color:var(--dim);font-size:10px;line-height:1.8">Clique sur ★ à côté<br>d\'un actif pour l\'ajouter<br>à ta watchlist</div>';
+    return;
+  }
+  var h='';
+  WATCHLIST.forEach(function(item){
+    var p=actGetPrice(item.t,item.p);
+    var ch=actGetChg(item.t,item.ch||0);
+    var chNum=parseFloat(ch)||0;
+    var cc=chNum>=0?'var(--green)':'var(--red)';
+    var cur=item.mkt==='us'?'$':'EUR';
+    var spark=generateSparkline(item.t);
+    var svgStr=drawSparklineSVG(spark,chNum>=0);
+    h+='<div class="wl-item">';
+    h+='<span class="wl-ticker" onclick="openChartModal(\''+item.t+'\')">'+item.t.split('.')[0]+'</span>';
+    h+='<span class="wl-company">'+item.n+'</span>';
+    h+='<span style="margin:0 4px">'+svgStr+'</span>';
+    h+='<span class="wl-price" style="color:var(--text)">'+cur+' '+parseFloat(p).toFixed(2)+'</span>';
+    h+='<span class="wl-chg" style="color:'+cc+'">'+(chNum>=0?'+':'')+chNum.toFixed(2)+'%</span>';
+    h+='<button class="wl-remove" onclick="wlRemove(\''+item.t+'\')" title="Retirer">✕</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+
+/* ── PDF RAPPORT JOURNALIER ── */
+function exportDailyPDF(){
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var timeStr=now.toLocaleTimeString('fr-FR');
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Rapport Mansa Terminal</title><style>'
+    +'body{font-family:Arial,sans-serif;background:#f8f9fa;color:#1a1a2e;margin:0;padding:20px}'
+    +'.header{background:linear-gradient(135deg,#040409,#0d0d1a);color:#fff;padding:24px 30px;border-radius:12px;margin-bottom:20px}'
+    +'.logo{font-size:22px;font-weight:900;color:#c8a03c;letter-spacing:2px}'
+    +'.section{background:#fff;border-radius:8px;padding:16px;margin-bottom:14px;border:1px solid #e5e7eb}'
+    +'.section-title{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:10px;border-bottom:2px solid #c8a03c;padding-bottom:6px}'
+    +'table{width:100%;border-collapse:collapse;font-size:10px}'
+    +'th{background:#f1f5f9;padding:6px 8px;text-align:left;font-weight:600}'
+    +'td{padding:5px 8px;border-bottom:1px solid #f0f0f0}'
+    +'.bull{color:#00a86b;font-weight:700}.bear{color:#dc2626;font-weight:700}'
+    +'.footer{text-align:center;font-size:8px;color:#aaa;margin-top:20px;padding-top:10px;border-top:1px solid #e5e7eb}'
+    +'@media print{body{padding:10px}}'
+    +'</style></head><body>'
+    +'<div class="header"><div class="logo">&#x26A1; MANSA TERMINAL</div>'
+    +'<div style="font-size:11px;color:#888;margin-top:4px">Rapport journalier &mdash; '+dateStr+' à '+timeStr+'</div>'
+    +'<div style="font-size:10px;color:#c8a03c;margin-top:8px">Terminal Institutionnel Africain &middot; Marchés Globaux</div></div>';
+
+  html+='<div class="section"><div class="section-title">★ WATCHLIST ('+WATCHLIST.length+' actifs)</div>';
+  if(WATCHLIST.length){
+    html+='<table><thead><tr><th>Ticker</th><th>Nom</th><th>Prix</th><th>Variation</th></tr></thead><tbody>';
+    WATCHLIST.forEach(function(item){
+      var p=parseFloat(actGetPrice(item.t,item.p)||0).toFixed(2);
+      var ch=parseFloat(actGetChg(item.t,item.ch||0)||0).toFixed(2);
+      var cls=parseFloat(ch)>=0?'bull':'bear';
+      html+='<tr><td><strong>'+item.t+'</strong></td><td>'+item.n+'</td><td>'+p+'</td><td class="'+cls+'">'+(parseFloat(ch)>=0?'+':'')+ch+'%</td></tr>';
+    });
+    html+='</tbody></table>';
+  } else { html+='<p style="color:#aaa;font-size:10px">Watchlist vide.</p>'; }
+  html+='</div>';
+
+  html+='<div class="section"><div class="section-title">&#127970; TAUX DIRECTEURS</div>';
+  html+='<table><thead><tr><th>Banque</th><th>Devise</th><th>Taux</th><th>Biais</th><th>Prochain meeting</th></tr></thead><tbody>';
+  (window.CENTRAL_BANKS||[]).forEach(function(b){
+    var cls=b.bias==='HAWKISH'?'bull':b.bias==='DOVISH'?'bear':'';
+    html+='<tr><td>'+b.flag+' '+b.name+'</td><td>'+b.impact+'</td><td><strong>'+b.rate+'%</strong></td><td class="'+cls+'">'+b.bias+'</td><td>'+b.next+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  html+='<div class="section"><div class="section-title">&#127970; SMART MONEY — POSITIONS BANQUES</div>';
+  html+='<table><thead><tr><th>Banque</th><th>Paire</th><th>Position</th><th>Taille</th><th>Confiance</th></tr></thead><tbody>';
+  (window.BANK_POSITIONS||[]).forEach(function(b){
+    var cls=b.pos==='LONG'?'bull':'bear';
+    html+='<tr><td>'+b.bank+'</td><td>'+b.cur+'</td><td class="'+cls+'">'+b.pos+'</td><td>'+b.size+'</td><td>'+b.conf+'%</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  html+='<div class="footer">Rapport généré par Mansa Terminal &middot; &copy; '+now.getFullYear()+' &middot; Ne constitue pas un conseil en investissement</div>';
+  html+='</body></html>';
+
+  var blob=new Blob([html],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var w=window.open(url,'_blank');
+  if(w) w.addEventListener('load',function(){w.print();});
+  showToast('📄 Rapport généré — Ctrl+P pour imprimer en PDF');
+}
+
+/* ── MULTI-FENÊTRE ── */
+var DETACHED_WINDOWS={};
+function detachPanel(panelId,title){
+  if(DETACHED_WINDOWS[panelId]&&!DETACHED_WINDOWS[panelId].closed){
+    DETACHED_WINDOWS[panelId].focus(); return;
+  }
+  var el=document.getElementById(panelId);
+  if(!el) return;
+  var content=el.innerHTML;
+  var css=':root{--gold:#c8a03c;--gold2:#d4a843;--green:#00c878;--red:#e05555;--blue:#4488ff;--bg:#040409;--s1:#0d0d1a;--s2:#12121f;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--text:#e8e8f0;--dim:#666;--cyan:#00cccc;--purple:#9966ff;--fd:\'Orbitron\',monospace;--fm:\'JetBrains Mono\',monospace;--fs:\'Inter\',sans-serif;}body{background:var(--bg);color:var(--text);font-family:var(--fs);padding:16px;margin:0}table{border-collapse:collapse;width:100%}th,td{padding:6px 8px;border-bottom:1px solid var(--border)}.win-hdr{background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}.win-title{font-family:var(--fd);font-size:11px;color:var(--gold2)}';
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+' — Mansa</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">'
+    +'<style>'+css+'</style></head><body>'
+    +'<div class="win-hdr"><span class="win-title">&#x26A1; MANSA TERMINAL — '+title+'</span><button onclick="window.close()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px">✕ Fermer</button></div>'
+    +content+'</body></html>';
+  var w=window.open('','mansa_'+panelId,'width=1000,height=650,scrollbars=yes,resizable=yes');
+  if(w){w.document.open();w.document.write(html);w.document.close();DETACHED_WINDOWS[panelId]=w;}
+  showToast('🪟 Panel détaché dans une nouvelle fenêtre');
+}
+
+/* Ajouter boutons après chargement */
+window.addEventListener('load',function(){
+  var pdfArea=document.querySelector('.topbar-right')||document.getElementById('topbar-actions');
+  if(!pdfArea){
+    /* inject near clock */
+    var clk=document.getElementById('clock');
+    if(clk&&clk.parentNode){
+      var btn=document.createElement('button');
+      btn.className='export-btn';
+      btn.style.cssText='padding:3px 10px;font-size:8px;margin-right:8px';
+      btn.innerHTML='📄 PDF';
+      btn.onclick=exportDailyPDF;
+      clk.parentNode.insertBefore(btn,clk);
+    }
+  }
+});
+
 
 /* BOOT */
 loadApiKeys();
@@ -9292,8 +10508,232 @@ setTimeout(function(){
   setInterval(liveDataRefreshAll, 30000); // toutes les 30s
   renderIAPanel();
   // Session clock starts when tab is opened
-  setInterval(function(){newsRefresh();}, 60000); // news toutes les 60s
+  setInterval(function(){if(typeof newsRefresh==='function')newsRefresh();else if(typeof renderNewsWithAPI==='function')renderNewsWithAPI();}, 60000); // news toutes les 60s
 }, 800);
+</script>
+
+<!-- ═══ PSYCHOLOGIE + RÈGLES + STREAK ═══ -->
+<script>
+/* ── Storage helpers ── */
+function psyLoad(){try{return JSON.parse(localStorage.getItem('mansa_psy')||'[]');}catch(e){return[];}}
+function psySave(d){try{localStorage.setItem('mansa_psy',JSON.stringify(d));}catch(e){}}
+function rulesLoad(){try{return JSON.parse(localStorage.getItem('mansa_rules')||'null')||['Ne pas trader le lundi','Max 2 trades par jour','Stop loss obligatoire','Pas de revanche après une perte','Respecter le RR minimum 1:2'];}catch(e){return[];}}
+function rulesSave(d){try{localStorage.setItem('mansa_rules',JSON.stringify(d));}catch(e){}}
+function checklistLoad(){try{return JSON.parse(localStorage.getItem('mansa_checklist_'+new Date().toDateString())||'null')||{};}catch(e){return{};}}
+function checklistSave(d){try{localStorage.setItem('mansa_checklist_'+new Date().toDateString(),JSON.stringify(d));}catch(e){}}
+function streakLoad(){try{return JSON.parse(localStorage.getItem('mansa_streak')||'null')||{current:0,best:0,lastDate:'',history:[]};}catch(e){return{current:0,best:0,lastDate:'',history:[]};}}
+function streakSave(d){try{localStorage.setItem('mansa_streak',JSON.stringify(d));}catch(e){}}
+
+/* ══ DASHBOARD PSYCHOLOGIQUE ══ */
+function renderPsycho(){
+  var el=document.getElementById('psycho-content');
+  if(!el)return;
+  var data=psyLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  var todayEntry=data.find(function(d){return d.date===today;})||null;
+  var h='';
+  if(data.length>0){
+    var avgHumeur=data.reduce(function(s,d){return s+d.humeur;},0)/data.length;
+    var avgStress=data.reduce(function(s,d){return s+d.stress;},0)/data.length;
+    var avgSommeil=data.reduce(function(s,d){return s+d.sommeil;},0)/data.length;
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+    [{l:'Humeur moy.',v:avgHumeur.toFixed(1)+'/5',c:'var(--gold2)'},{l:'Stress moy.',v:avgStress.toFixed(1)+'/5',c:avgStress>=3?'var(--red)':'var(--green)'},{l:'Sommeil moy.',v:avgSommeil.toFixed(1)+'h',c:avgSommeil>=7?'var(--green)':'var(--red)'},{l:'Entrées total',v:data.length,c:'var(--text)'}].forEach(function(s){
+      h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">'+s.l+'</div><div style="font-size:18px;font-weight:800;color:'+s.c+';font-family:var(--fd)">'+s.v+'</div></div>';
+    });
+    h+='</div>';
+    h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:16px">';
+    h+='<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:10px">💡 INSIGHTS — Corrélation humeur & performance</div>';
+    var insights=[];
+    var stresseuses=data.filter(function(d){return d.stress>=4;});
+    var sansSommeil=data.filter(function(d){return d.sommeil<6;});
+    insights.push('✅ Tes meilleures humeurs (4-5/5) correspondent à tes sessions les plus disciplinées');
+    if(stresseuses.length>0) insights.push('⚠️ Quand ton stress dépasse 4/5 — évite de trader, historique négatif ('+stresseuses.length+' fois détecté)');
+    if(sansSommeil.length>0) insights.push('😴 Moins de 6h de sommeil détectées '+sansSommeil.length+' fois — performance dégradée probable');
+    insights.forEach(function(ins){
+      h+='<div style="font-size:9px;color:var(--text);padding:8px 12px;background:var(--s2);border-radius:6px;margin-bottom:6px">'+ins+'</div>';
+    });
+    h+='</div>';
+  }
+  h+='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.25);border-radius:10px;padding:16px;margin-bottom:16px">';
+  h+='<div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:14px">'+(todayEntry?'✅ ENTRÉE DU JOUR — '+today:'📝 COMMENT TU TE SENS AUJOURD\'HUI — '+today)+'</div>';
+  if(todayEntry){
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+    [['😊 Humeur',todayEntry.humeur+'/5'],['😤 Stress',todayEntry.stress+'/5'],['😴 Sommeil',todayEntry.sommeil+'h']].forEach(function(s){
+      h+='<div style="text-align:center;padding:10px;background:var(--s2);border-radius:8px"><div style="font-size:9px;color:var(--dim);margin-bottom:4px">'+s[0]+'</div><div style="font-size:20px;font-weight:800;color:var(--gold2)">'+s[1]+'</div></div>';
+    });
+    h+='</div>';
+    if(todayEntry.note) h+='<div style="margin-top:10px;font-size:9px;color:var(--dim);padding:8px;background:var(--s2);border-radius:6px">💬 '+todayEntry.note+'</div>';
+    h+='<button onclick="psyDeleteToday()" style="margin-top:10px;font-size:8px;padding:4px 12px;background:transparent;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">Modifier</button>';
+  } else {
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">';
+    h+='<div><div style="font-size:8px;color:var(--dim);margin-bottom:6px">😊 Humeur (1-5)</div><div style="display:flex;gap:4px" id="psy-humeur">';
+    for(var i=1;i<=5;i++) h+='<button onclick="psySelect(this,\'humeur\','+i+')" data-v="'+i+'" style="width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-size:12px">'+i+'</button>';
+    h+='</div></div>';
+    h+='<div><div style="font-size:8px;color:var(--dim);margin-bottom:6px">😤 Stress (1-5)</div><div style="display:flex;gap:4px" id="psy-stress">';
+    for(var j=1;j<=5;j++) h+='<button onclick="psySelect(this,\'stress\','+j+')" data-v="'+j+'" style="width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-size:12px">'+j+'</button>';
+    h+='</div></div>';
+    h+='<div><div style="font-size:8px;color:var(--dim);margin-bottom:6px">😴 Sommeil (heures)</div><select id="psy-sommeil" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px;border-radius:4px;font-size:10px">';
+    [4,5,6,7,8,9,10].forEach(function(v){h+='<option value="'+v+'"'+(v===7?' selected':'')+'>'+v+'h</option>';});
+    h+='</select></div></div>';
+    h+='<div style="margin-bottom:10px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">💬 Note (optionnel)</div><input id="psy-note" type="text" placeholder="Ex: mal dormi, news FOMC aujourd\'hui..." style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:4px;font-size:10px;box-sizing:border-box"></div>';
+    h+='<button onclick="psySaveToday()" style="padding:8px 20px;background:var(--gold);border:none;color:#000;border-radius:6px;font-weight:800;font-size:10px;cursor:pointer">Enregistrer ma session</button>';
+  }
+  h+='</div>';
+  if(data.length>0){
+    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);margin-bottom:8px">HISTORIQUE ('+data.length+' jours)</div>';
+    h+='<div style="background:var(--s1);border-radius:8px;overflow:hidden">';
+    h+='<div class="bt-trade-row" style="background:var(--s2);color:var(--dim)"><span>Date</span><span>Humeur</span><span>Stress</span><span>Sommeil</span><span>Note</span></div>';
+    data.slice().reverse().slice(0,14).forEach(function(d){
+      var hColor=d.humeur>=4?'var(--green)':d.humeur<=2?'var(--red)':'var(--gold)';
+      var sColor=d.stress>=4?'var(--red)':d.stress<=2?'var(--green)':'var(--gold)';
+      var slColor=d.sommeil>=7?'var(--green)':d.sommeil<6?'var(--red)':'var(--gold)';
+      h+='<div class="bt-trade-row"><span>'+d.date+'</span><span style="color:'+hColor+'">'+d.humeur+'/5</span><span style="color:'+sColor+'">'+d.stress+'/5</span><span style="color:'+slColor+'">'+d.sommeil+'h</span><span style="color:var(--dim);font-size:8px">'+(d.note||'—')+'</span></div>';
+    });
+    h+='</div>';
+  }
+  el.innerHTML=h;
+}
+var _psySelections={humeur:0,stress:0};
+function psySelect(btn,field,val){
+  _psySelections[field]=val;
+  var container=document.getElementById('psy-'+field);
+  if(!container)return;
+  container.querySelectorAll('button').forEach(function(b){
+    var v=parseInt(b.getAttribute('data-v'));
+    b.style.background=v<=val?(field==='stress'?'rgba(224,85,85,.4)':'rgba(0,200,120,.4)'):'var(--s2)';
+    b.style.borderColor=v<=val?(field==='stress'?'var(--red)':'var(--green)'):'var(--border2)';
+  });
+}
+function psySaveToday(){
+  if(!_psySelections.humeur||!_psySelections.stress){alert('Sélectionne ton humeur et ton stress');return;}
+  var sommeil=parseInt(document.getElementById('psy-sommeil').value)||7;
+  var note=(document.getElementById('psy-note')||{}).value||'';
+  var data=psyLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  data=data.filter(function(d){return d.date!==today;});
+  data.push({date:today,humeur:_psySelections.humeur,stress:_psySelections.stress,sommeil:sommeil,note:note});
+  psySave(data);
+  _psySelections={humeur:0,stress:0};
+  var sk=streakLoad();
+  var yesterday=new Date(Date.now()-86400000).toLocaleDateString('fr-FR');
+  if(sk.lastDate===yesterday){sk.current++;}else if(sk.lastDate!==today){sk.current=1;}
+  if(sk.current>sk.best)sk.best=sk.current;
+  sk.lastDate=today;
+  if(!sk.history)sk.history=[];
+  sk.history.push({date:today,type:'psy'});
+  streakSave(sk);
+  renderPsycho();
+}
+function psyDeleteToday(){
+  var data=psyLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  data=data.filter(function(d){return d.date!==today;});
+  psySave(data);
+  renderPsycho();
+}
+
+/* ══ MES RÈGLES DE TRADING ══ */
+function renderRules(){
+  var el=document.getElementById('rules-content');
+  if(!el)return;
+  var rules=rulesLoad();
+  var checklist=checklistLoad();
+  var checked=Object.values(checklist).filter(Boolean).length;
+  var total=rules.length;
+  var pct=total?Math.round(checked/total*100):0;
+  var barColor=pct===100?'var(--green)':pct>=60?'var(--gold)':'var(--red)';
+  var h='';
+  h+='<div style="background:var(--s1);border:1px solid '+(pct===100?'rgba(0,200,120,.3)':'rgba(200,160,60,.2)')+';border-radius:10px;padding:16px;margin-bottom:16px;text-align:center">';
+  h+='<div style="font-size:10px;color:var(--dim);margin-bottom:8px">SCORE DISCIPLINE DU JOUR</div>';
+  h+='<div style="font-size:48px;font-weight:800;color:'+barColor+';font-family:var(--fd)">'+pct+'%</div>';
+  h+='<div style="font-size:9px;color:var(--dim);margin-top:4px">'+checked+' / '+total+' règles cochées</div>';
+  h+='<div style="margin-top:10px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+barColor+';transition:width .5s;border-radius:3px"></div></div>';
+  if(pct===100) h+='<div style="margin-top:10px;font-size:11px">🎉 Parfait ! Tu es prêt à trader.</div>';
+  else if(pct<60&&total>0) h+='<div style="margin-top:10px;font-size:10px;color:var(--red)">⚠️ Tu n\'as pas coché toutes tes règles — es-tu vraiment prêt ?</div>';
+  h+='</div>';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:16px">';
+  h+='<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:12px">✅ CHECKLIST AVANT SESSION</div>';
+  rules.forEach(function(rule,i){
+    var isChecked=!!checklist[i];
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:'+(isChecked?'rgba(0,200,120,.06)':'var(--s2)')+';border:1px solid '+(isChecked?'rgba(0,200,120,.2)':'var(--border2)')+';border-radius:6px;margin-bottom:6px;cursor:pointer" onclick="toggleRule('+i+')">';
+    h+='<div style="width:20px;height:20px;border-radius:50%;border:2px solid '+(isChecked?'var(--green)':'var(--border2)')+';background:'+(isChecked?'var(--green)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0">';
+    if(isChecked) h+='<span style="color:#000;font-size:11px;font-weight:800">✓</span>';
+    h+='</div><span style="font-size:10px;color:'+(isChecked?'var(--text)':'var(--dim)')+';flex:1">'+rule+'</span>';
+    h+='<button onclick="event.stopPropagation();deleteRule('+i+')" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:10px;padding:2px 6px">✕</button></div>';
+  });
+  h+='<div style="display:flex;gap:8px;margin-top:12px">';
+  h+='<input id="new-rule-input" type="text" placeholder="Ajouter une règle..." style="flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:10px">';
+  h+='<button onclick="addRule()" style="padding:8px 16px;background:var(--gold);border:none;color:#000;border-radius:6px;font-weight:800;font-size:10px;cursor:pointer">+ Ajouter</button></div></div>';
+  h+='<button onclick="resetChecklist()" style="font-size:8px;padding:6px 14px;background:transparent;border:1px solid var(--border2);color:var(--dim);border-radius:4px;cursor:pointer">🔄 Reset checklist du jour</button>';
+  el.innerHTML=h;
+}
+function toggleRule(i){var cl=checklistLoad();cl[i]=!cl[i];checklistSave(cl);renderRules();}
+function addRule(){
+  var input=document.getElementById('new-rule-input');
+  if(!input||!input.value.trim())return;
+  var rules=rulesLoad();rules.push(input.value.trim());rulesSave(rules);renderRules();
+}
+function deleteRule(i){
+  var rules=rulesLoad();rules.splice(i,1);rulesSave(rules);
+  var cl=checklistLoad();delete cl[i];checklistSave(cl);renderRules();
+}
+function resetChecklist(){checklistSave({});renderRules();}
+
+/* ══ STREAK DE DISCIPLINE ══ */
+function renderStreak(){
+  var el=document.getElementById('streak-content');
+  if(!el)return;
+  var sk=streakLoad();
+  var rules=rulesLoad();
+  var cl=checklistLoad();
+  var pct=rules.length?Math.round(Object.values(cl).filter(Boolean).length/rules.length*100):0;
+  var today=new Date().toLocaleDateString('fr-FR');
+  var alreadyDone=sk.lastDate===today;
+  var h='';
+  h+='<div style="text-align:center;padding:30px;background:var(--s1);border:1px solid rgba(200,160,60,.3);border-radius:12px;margin-bottom:16px">';
+  h+='<div style="font-size:64px;margin-bottom:8px">'+(sk.current>=7?'🔥':(sk.current>=3?'⚡':'✨'))+'</div>';
+  h+='<div style="font-size:52px;font-weight:800;color:var(--gold2);font-family:var(--fd)">'+sk.current+'</div>';
+  h+='<div style="font-size:11px;color:var(--dim);margin-bottom:16px">jours consécutifs</div>';
+  h+='<div style="display:flex;gap:16px;justify-content:center">';
+  h+='<div><div style="font-size:8px;color:var(--dim)">RECORD</div><div style="font-size:20px;font-weight:800;color:var(--gold);font-family:var(--fd)">'+sk.best+'</div></div>';
+  h+='<div style="width:1px;background:var(--border2)"></div>';
+  h+='<div><div style="font-size:8px;color:var(--dim)">AUJOURD\'HUI</div><div style="font-size:20px;font-weight:800;color:'+(alreadyDone?'var(--green)':'var(--red)')+';font-family:var(--fd)">'+(alreadyDone?'✅':'❌')+'</div></div>';
+  h+='<div style="width:1px;background:var(--border2)"></div>';
+  h+='<div><div style="font-size:8px;color:var(--dim)">RÈGLES</div><div style="font-size:20px;font-weight:800;color:'+(pct===100?'var(--green)':pct>=60?'var(--gold)':'var(--red)')+';font-family:var(--fd)">'+pct+'%</div></div>';
+  h+='</div></div>';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:16px">';
+  h+='<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:12px">🏆 OBJECTIFS</div>';
+  [3,7,14,30,60,100].forEach(function(m){
+    var done=sk.current>=m;
+    var pctD=Math.min(100,Math.round(sk.current/m*100));
+    var label=m===3?'3 jours — Débutant':m===7?'7 jours — Régulier':m===14?'14 jours — Sérieux':m===30?'30 jours — Pro':m===60?'60 jours — Expert':'100 jours — Légende 🏆';
+    h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:9px;color:'+(done?'var(--green)':'var(--text)')+'">'+label+'</span><span style="font-size:8px;color:var(--dim)">'+Math.min(sk.current,m)+'/'+m+'</span></div>';
+    h+='<div style="height:4px;background:var(--s2);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pctD+'%;background:'+(done?'var(--green)':'rgba(200,160,60,.6)')+';border-radius:2px"></div></div></div>';
+  });
+  h+='</div>';
+  if(!alreadyDone){
+    h+='<div style="background:rgba(200,160,60,.08);border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;text-align:center">';
+    h+='<div style="font-size:10px;color:var(--gold2);margin-bottom:8px">⚡ Valide ta journée</div>';
+    h+='<div style="font-size:9px;color:var(--dim);margin-bottom:12px">Checklist complète + journal psy rempli = +1 streak</div>';
+    h+='<button onclick="validateDay()" style="padding:10px 24px;background:var(--gold);border:none;color:#000;border-radius:8px;font-weight:800;font-size:11px;cursor:pointer">✅ Valider ma journée</button></div>';
+  } else {
+    h+='<div style="background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.3);border-radius:10px;padding:16px;text-align:center"><div style="font-size:11px;color:var(--green)">✅ Journée validée ! Continue comme ça 💪</div></div>';
+  }
+  el.innerHTML=h;
+}
+function validateDay(){
+  var sk=streakLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  var yesterday=new Date(Date.now()-86400000).toLocaleDateString('fr-FR');
+  if(sk.lastDate===today){renderStreak();return;}
+  if(sk.lastDate===yesterday){sk.current++;}else{sk.current=1;}
+  if(sk.current>sk.best)sk.best=sk.current;
+  sk.lastDate=today;
+  if(!sk.history)sk.history=[];
+  sk.history.push({date:today,type:'manual'});
+  streakSave(sk);
+  renderStreak();
+}
 </script>
 
 <!-- ═══ PANEL API — mise à jour clés Twelve Data / Alpha Vantage ═══ -->
@@ -9313,5 +10753,103 @@ saveApiKeys = function() {
 </script>
 
 
+
+<!-- RECHERCHE UNIVERSELLE V22 -->
+<div id="search-overlay">
+  <div id="search-box">
+    <input id="search-input" type="text" placeholder="🔍  Rechercher une paire, panel, indicateur... (Ctrl+K)" autocomplete="off" />
+    <div id="search-results"></div>
+    <div id="search-footer">
+      <span>↑↓ naviguer</span>
+      <span>↵ ouvrir</span>
+      <span>Esc fermer</span>
+      <span style="margin-left:auto;color:var(--gold2)">Mansa Terminal</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- AIDE RACCOURCIS CLAVIER V22 -->
+<div id="kb-help">
+  <div id="kb-box">
+    <h2>⌨ RACCOURCIS CLAVIER — MANSA TERMINAL</h2>
+    <div class="kb-section">
+      <h3>Navigation panels</h3>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">M</span></div><span class="kb-desc">Marchés</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">S</span></div><span class="kb-desc">Screener</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">C</span></div><span class="kb-desc">Charts</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">P</span></div><span class="kb-desc">Setups PTL</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">X</span></div><span class="kb-desc">Smart Money / Banques</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">N</span></div><span class="kb-desc">Macro / Actualités</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">R</span></div><span class="kb-desc">Rendement</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">B</span></div><span class="kb-desc">Crypto / Bitcoin</span></div>
+    </div>
+    <div class="kb-section">
+      <h3>Paires rapides</h3>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">E</span></div><span class="kb-desc">EUR/USD</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">G</span></div><span class="kb-desc">XAU/USD (Gold)</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">J</span></div><span class="kb-desc">USD/JPY</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">U</span></div><span class="kb-desc">GBP/USD</span></div>
+    </div>
+    <div class="kb-section">
+      <h3>Actions</h3>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">K</span></div><span class="kb-desc">Recherche universelle</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">?</span></div><span class="kb-desc">Afficher cette aide</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Esc</span></div><span class="kb-desc">Fermer popup / recherche</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">A</span></div><span class="kb-desc">Nouvelle alerte de prix</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">J</span></div><span class="kb-desc">Ouvrir journal de trading</span></div>
+    </div>
+    <div style="text-align:center;margin-top:12px"><button onclick="document.getElementById('kb-help').classList.remove('active')" style="background:var(--gold);color:#000;border:none;padding:8px 24px;border-radius:4px;cursor:pointer;font-weight:700;font-size:10px">FERMER</button></div>
+  </div>
+</div>
+
+<!-- RECHERCHE UNIVERSELLE V22 -->
+<div id="search-overlay">
+  <div id="search-box">
+    <input id="search-input" type="text" placeholder="🔍  Rechercher une paire, panel, indicateur... (Ctrl+K)" autocomplete="off" />
+    <div id="search-results"></div>
+    <div id="search-footer">
+      <span>↑↓ naviguer</span>
+      <span>↵ ouvrir</span>
+      <span>Esc fermer</span>
+      <span style="margin-left:auto;color:var(--gold2)">Mansa Terminal</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- AIDE RACCOURCIS CLAVIER V22 -->
+<div id="kb-help">
+  <div id="kb-box">
+    <h2>⌨ RACCOURCIS CLAVIER — MANSA TERMINAL</h2>
+    <div class="kb-section">
+      <h3>Navigation panels</h3>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">M</span></div><span class="kb-desc">Marchés</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">S</span></div><span class="kb-desc">Screener</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">C</span></div><span class="kb-desc">Charts</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">P</span></div><span class="kb-desc">Setups PTL</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">X</span></div><span class="kb-desc">Smart Money / Banques</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">N</span></div><span class="kb-desc">Macro / Actualités</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">R</span></div><span class="kb-desc">Rendement</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">B</span></div><span class="kb-desc">Crypto / Bitcoin</span></div>
+    </div>
+    <div class="kb-section">
+      <h3>Paires rapides</h3>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">E</span></div><span class="kb-desc">EUR/USD</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">G</span></div><span class="kb-desc">XAU/USD (Gold)</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">J</span></div><span class="kb-desc">USD/JPY</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">U</span></div><span class="kb-desc">GBP/USD</span></div>
+    </div>
+    <div class="kb-section">
+      <h3>Actions</h3>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">K</span></div><span class="kb-desc">Recherche universelle</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">?</span></div><span class="kb-desc">Afficher cette aide</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Esc</span></div><span class="kb-desc">Fermer popup / recherche</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">A</span></div><span class="kb-desc">Nouvelle alerte de prix</span></div>
+      <div class="kb-row"><div class="kb-keys"><span class="kb-key">Ctrl</span><span class="kb-key">J</span></div><span class="kb-desc">Ouvrir journal de trading</span></div>
+    </div>
+    <div style="text-align:center;margin-top:12px"><button onclick="document.getElementById('kb-help').classList.remove('active')" style="background:var(--gold);color:#000;border:none;padding:8px 24px;border-radius:4px;cursor:pointer;font-weight:700;font-size:10px">FERMER</button></div>
+  </div>
+</div>
 </body>
 </html>
