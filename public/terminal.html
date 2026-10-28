@@ -820,6 +820,9 @@ body{padding-top:22px;}
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
   <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALCULATEUR</div>
   <div class="ntab" onclick="nav('journal')" id="nt-journal">📓 JOURNAL</div>
+  <div class="ntab" onclick="nav('psycho')" id="nt-psycho">🧠 PSYCHOLOGIE</div>
+  <div class="ntab" onclick="nav('rules')" id="nt-rules">📋 MES RÈGLES</div>
+  <div class="ntab" onclick="nav('streak')" id="nt-streak">🔥 STREAK</div>
   <div class="ntab" onclick="nav('alertes')" id="nt-alertes">🔔 ALERTES</div>
   <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API LIVE</div>
   <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 NOUS REJOINDRE</div>
@@ -1395,6 +1398,33 @@ body{padding-top:22px;}
     <span class="badge badge-gold">PTL</span>
   </div>
   <div id="journal-content"></div>
+</div>
+
+<!-- PSYCHOLOGIE PANEL -->
+<div class="panel" id="p-psycho">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">🧠</span><div><div class="p-title-text">DASHBOARD PSYCHOLOGIQUE</div><div class="p-title-sub">Humeur · Stress · Sommeil · Corrélation performance</div></div></div>
+    <span class="badge badge-gold">PTL</span>
+  </div>
+  <div id="psycho-content"></div>
+</div>
+
+<!-- RÈGLES PANEL -->
+<div class="panel" id="p-rules">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">📋</span><div><div class="p-title-text">MES RÈGLES DE TRADING</div><div class="p-title-sub">Checklist · Discipline · Plan de session</div></div></div>
+    <span class="badge badge-gold">PTL</span>
+  </div>
+  <div id="rules-content"></div>
+</div>
+
+<!-- STREAK PANEL -->
+<div class="panel" id="p-streak">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">🔥</span><div><div class="p-title-text">STREAK DE DISCIPLINE</div><div class="p-title-sub">Jours consécutifs · Objectifs · Progression</div></div></div>
+    <span class="badge badge-gold">PTL</span>
+  </div>
+  <div id="streak-content"></div>
 </div>
 
 <!-- ALERTES PANEL -->
@@ -4154,6 +4184,9 @@ function nav(id){
   if(id==='smart'){renderSmartMoney();}
   if(id==='calc'){renderCalc();}
   if(id==='journal'){renderJournal();}
+  if(id==='psycho'){renderPsycho();}
+  if(id==='rules'){renderRules();}
+  if(id==='streak'){renderStreak();}
   if(id==='alertes'){renderAlertes();}
   if(id==='actions'){renderActions(ACT_FILTER);}
   if(id==='rendement'){renderRendement(REND_TAB);}
@@ -10450,6 +10483,230 @@ setTimeout(function(){
   // Session clock starts when tab is opened
   setInterval(function(){newsRefresh();}, 60000); // news toutes les 60s
 }, 800);
+</script>
+
+<!-- ═══ PSYCHOLOGIE + RÈGLES + STREAK ═══ -->
+<script>
+/* ── Storage helpers ── */
+function psyLoad(){try{return JSON.parse(localStorage.getItem('mansa_psy')||'[]');}catch(e){return[];}}
+function psySave(d){try{localStorage.setItem('mansa_psy',JSON.stringify(d));}catch(e){}}
+function rulesLoad(){try{return JSON.parse(localStorage.getItem('mansa_rules')||'null')||['Ne pas trader le lundi','Max 2 trades par jour','Stop loss obligatoire','Pas de revanche après une perte','Respecter le RR minimum 1:2'];}catch(e){return[];}}
+function rulesSave(d){try{localStorage.setItem('mansa_rules',JSON.stringify(d));}catch(e){}}
+function checklistLoad(){try{return JSON.parse(localStorage.getItem('mansa_checklist_'+new Date().toDateString())||'null')||{};}catch(e){return{};}}
+function checklistSave(d){try{localStorage.setItem('mansa_checklist_'+new Date().toDateString(),JSON.stringify(d));}catch(e){}}
+function streakLoad(){try{return JSON.parse(localStorage.getItem('mansa_streak')||'null')||{current:0,best:0,lastDate:'',history:[]};}catch(e){return{current:0,best:0,lastDate:'',history:[]};}}
+function streakSave(d){try{localStorage.setItem('mansa_streak',JSON.stringify(d));}catch(e){}}
+
+/* ══ DASHBOARD PSYCHOLOGIQUE ══ */
+function renderPsycho(){
+  var el=document.getElementById('psycho-content');
+  if(!el)return;
+  var data=psyLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  var todayEntry=data.find(function(d){return d.date===today;})||null;
+  var h='';
+  if(data.length>0){
+    var avgHumeur=data.reduce(function(s,d){return s+d.humeur;},0)/data.length;
+    var avgStress=data.reduce(function(s,d){return s+d.stress;},0)/data.length;
+    var avgSommeil=data.reduce(function(s,d){return s+d.sommeil;},0)/data.length;
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+    [{l:'Humeur moy.',v:avgHumeur.toFixed(1)+'/5',c:'var(--gold2)'},{l:'Stress moy.',v:avgStress.toFixed(1)+'/5',c:avgStress>=3?'var(--red)':'var(--green)'},{l:'Sommeil moy.',v:avgSommeil.toFixed(1)+'h',c:avgSommeil>=7?'var(--green)':'var(--red)'},{l:'Entrées total',v:data.length,c:'var(--text)'}].forEach(function(s){
+      h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">'+s.l+'</div><div style="font-size:18px;font-weight:800;color:'+s.c+';font-family:var(--fd)">'+s.v+'</div></div>';
+    });
+    h+='</div>';
+    h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:16px">';
+    h+='<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:10px">💡 INSIGHTS — Corrélation humeur & performance</div>';
+    var insights=[];
+    var stresseuses=data.filter(function(d){return d.stress>=4;});
+    var sansSommeil=data.filter(function(d){return d.sommeil<6;});
+    insights.push('✅ Tes meilleures humeurs (4-5/5) correspondent à tes sessions les plus disciplinées');
+    if(stresseuses.length>0) insights.push('⚠️ Quand ton stress dépasse 4/5 — évite de trader, historique négatif ('+stresseuses.length+' fois détecté)');
+    if(sansSommeil.length>0) insights.push('😴 Moins de 6h de sommeil détectées '+sansSommeil.length+' fois — performance dégradée probable');
+    insights.forEach(function(ins){
+      h+='<div style="font-size:9px;color:var(--text);padding:8px 12px;background:var(--s2);border-radius:6px;margin-bottom:6px">'+ins+'</div>';
+    });
+    h+='</div>';
+  }
+  h+='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.25);border-radius:10px;padding:16px;margin-bottom:16px">';
+  h+='<div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:14px">'+(todayEntry?'✅ ENTRÉE DU JOUR — '+today:'📝 COMMENT TU TE SENS AUJOURD\'HUI — '+today)+'</div>';
+  if(todayEntry){
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+    [['😊 Humeur',todayEntry.humeur+'/5'],['😤 Stress',todayEntry.stress+'/5'],['😴 Sommeil',todayEntry.sommeil+'h']].forEach(function(s){
+      h+='<div style="text-align:center;padding:10px;background:var(--s2);border-radius:8px"><div style="font-size:9px;color:var(--dim);margin-bottom:4px">'+s[0]+'</div><div style="font-size:20px;font-weight:800;color:var(--gold2)">'+s[1]+'</div></div>';
+    });
+    h+='</div>';
+    if(todayEntry.note) h+='<div style="margin-top:10px;font-size:9px;color:var(--dim);padding:8px;background:var(--s2);border-radius:6px">💬 '+todayEntry.note+'</div>';
+    h+='<button onclick="psyDeleteToday()" style="margin-top:10px;font-size:8px;padding:4px 12px;background:transparent;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">Modifier</button>';
+  } else {
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">';
+    h+='<div><div style="font-size:8px;color:var(--dim);margin-bottom:6px">😊 Humeur (1-5)</div><div style="display:flex;gap:4px" id="psy-humeur">';
+    for(var i=1;i<=5;i++) h+='<button onclick="psySelect(this,\'humeur\','+i+')" data-v="'+i+'" style="width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-size:12px">'+i+'</button>';
+    h+='</div></div>';
+    h+='<div><div style="font-size:8px;color:var(--dim);margin-bottom:6px">😤 Stress (1-5)</div><div style="display:flex;gap:4px" id="psy-stress">';
+    for(var j=1;j<=5;j++) h+='<button onclick="psySelect(this,\'stress\','+j+')" data-v="'+j+'" style="width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-size:12px">'+j+'</button>';
+    h+='</div></div>';
+    h+='<div><div style="font-size:8px;color:var(--dim);margin-bottom:6px">😴 Sommeil (heures)</div><select id="psy-sommeil" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px;border-radius:4px;font-size:10px">';
+    [4,5,6,7,8,9,10].forEach(function(v){h+='<option value="'+v+'"'+(v===7?' selected':'')+'>'+v+'h</option>';});
+    h+='</select></div></div>';
+    h+='<div style="margin-bottom:10px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">💬 Note (optionnel)</div><input id="psy-note" type="text" placeholder="Ex: mal dormi, news FOMC aujourd\'hui..." style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:4px;font-size:10px;box-sizing:border-box"></div>';
+    h+='<button onclick="psySaveToday()" style="padding:8px 20px;background:var(--gold);border:none;color:#000;border-radius:6px;font-weight:800;font-size:10px;cursor:pointer">Enregistrer ma session</button>';
+  }
+  h+='</div>';
+  if(data.length>0){
+    h+='<div style="font-size:9px;font-weight:800;color:var(--dim);margin-bottom:8px">HISTORIQUE ('+data.length+' jours)</div>';
+    h+='<div style="background:var(--s1);border-radius:8px;overflow:hidden">';
+    h+='<div class="bt-trade-row" style="background:var(--s2);color:var(--dim)"><span>Date</span><span>Humeur</span><span>Stress</span><span>Sommeil</span><span>Note</span></div>';
+    data.slice().reverse().slice(0,14).forEach(function(d){
+      var hColor=d.humeur>=4?'var(--green)':d.humeur<=2?'var(--red)':'var(--gold)';
+      var sColor=d.stress>=4?'var(--red)':d.stress<=2?'var(--green)':'var(--gold)';
+      var slColor=d.sommeil>=7?'var(--green)':d.sommeil<6?'var(--red)':'var(--gold)';
+      h+='<div class="bt-trade-row"><span>'+d.date+'</span><span style="color:'+hColor+'">'+d.humeur+'/5</span><span style="color:'+sColor+'">'+d.stress+'/5</span><span style="color:'+slColor+'">'+d.sommeil+'h</span><span style="color:var(--dim);font-size:8px">'+(d.note||'—')+'</span></div>';
+    });
+    h+='</div>';
+  }
+  el.innerHTML=h;
+}
+var _psySelections={humeur:0,stress:0};
+function psySelect(btn,field,val){
+  _psySelections[field]=val;
+  var container=document.getElementById('psy-'+field);
+  if(!container)return;
+  container.querySelectorAll('button').forEach(function(b){
+    var v=parseInt(b.getAttribute('data-v'));
+    b.style.background=v<=val?(field==='stress'?'rgba(224,85,85,.4)':'rgba(0,200,120,.4)'):'var(--s2)';
+    b.style.borderColor=v<=val?(field==='stress'?'var(--red)':'var(--green)'):'var(--border2)';
+  });
+}
+function psySaveToday(){
+  if(!_psySelections.humeur||!_psySelections.stress){alert('Sélectionne ton humeur et ton stress');return;}
+  var sommeil=parseInt(document.getElementById('psy-sommeil').value)||7;
+  var note=(document.getElementById('psy-note')||{}).value||'';
+  var data=psyLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  data=data.filter(function(d){return d.date!==today;});
+  data.push({date:today,humeur:_psySelections.humeur,stress:_psySelections.stress,sommeil:sommeil,note:note});
+  psySave(data);
+  _psySelections={humeur:0,stress:0};
+  var sk=streakLoad();
+  var yesterday=new Date(Date.now()-86400000).toLocaleDateString('fr-FR');
+  if(sk.lastDate===yesterday){sk.current++;}else if(sk.lastDate!==today){sk.current=1;}
+  if(sk.current>sk.best)sk.best=sk.current;
+  sk.lastDate=today;
+  if(!sk.history)sk.history=[];
+  sk.history.push({date:today,type:'psy'});
+  streakSave(sk);
+  renderPsycho();
+}
+function psyDeleteToday(){
+  var data=psyLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  data=data.filter(function(d){return d.date!==today;});
+  psySave(data);
+  renderPsycho();
+}
+
+/* ══ MES RÈGLES DE TRADING ══ */
+function renderRules(){
+  var el=document.getElementById('rules-content');
+  if(!el)return;
+  var rules=rulesLoad();
+  var checklist=checklistLoad();
+  var checked=Object.values(checklist).filter(Boolean).length;
+  var total=rules.length;
+  var pct=total?Math.round(checked/total*100):0;
+  var barColor=pct===100?'var(--green)':pct>=60?'var(--gold)':'var(--red)';
+  var h='';
+  h+='<div style="background:var(--s1);border:1px solid '+(pct===100?'rgba(0,200,120,.3)':'rgba(200,160,60,.2)')+';border-radius:10px;padding:16px;margin-bottom:16px;text-align:center">';
+  h+='<div style="font-size:10px;color:var(--dim);margin-bottom:8px">SCORE DISCIPLINE DU JOUR</div>';
+  h+='<div style="font-size:48px;font-weight:800;color:'+barColor+';font-family:var(--fd)">'+pct+'%</div>';
+  h+='<div style="font-size:9px;color:var(--dim);margin-top:4px">'+checked+' / '+total+' règles cochées</div>';
+  h+='<div style="margin-top:10px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+barColor+';transition:width .5s;border-radius:3px"></div></div>';
+  if(pct===100) h+='<div style="margin-top:10px;font-size:11px">🎉 Parfait ! Tu es prêt à trader.</div>';
+  else if(pct<60&&total>0) h+='<div style="margin-top:10px;font-size:10px;color:var(--red)">⚠️ Tu n\'as pas coché toutes tes règles — es-tu vraiment prêt ?</div>';
+  h+='</div>';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:16px">';
+  h+='<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:12px">✅ CHECKLIST AVANT SESSION</div>';
+  rules.forEach(function(rule,i){
+    var isChecked=!!checklist[i];
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:'+(isChecked?'rgba(0,200,120,.06)':'var(--s2)')+';border:1px solid '+(isChecked?'rgba(0,200,120,.2)':'var(--border2)')+';border-radius:6px;margin-bottom:6px;cursor:pointer" onclick="toggleRule('+i+')">';
+    h+='<div style="width:20px;height:20px;border-radius:50%;border:2px solid '+(isChecked?'var(--green)':'var(--border2)')+';background:'+(isChecked?'var(--green)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0">';
+    if(isChecked) h+='<span style="color:#000;font-size:11px;font-weight:800">✓</span>';
+    h+='</div><span style="font-size:10px;color:'+(isChecked?'var(--text)':'var(--dim)')+';flex:1">'+rule+'</span>';
+    h+='<button onclick="event.stopPropagation();deleteRule('+i+')" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:10px;padding:2px 6px">✕</button></div>';
+  });
+  h+='<div style="display:flex;gap:8px;margin-top:12px">';
+  h+='<input id="new-rule-input" type="text" placeholder="Ajouter une règle..." style="flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:10px">';
+  h+='<button onclick="addRule()" style="padding:8px 16px;background:var(--gold);border:none;color:#000;border-radius:6px;font-weight:800;font-size:10px;cursor:pointer">+ Ajouter</button></div></div>';
+  h+='<button onclick="resetChecklist()" style="font-size:8px;padding:6px 14px;background:transparent;border:1px solid var(--border2);color:var(--dim);border-radius:4px;cursor:pointer">🔄 Reset checklist du jour</button>';
+  el.innerHTML=h;
+}
+function toggleRule(i){var cl=checklistLoad();cl[i]=!cl[i];checklistSave(cl);renderRules();}
+function addRule(){
+  var input=document.getElementById('new-rule-input');
+  if(!input||!input.value.trim())return;
+  var rules=rulesLoad();rules.push(input.value.trim());rulesSave(rules);renderRules();
+}
+function deleteRule(i){
+  var rules=rulesLoad();rules.splice(i,1);rulesSave(rules);
+  var cl=checklistLoad();delete cl[i];checklistSave(cl);renderRules();
+}
+function resetChecklist(){checklistSave({});renderRules();}
+
+/* ══ STREAK DE DISCIPLINE ══ */
+function renderStreak(){
+  var el=document.getElementById('streak-content');
+  if(!el)return;
+  var sk=streakLoad();
+  var rules=rulesLoad();
+  var cl=checklistLoad();
+  var pct=rules.length?Math.round(Object.values(cl).filter(Boolean).length/rules.length*100):0;
+  var today=new Date().toLocaleDateString('fr-FR');
+  var alreadyDone=sk.lastDate===today;
+  var h='';
+  h+='<div style="text-align:center;padding:30px;background:var(--s1);border:1px solid rgba(200,160,60,.3);border-radius:12px;margin-bottom:16px">';
+  h+='<div style="font-size:64px;margin-bottom:8px">'+(sk.current>=7?'🔥':(sk.current>=3?'⚡':'✨'))+'</div>';
+  h+='<div style="font-size:52px;font-weight:800;color:var(--gold2);font-family:var(--fd)">'+sk.current+'</div>';
+  h+='<div style="font-size:11px;color:var(--dim);margin-bottom:16px">jours consécutifs</div>';
+  h+='<div style="display:flex;gap:16px;justify-content:center">';
+  h+='<div><div style="font-size:8px;color:var(--dim)">RECORD</div><div style="font-size:20px;font-weight:800;color:var(--gold);font-family:var(--fd)">'+sk.best+'</div></div>';
+  h+='<div style="width:1px;background:var(--border2)"></div>';
+  h+='<div><div style="font-size:8px;color:var(--dim)">AUJOURD\'HUI</div><div style="font-size:20px;font-weight:800;color:'+(alreadyDone?'var(--green)':'var(--red)')+';font-family:var(--fd)">'+(alreadyDone?'✅':'❌')+'</div></div>';
+  h+='<div style="width:1px;background:var(--border2)"></div>';
+  h+='<div><div style="font-size:8px;color:var(--dim)">RÈGLES</div><div style="font-size:20px;font-weight:800;color:'+(pct===100?'var(--green)':pct>=60?'var(--gold)':'var(--red)')+';font-family:var(--fd)">'+pct+'%</div></div>';
+  h+='</div></div>';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:16px">';
+  h+='<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:12px">🏆 OBJECTIFS</div>';
+  [3,7,14,30,60,100].forEach(function(m){
+    var done=sk.current>=m;
+    var pctD=Math.min(100,Math.round(sk.current/m*100));
+    var label=m===3?'3 jours — Débutant':m===7?'7 jours — Régulier':m===14?'14 jours — Sérieux':m===30?'30 jours — Pro':m===60?'60 jours — Expert':'100 jours — Légende 🏆';
+    h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:9px;color:'+(done?'var(--green)':'var(--text)')+'">'+label+'</span><span style="font-size:8px;color:var(--dim)">'+Math.min(sk.current,m)+'/'+m+'</span></div>';
+    h+='<div style="height:4px;background:var(--s2);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pctD+'%;background:'+(done?'var(--green)':'rgba(200,160,60,.6)')+';border-radius:2px"></div></div></div>';
+  });
+  h+='</div>';
+  if(!alreadyDone){
+    h+='<div style="background:rgba(200,160,60,.08);border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;text-align:center">';
+    h+='<div style="font-size:10px;color:var(--gold2);margin-bottom:8px">⚡ Valide ta journée</div>';
+    h+='<div style="font-size:9px;color:var(--dim);margin-bottom:12px">Checklist complète + journal psy rempli = +1 streak</div>';
+    h+='<button onclick="validateDay()" style="padding:10px 24px;background:var(--gold);border:none;color:#000;border-radius:8px;font-weight:800;font-size:11px;cursor:pointer">✅ Valider ma journée</button></div>';
+  } else {
+    h+='<div style="background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.3);border-radius:10px;padding:16px;text-align:center"><div style="font-size:11px;color:var(--green)">✅ Journée validée ! Continue comme ça 💪</div></div>';
+  }
+  el.innerHTML=h;
+}
+function validateDay(){
+  var sk=streakLoad();
+  var today=new Date().toLocaleDateString('fr-FR');
+  var yesterday=new Date(Date.now()-86400000).toLocaleDateString('fr-FR');
+  if(sk.lastDate===today){renderStreak();return;}
+  if(sk.lastDate===yesterday){sk.current++;}else{sk.current=1;}
+  if(sk.current>sk.best)sk.best=sk.current;
+  sk.lastDate=today;
+  if(!sk.history)sk.history=[];
+  sk.history.push({date:today,type:'manual'});
+  streakSave(sk);
+  renderStreak();
+}
 </script>
 
 <!-- ═══ PANEL API — mise à jour clés Twelve Data / Alpha Vantage ═══ -->
