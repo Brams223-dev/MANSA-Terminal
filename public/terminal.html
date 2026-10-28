@@ -1195,7 +1195,7 @@ body{padding-top:22px;}
     <div class="p-title-left"><span class="p-title-icon">📰</span><div><div class="p-title-text">NEWS FLOW — TEMPS RÉEL</div><div class="p-title-sub">Reuters · Bloomberg · Forexlive · Importance ⭐ · Paires Forex concernées</div></div></div>
     <div class="p-title-right" style="display:flex;align-items:center;gap:8px">
       <span id="news-live-dot" style="display:inline-flex;align-items:center;gap:5px;font-size:9px;color:var(--green)"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;box-shadow:0 0 8px var(--green)"></span>LIVE</span>
-      <button class="tool-btn" onclick="newsRefresh()">🔄 REFRESH</button>
+      <button class="tool-btn" onclick="if(typeof newsRefresh==='function')newsRefresh();else renderNewsWithAPI()">🔄 REFRESH</button>
     </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
@@ -9262,14 +9262,16 @@ async function enrichWatchlistWithTD(){
 
 /* ── AUTO-INIT: déclenche au chargement du panel News ── */
 var _newsInitDone = false;
-var _origNavForNews = nav;
-function nav(id){
-  _origNavForNews(id);
-  if((id==='news'||id==='actu'||id==='macro') && !_newsInitDone){
-    _newsInitDone = true;
-    setTimeout(renderNewsWithAPI, 300);
-  }
-}
+(function(){
+  var _origNavForNews = nav;
+  nav = function(id){
+    _origNavForNews(id);
+    if((id==='news'||id==='actu'||id==='macro') && !_newsInitDone){
+      _newsInitDone = true;
+      setTimeout(renderNewsWithAPI, 300);
+    }
+  };
+})();
 
 
 /* ═══════════════════════════════════════════
@@ -10481,7 +10483,7 @@ setTimeout(function(){
   setInterval(liveDataRefreshAll, 30000); // toutes les 30s
   renderIAPanel();
   // Session clock starts when tab is opened
-  setInterval(function(){newsRefresh();}, 60000); // news toutes les 60s
+  setInterval(function(){if(typeof newsRefresh==='function')newsRefresh();else if(typeof renderNewsWithAPI==='function')renderNewsWithAPI();}, 60000); // news toutes les 60s
 }, 800);
 </script>
 
