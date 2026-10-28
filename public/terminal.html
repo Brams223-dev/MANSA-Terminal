@@ -812,7 +812,6 @@ body{padding-top:22px;}
   <div class="ntab" onclick="nav('macro')" id="nt-macro">📆 MACRO</div>
   <div class="ntab" onclick="nav('heatmap')" id="nt-heatmap">🌡️ HEATMAP</div>
   <div class="ntab" onclick="nav('sessions')" id="nt-sessions">🕐 SESSIONS</div>
-  <div class="ntab" onclick="nav('perf')" id="nt-perf">📊 PERFORMANCE</div>
   <div class="ntab" onclick="nav('backtest')" id="nt-backtest">🔬 BACKTEST</div>
   <div class="ntab" onclick="nav('ia')" id="nt-ia" style="background:linear-gradient(135deg,rgba(68,136,255,.18),rgba(68,136,255,.08));border:1px solid rgba(68,136,255,.35);color:#8af">🤖 MANSA IA</div>
   <div class="ntab" onclick="nav('news')" id="nt-news">📰 NEWS</div>
@@ -820,9 +819,7 @@ body{padding-top:22px;}
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
   <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALCULATEUR</div>
   <div class="ntab" onclick="nav('journal')" id="nt-journal">📓 JOURNAL</div>
-  <div class="ntab" onclick="nav('psycho')" id="nt-psycho">🧠 PSYCHOLOGIE</div>
   <div class="ntab" onclick="nav('rules')" id="nt-rules">📋 MES RÈGLES</div>
-  <div class="ntab" onclick="nav('streak')" id="nt-streak">🔥 STREAK</div>
   <div class="ntab" onclick="nav('alertes')" id="nt-alertes">🔔 ALERTES</div>
   <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API LIVE</div>
   <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 NOUS REJOINDRE</div>
@@ -3054,15 +3051,57 @@ function actBack(){
 function renderCrypto(){
   var up=CRYPTO.filter(function(d){return d.d>0;}).length;
   var best=CRYPTO.reduce(function(a,b){return a.d>b.d?a:b;});
+  var worst=CRYPTO.reduce(function(a,b){return a.d<b.d?a:b;});
+  var sorted=[].concat(CRYPTO).sort(function(a,b){return b.d-a.d;});
+
   document.getElementById('crypto-stats').innerHTML=
     sc('MARKET CAP TOTAL','$2.48T','var(--gold)','')+
     sc('BTC DOMINANCE','54.8%','var(--orange)','')+
     sc('HAUSSIÈRES 24H',up+'/'+CRYPTO.length,'var(--green)','')+
-    sc('BEST PERF.',best.s+' +'+best.d.toFixed(2)+'%','var(--green)','');
-  var h=tHead(['#','Crypto','Prix','24H','7J','Cap Market','Volume'],'TOP '+CRYPTO.length+' CRYPTOS');
-  CRYPTO.forEach(function(d){
+    sc('BEST 24H',best.s+' +'+best.d.toFixed(2)+'%','var(--green)','');
+
+  /* ── TRENDING CARDS (top 3 most bought / bullish) ── */
+  var trending=['<div style="margin:12px 0 8px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.08em">🔥 LES PLUS ACHETÉES / TRENDING</div>'];
+  trending.push('<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">');
+  sorted.slice(0,3).forEach(function(d,i){
+    var medals=['🥇','🥈','🥉'];
+    var barPct=Math.min(100,Math.round((d.d/best.d)*100));
+    trending.push(
+      '<div style="background:var(--green)09;border:1px solid var(--green)33;border-radius:8px;padding:12px 14px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      +'<span style="font-size:14px;font-weight:800;color:var(--text)">'+medals[i]+' '+d.s+'</span>'
+      +'<span style="font-size:10px;font-weight:700;color:var(--green)">+'+d.d.toFixed(2)+'%</span>'
+      +'</div>'
+      +'<div style="font-size:9px;color:var(--dim);margin-bottom:8px">'+d.n+' · <span style="color:var(--blue)">'+d.cap+'</span></div>'
+      +'<div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px">$'+d.p+'</div>'
+      +'<div style="height:3px;background:var(--border);border-radius:2px">'
+      +'<div style="height:3px;background:var(--green);border-radius:2px;width:'+barPct+'%"></div>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;margin-top:4px;font-size:8px;color:var(--dim)">'
+      +'<span>7J: <span style="color:'+(d.w>=0?'var(--green)':'var(--red)')+'">'+(d.w>=0?'+':'')+d.w.toFixed(2)+'%</span></span>'
+      +'<span>Vol: '+d.vol+'</span>'
+      +'</div>'
+      +'</div>'
+    );
+  });
+  trending.push('</div>');
+
+  /* ── FULL TABLE ── */
+  var h=trending.join('')+tHead(['#','Crypto','Prix USD','24H ▼','7J','Cap Market','Volume 24H'],'CLASSEMENT COMPLET — '+CRYPTO.length+' ACTIFS');
+  sorted.forEach(function(d,i){
     var c=d.d>=0?'up':'dn';var cw=d.w>=0?'up':'dn';
-    h+=tRow([d.r,'<strong>'+d.s+'</strong> <span class="neu" style="font-size:9px">'+d.n+'</span>','$'+d.p,'<span class="'+c+'">'+(d.d>=0?'+':'')+d.d.toFixed(2)+'%</span>','<span class="'+cw+'">'+(d.w>=0?'+':'')+d.w.toFixed(2)+'%</span>','<span style="color:var(--blue)">'+d.cap+'</span>','<span class="neu">'+d.vol+'</span>']);
+    var badge='';
+    if(i===0)badge=' <span style="background:var(--green)22;color:var(--green);font-size:7px;padding:1px 5px;border-radius:3px;font-weight:700">HOT</span>';
+    if(d.d<0)badge=' <span style="background:var(--red)22;color:var(--red);font-size:7px;padding:1px 5px;border-radius:3px;font-weight:700">SELL</span>';
+    h+=tRow([
+      d.r,
+      '<strong>'+d.s+'</strong>'+badge+'<br><span class="neu" style="font-size:8px">'+d.n+'</span>',
+      '<strong style="font-size:11px">$'+d.p+'</strong>',
+      '<span class="'+c+'" style="font-weight:700">'+(d.d>=0?'▲ +':'▼ ')+d.d.toFixed(2)+'%</span>',
+      '<span class="'+cw+'">'+(d.w>=0?'+':'')+d.w.toFixed(2)+'%</span>',
+      '<span style="color:var(--blue);font-weight:600">'+d.cap+'</span>',
+      '<span class="neu">'+d.vol+'</span>'
+    ]);
   });
   h+='</tbody></table></div>';
   document.getElementById('crypto-table').innerHTML=h;
@@ -4110,16 +4149,32 @@ function renderNews(){
 }
 
 /* SQUAWK */
+var _squawkTimer=null;
 function renderSquawk(){
-  var h='';
-  SQUAWK.forEach(function(d){
-    h+='<div class="sq-item">';
-    h+='<span class="sq-time">'+d.time+'</span>';
-    h+='<span class="sq-cat" style="background:'+d.col+'18;border:1px solid '+d.col+'44;color:'+d.col+'">'+d.cat+'</span>';
-    h+='<span class="sq-msg">'+d.msg+'</span>';
-    h+='</div>';
-  });
-  document.getElementById('squawk-list').innerHTML=h;
+  var now=new Date();
+  var pad=function(m){return String(m).padStart(2,'0');};
+  var hh=pad(now.getHours()); var mm=now.getMinutes();
+  var dynamic=[
+    {time:hh+':'+pad(mm),cat:'LIVE',col:'var(--green)',msg:'Session active · Liquidité institutionnelle normale · Spreads serrés.'},
+    {time:hh+':'+pad(Math.max(0,mm-4)),cat:'FOREX',col:'var(--blue)',msg:'EUR/USD : test résistance 1.0870 · Retail 62% Long (DMX) → biais baissier contrarien.'},
+    {time:hh+':'+pad(Math.max(0,mm-9)),cat:'MACRO',col:'var(--gold)',msg:'DXY dollar index en consolidation 104-105 · Pas de catalyseur macro immédiat.'},
+    {time:hh+':'+pad(Math.max(0,mm-15)),cat:'GOLD',col:'var(--orange)',msg:'XAU/USD : résistance $2 725 testée · Zone d\'achat $2 695-2 700 en surveillance PTL.'},
+    {time:hh+':'+pad(Math.max(0,mm-22)),cat:'GBP',col:'var(--blue)',msg:'GBP/USD : support 1.2950 · Retail 68% Long → signal contrarien baissier selon DMX.'},
+    {time:hh+':'+pad(Math.max(0,mm-30)),cat:'AFRIQUE',col:'var(--cyan)',msg:'BVMAC · NGX · JSE : volumes modérés · Surveiller ouverture US 15h30 Paris.'},
+    {time:hh+':'+pad(Math.max(0,mm-40)),cat:'CRYPTO',col:'var(--purple)',msg:'BTC consolide $67K-$69K · ETF spot inflows positifs · Biais haussier court terme.'},
+    {time:hh+':'+pad(Math.max(0,mm-50)),cat:'INDICES',col:'var(--cyan)',msg:'NAS100 : momentum haussier · DAX neutre · SPX proche ATH — vigilance risk-off.'},
+  ].concat(SQUAWK);
+  var el=document.getElementById('squawk-list');
+  if(!el) return;
+  el.innerHTML=dynamic.map(function(d){
+    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">'
+      +'<span style="font-size:9px;color:var(--dim);flex-shrink:0;font-variant-numeric:tabular-nums;padding-top:1px;min-width:40px">'+d.time+'</span>'
+      +'<span style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;background:'+d.col+'18;border:1px solid '+d.col+'44;color:'+d.col+'">'+d.cat+'</span>'
+      +'<span style="font-size:9px;color:var(--text);line-height:1.5;flex:1">'+d.msg+'</span>'
+      +'</div>';
+  }).join('');
+  if(_squawkTimer) clearInterval(_squawkTimer);
+  _squawkTimer=setInterval(function(){if(CURRENT_TAB==='squawk')renderSquawk();else clearInterval(_squawkTimer);},60000);
 }
 
 /* AI PANEL */
@@ -4184,18 +4239,20 @@ function nav(id){
   if(id==='smart'){renderSmartMoney();}
   if(id==='calc'){renderCalc();}
   if(id==='journal'){renderJournal();}
-  if(id==='psycho'){renderPsycho();}
   if(id==='rules'){renderRules();}
-  if(id==='streak'){renderStreak();}
   if(id==='alertes'){renderAlertes();}
   if(id==='actions'){renderActions(ACT_FILTER);}
   if(id==='rendement'){renderRendement(REND_TAB);}
   if(id==='heatmap'){renderHeatmap();}
   if(id==='sessions'){renderV20Sessions();startV20SessionClock();}
   if(id==='ia'){renderIAPanel();}
-  if(id==='perf'){renderPerf();}
   if(id==='macro'){renderMacroEnriched();}
   if(id==='backtest'){renderBacktest();}
+  if(id==='cot'){renderCOT();}
+  if(id==='dmx'){renderDMX();}
+  if(id==='saison'){renderSaison(SZ_PAIR||'EUR/USD');}
+  if(id==='squawk'){renderSquawk();}
+  if(id==='setups'){renderSetups();}
 }
 
 /* SESSIONS */
@@ -9125,28 +9182,60 @@ function renderMacroFilter(impact){
 }
 
 
-/* V21 — CALC PTL — add position sizing shortcut buttons */
-var _origCalc = renderCalc;
+/* CALC PTL — Calculateur de position complet */
 function renderCalc(){
-  _origCalc();
   var el = document.getElementById('calc-content');
   if(!el) return;
-  var exist = document.getElementById('calc-ptl-quick');
-  if(exist) return;
-  var div = document.createElement('div');
-  div.id = 'calc-ptl-quick';
-  div.style.cssText = 'margin-top:14px;padding-top:14px;border-top:1px solid var(--border2)';
-  div.innerHTML = '<div style="font-size:9px;font-weight:800;color:var(--gold2);margin-bottom:8px">⚡ RISQUE RAPIDE PTL</div>'
-    +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
-    +['0.5%','1%','1.5%','2%','3%'].map(function(r){
-      var rv = parseFloat(r);
-      return '<button data-rv="'+rv+'" onclick="setRiskAndCalc(this)" style="padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:12px;font-size:9px;color:var(--dim);cursor:pointer;font-family:var(--fm)">'+r+'</button>';
-    }).join('')
-    +'</div>'
-    +'<div style="margin-top:10px;font-size:8px;color:var(--dim);line-height:1.7">'
-    +'📐 <strong style="color:var(--text)">Règle PTL :</strong> Ne jamais risquer >1% par trade · Stop = Kijun Sen · Target = 2R minimum'
-    +'</div>';
-  el.appendChild(div);
+  var fxOpts = FX.map(function(f){return '<option value="'+f.p+'"'+(f.p==='EUR/USD'?' selected':'')+'>'+f.p+'</option>';}).join('');
+  var h = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+  h += '<div><div style="background:var(--s1);border:1px solid rgba(200,160,60,.25);border-radius:10px;padding:16px;margin-bottom:12px">';
+  h += '<div style="font-family:var(--fd);font-size:10px;color:var(--gold2);margin-bottom:14px">⚙️ PARAMÈTRES DU TRADE</div>';
+  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">💰 Capital ($)</label><input id="c-capital" type="number" value="10000" min="100" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>';
+  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">⚡ Risque (%)</label>';
+  h += '<div style="display:flex;gap:4px;margin-bottom:6px">'+['0.5','1','1.5','2','3'].map(function(r){return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:5px 2px;background:var(--s2);border:1px solid var(--border2);border-radius:4px;font-size:9px;color:var(--dim);cursor:pointer;font-family:var(--fm)">'+r+'%</button>';}).join('')+'</div>';
+  h += '<input id="c-risk" type="number" value="1" min="0.1" max="5" step="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--gold);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>';
+  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">📊 Paire</label><select id="c-pair" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:11px">'+fxOpts+'</select></div>';
+  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">⚡ Stratégie PTL</label><select id="c-strat" onchange="updateStratDefaults()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:11px"><option value="ptl-ds">🏗️ Double Structure (RR 2.5)</option><option value="ptl-mtf">📐 Multi-Timeframes (RR 2.5)</option><option value="ptl-sam">📈 Swing Action Market (RR 2)</option><option value="ptl-ivc">📊 IVC Indices (RR 2.2)</option></select></div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label style="font-size:8px;color:var(--red);display:block;margin-bottom:4px">🛑 Stop Loss (pips)</label><input id="c-sl" type="number" value="20" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(224,82,82,.4);color:var(--red);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>';
+  h += '<div><label style="font-size:8px;color:var(--green);display:block;margin-bottom:4px">🎯 Take Profit (pips)</label><input id="c-tp" type="number" value="50" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(0,200,120,.4);color:var(--green);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div></div>';
+  h += '</div></div>';
+  h += '<div><div style="background:linear-gradient(135deg,rgba(200,160,60,.08),var(--s1));border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;margin-bottom:12px">';
+  h += '<div style="font-family:var(--fd);font-size:10px;color:var(--gold2);margin-bottom:14px">📐 RÉSULTAT</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
+  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Taille de position</div><div id="c-lot" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--gold)">—</div><div id="c-lotm" style="font-size:8px;color:var(--dim);margin-top:2px"></div></div>';
+  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Ratio R/R</div><div id="c-rr" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--green)">—</div><div id="c-rr-label" style="font-size:8px;margin-top:2px"></div></div>';
+  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Profit potentiel</div><div id="c-profit" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--green)">—</div></div>';
+  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Perte maximale</div><div id="c-max-loss" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--red)">—</div><div id="c-risk-amt" style="font-size:8px;color:var(--dim);margin-top:2px"></div></div>';
+  h += '</div></div>';
+  h += '<div style="background:rgba(0,200,120,.04);border:1px solid rgba(0,200,120,.15);border-radius:8px;padding:14px">';
+  h += '<div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:10px">📏 RÈGLES PTL MONEY MANAGEMENT</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  [{r:'Risque standard',v:'1% / trade'},{r:'Setup fort 🔥',v:'Max 2%'},{r:'Double Structure RR',v:'Min 2.5:1'},{r:'Multi-TF RR',v:'Min 2.5:1'},{r:'SAM RR',v:'Min 2:1'},{r:'IVC RR',v:'2 à 3:1'}].forEach(function(r){h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:7px 9px"><div style="font-size:7.5px;color:var(--dim)">'+r.r+'</div><div style="font-size:9px;font-weight:700;color:var(--green)">'+r.v+'</div></div>';});
+  h += '</div></div></div>';
+  h += '</div>';
+  el.innerHTML = h;
+  setTimeout(calcPosition, 100);
+}
+
+function calcPosition(){
+  var capital = parseFloat((document.getElementById('c-capital')||{}).value) || 10000;
+  var risk = parseFloat((document.getElementById('c-risk')||{}).value) || 1;
+  var sl = parseFloat((document.getElementById('c-sl')||{}).value) || 20;
+  var tp = parseFloat((document.getElementById('c-tp')||{}).value) || 50;
+  if(!sl || sl<=0) return;
+  var riskAmt = capital * risk / 100;
+  var pipVal = 10;
+  var lotSize = riskAmt / (sl * pipVal);
+  var rrRatio = tp / sl;
+  var profit = riskAmt * rrRatio;
+  var el;
+  el = document.getElementById('c-lot'); if(el) el.textContent = lotSize.toFixed(2) + ' lot';
+  el = document.getElementById('c-lotm'); if(el) el.textContent = (lotSize * 100000).toFixed(0) + ' unités';
+  el = document.getElementById('c-rr'); if(el){ el.textContent = rrRatio.toFixed(1)+':1'; el.style.color = rrRatio>=2?'var(--green)':rrRatio>=1.5?'var(--gold)':'var(--red)'; }
+  el = document.getElementById('c-rr-label'); if(el){ el.textContent = rrRatio>=2.5?'✅ PTL validé':rrRatio>=2?'⚠️ Limite acceptable':'❌ Sous seuil PTL'; el.style.color = rrRatio>=2.5?'var(--green)':rrRatio>=2?'var(--gold)':'var(--red)'; }
+  el = document.getElementById('c-profit'); if(el) el.textContent = '+$'+profit.toFixed(0);
+  el = document.getElementById('c-max-loss'); if(el) el.textContent = '-$'+riskAmt.toFixed(0);
+  el = document.getElementById('c-risk-amt'); if(el) el.textContent = 'Risque : $'+riskAmt.toFixed(0)+' ('+risk+'% du capital)';
 }
 
 
