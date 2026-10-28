@@ -309,6 +309,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .chart-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:8px 10px;background:var(--s1);border:1px solid var(--border2);border-radius:6px}
 .ct-sep{width:1px;height:18px;background:var(--border2);flex-shrink:0}
 .ct-lbl{font-size:8px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-right:2px}
+/* ─── MT5 MODULE ─── */
+.mt5-tf{font-size:8px;padding:3px 7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-family:monospace;transition:all .12s;letter-spacing:.04em}
+.mt5-tf:hover{color:var(--text);border-color:var(--border2)}
+.mt5-tf.on{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#4ade80}
+.mt5-ind-btn{font-size:8px;padding:3px 7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-family:monospace;transition:all .12s}
+.mt5-ind-btn.on{background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:var(--blue)}
+.mt5-pos-row{display:grid;grid-template-columns:70px 40px 1fr 1fr 60px 28px;gap:4px;align-items:center;padding:6px 8px;border-radius:6px;border:1px solid var(--border2);margin-bottom:4px;font-size:8.5px;font-family:monospace;background:var(--surface2)}
+.mt5-pos-buy{border-left:2px solid var(--green)}
+.mt5-pos-sell{border-left:2px solid var(--red)}
+.mt5-close-btn{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:3px;padding:2px 5px;font-size:8px;color:var(--red);cursor:pointer;width:100%}
+.mt5-close-btn:hover{background:rgba(239,68,68,.3)}
+.mt5-tick-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border)}
+.mt5-tick-row:last-child{border-bottom:none}
+.mt5-hist-row{display:grid;grid-template-columns:80px 70px 35px 45px 50px 55px;gap:4px;padding:4px 8px;border-radius:4px;font-size:8px;font-family:monospace;border-bottom:1px solid var(--border)}
 .ct-btn{font-size:8px;padding:3px 9px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--dim);cursor:pointer;font-family:var(--fm);transition:all .12s;letter-spacing:.04em;white-space:nowrap}
 .ct-btn:hover{color:var(--text);border-color:var(--border3);background:rgba(255,255,255,.03)}
 .ct-btn.on{background:rgba(200,160,60,.12);border-color:rgba(200,160,60,.4);color:var(--gold2)}
@@ -794,6 +808,7 @@ body{padding-top:22px;}
   <div class="ntab on" onclick="nav('wei')" id="nt-wei">📋 MARCHÉS</div>
   <div class="ntab" onclick="nav('screener')" id="nt-screener">🔍 SCREENER</div>
   <div class="ntab" onclick="nav('charts')" id="nt-charts">📉 CHARTS</div>
+  <div class="ntab" onclick="nav('mt5')" id="nt-mt5" style="background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.07));border:1px solid rgba(34,197,94,.35);color:#4ade80;font-weight:700">🖥️ TRADING MT5</div>
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
   <div class="ntab" onclick="nav('setups')" id="nt-setups" style="color:var(--gold)">🎯 SETUPS PTL</div>
   <div class="ntab" onclick="nav('ptl')" id="nt-ptl">⚡ PTL STRATS</div>
@@ -1495,6 +1510,206 @@ body{padding-top:22px;}
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════ MT5 TRADING PANEL -->
+<div class="panel" id="p-mt5">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">🖥️</span><div>
+      <div class="p-title-text">TRADING MT5 — EXÉCUTION DIRECTE</div>
+      <div class="p-title-sub">Graphiques live · Ordres market &amp; pending · Gestion positions · Aucun abonnement TradingView</div>
+    </div></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="mt5-status-dot" style="width:8px;height:8px;border-radius:50%;background:#3a3835"></div>
+      <span id="mt5-status-txt" style="font-size:9px;color:var(--muted)">Non connecté</span>
+    </div>
+  </div>
+
+  <!-- BRIDGE CONNECT BAR -->
+  <div id="mt5-connect-bar" style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;margin-bottom:12px">
+    <div style="font-size:10px;color:var(--gold);font-weight:700;margin-bottom:10px;letter-spacing:.06em">⚙️ CONNEXION AU BRIDGE MT5</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px auto;gap:8px;align-items:end">
+      <div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:4px">ADRESSE BRIDGE</div>
+        <input id="mt5-ws-host" value="localhost" placeholder="localhost ou IP" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-size:10px;color:var(--text);font-family:monospace;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:4px">PORT</div>
+        <input id="mt5-ws-port" value="8765" placeholder="8765" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-size:10px;color:var(--text);font-family:monospace;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:4px">LOGIN MT5 (optionnel)</div>
+        <input id="mt5-login" placeholder="Numéro compte" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-size:10px;color:var(--text);font-family:monospace;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:4px">MOT DE PASSE</div>
+        <input id="mt5-pass" type="password" placeholder="••••••••" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-size:10px;color:var(--text);box-sizing:border-box">
+      </div>
+      <button onclick="mt5Connect()" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:8px 16px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap">CONNECTER</button>
+    </div>
+    <div style="margin-top:10px;padding:8px 12px;background:rgba(200,160,60,.06);border:1px solid rgba(200,160,60,.15);border-radius:6px;font-size:8.5px;color:var(--muted);line-height:1.6">
+      💡 Lance <code style="color:var(--gold);background:rgba(200,160,60,.1);padding:1px 5px;border-radius:3px">python mt5_bridge.py</code> sur le PC où MetaTrader 5 est installé.
+      Le bridge est dans le dossier <code style="color:var(--gold);background:rgba(200,160,60,.1);padding:1px 5px;border-radius:3px">mt5-bridge/</code> du terminal.
+      Pour accès réseau : <code style="color:var(--gold);background:rgba(200,160,60,.1);padding:1px 5px;border-radius:3px">python mt5_bridge.py --host 0.0.0.0</code>
+    </div>
+  </div>
+
+  <!-- ACCOUNT SUMMARY (visible après connexion) -->
+  <div id="mt5-account-bar" style="display:none;background:var(--surface);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 18px;margin-bottom:12px">
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+      <div style="font-size:9px;color:var(--muted)">COMPTE<div id="mt5-acc-name" style="font-size:11px;font-weight:700;color:var(--text);margin-top:2px">—</div></div>
+      <div style="font-size:9px;color:var(--muted)">BALANCE<div id="mt5-acc-balance" style="font-size:14px;font-weight:700;color:var(--text);font-family:var(--mono,monospace);margin-top:2px">—</div></div>
+      <div style="font-size:9px;color:var(--muted)">ÉQUITÉ<div id="mt5-acc-equity" style="font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono,monospace);margin-top:2px">—</div></div>
+      <div style="font-size:9px;color:var(--muted)">MARGE LIBRE<div id="mt5-acc-free" style="font-size:14px;font-weight:700;color:var(--blue);font-family:var(--mono,monospace);margin-top:2px">—</div></div>
+      <div style="font-size:9px;color:var(--muted)">P&amp;L OUVERT<div id="mt5-acc-profit" style="font-size:14px;font-weight:700;font-family:var(--mono,monospace);margin-top:2px">—</div></div>
+      <div style="font-size:9px;color:var(--muted)">LEVIER<div id="mt5-acc-leverage" style="font-size:11px;font-weight:700;color:var(--gold);margin-top:2px">—</div></div>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button onclick="mt5RefreshAll()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:5px 10px;font-size:9px;color:var(--text);cursor:pointer">⟳ Rafraîchir</button>
+        <button onclick="mt5Disconnect()" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:5px;padding:5px 10px;font-size:9px;color:var(--red);cursor:pointer">Déconnecter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN TRADING LAYOUT: chart + order panel -->
+  <div id="mt5-main" style="display:none;display:grid;grid-template-columns:1fr 320px;gap:10px;height:calc(100vh - 320px);min-height:480px">
+
+    <!-- CHART SIDE -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <!-- Chart toolbar -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <select id="mt5-chart-symbol" onchange="mt5LoadChart()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;font-size:10px;color:var(--text);cursor:pointer">
+          <option value="EURUSD">EUR/USD</option>
+          <option value="GBPUSD">GBP/USD</option>
+          <option value="USDJPY">USD/JPY</option>
+          <option value="GBPJPY">GBP/JPY</option>
+          <option value="EURJPY">EUR/JPY</option>
+          <option value="AUDUSD">AUD/USD</option>
+          <option value="USDCAD">USD/CAD</option>
+          <option value="USDCHF">USD/CHF</option>
+          <option value="XAUUSD">XAU/USD (Gold)</option>
+          <option value="XAGUSD">XAG/USD (Silver)</option>
+          <option value="US30">US30 (Dow)</option>
+          <option value="NAS100">NAS100 (Nasdaq)</option>
+          <option value="SP500">SP500</option>
+          <option value="BTCUSD">BTC/USD</option>
+          <option value="ETHUSD">ETH/USD</option>
+        </select>
+        <div style="display:flex;gap:2px">
+          <button class="mt5-tf on" onclick="mt5SetTF('M1')" data-tf="M1">M1</button>
+          <button class="mt5-tf" onclick="mt5SetTF('M5')" data-tf="M5">M5</button>
+          <button class="mt5-tf" onclick="mt5SetTF('M15')" data-tf="M15">M15</button>
+          <button class="mt5-tf" onclick="mt5SetTF('M30')" data-tf="M30">M30</button>
+          <button class="mt5-tf" onclick="mt5SetTF('H1')" data-tf="H1">H1</button>
+          <button class="mt5-tf" onclick="mt5SetTF('H4')" data-tf="H4">H4</button>
+          <button class="mt5-tf" onclick="mt5SetTF('D1')" data-tf="D1">D1</button>
+          <button class="mt5-tf" onclick="mt5SetTF('W1')" data-tf="W1">W1</button>
+        </div>
+        <div style="display:flex;gap:2px;margin-left:auto">
+          <button class="mt5-ind-btn" onclick="mt5ToggleEMA(20)" id="mt5-ema20">EMA20</button>
+          <button class="mt5-ind-btn" onclick="mt5ToggleEMA(50)" id="mt5-ema50">EMA50</button>
+          <button class="mt5-ind-btn" onclick="mt5ToggleEMA(200)" id="mt5-ema200">EMA200</button>
+        </div>
+        <div id="mt5-live-price" style="font-size:13px;font-weight:700;color:var(--gold);font-family:monospace;min-width:80px;text-align:right">—</div>
+      </div>
+
+      <!-- Lightweight Chart container -->
+      <div id="mt5-chart-wrap" style="flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:8px;overflow:hidden;position:relative;min-height:340px">
+        <div id="mt5-chart" style="width:100%;height:100%"></div>
+        <div id="mt5-chart-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)">Connecte le bridge pour afficher les graphiques</div>
+      </div>
+    </div>
+
+    <!-- ORDER PANEL SIDE -->
+    <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+
+      <!-- QUICK ORDER -->
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px">
+        <div style="font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.06em;margin-bottom:10px">⚡ PASSER UN ORDRE</div>
+
+        <div style="margin-bottom:8px">
+          <div style="font-size:8px;color:var(--muted);margin-bottom:4px">SYMBOLE</div>
+          <select id="mt5-ord-sym" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-size:10px;color:var(--text)">
+            <option>EURUSD</option><option>GBPUSD</option><option>USDJPY</option>
+            <option>GBPJPY</option><option>EURJPY</option><option>AUDUSD</option>
+            <option>XAUUSD</option><option>US30</option><option>NAS100</option>
+            <option>BTCUSD</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+          <div>
+            <div style="font-size:8px;color:var(--muted);margin-bottom:4px">LOT</div>
+            <input id="mt5-ord-vol" type="number" value="0.01" min="0.01" step="0.01" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-size:11px;font-weight:700;color:var(--text);font-family:monospace;box-sizing:border-box">
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--muted);margin-bottom:4px">TYPE</div>
+            <select id="mt5-ord-type" onchange="mt5OrderTypeChanged()" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-size:10px;color:var(--text)">
+              <option value="BUY">BUY Market</option>
+              <option value="SELL">SELL Market</option>
+              <option value="BUY_LIMIT">BUY Limit</option>
+              <option value="SELL_LIMIT">SELL Limit</option>
+              <option value="BUY_STOP">BUY Stop</option>
+              <option value="SELL_STOP">SELL Stop</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Prix (pour pending orders) -->
+        <div id="mt5-ord-price-row" style="display:none;margin-bottom:8px">
+          <div style="font-size:8px;color:var(--muted);margin-bottom:4px">PRIX PENDING</div>
+          <input id="mt5-ord-price" type="number" step="0.00001" placeholder="0.00000" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--text);font-family:monospace;box-sizing:border-box">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div>
+            <div style="font-size:8px;color:var(--red);margin-bottom:4px">STOP LOSS</div>
+            <input id="mt5-ord-sl" type="number" step="0.00001" placeholder="0.00000" style="width:100%;background:var(--surface2);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--red);font-family:monospace;box-sizing:border-box">
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--green);margin-bottom:4px">TAKE PROFIT</div>
+            <input id="mt5-ord-tp" type="number" step="0.00001" placeholder="0.00000" style="width:100%;background:var(--surface2);border:1px solid rgba(34,197,94,.3);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--green);font-family:monospace;box-sizing:border-box">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button onclick="mt5PlaceOrder('BUY')" id="mt5-btn-buy" style="background:var(--green);color:#000;border:none;border-radius:7px;padding:11px;font-size:11px;font-weight:800;cursor:pointer;letter-spacing:.04em">
+            ▲ BUY
+          </button>
+          <button onclick="mt5PlaceOrder('SELL')" id="mt5-btn-sell" style="background:var(--red);color:#fff;border:none;border-radius:7px;padding:11px;font-size:11px;font-weight:800;cursor:pointer;letter-spacing:.04em">
+            ▼ SELL
+          </button>
+        </div>
+
+        <div id="mt5-ord-feedback" style="margin-top:8px;font-size:9px;color:var(--muted);min-height:14px;text-align:center"></div>
+      </div>
+
+      <!-- LIVE PRICES -->
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px">
+        <div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:8px">📡 PRIX LIVE</div>
+        <div id="mt5-ticks-grid" style="display:flex;flex-direction:column;gap:4px;font-size:9px;font-family:monospace">
+          <div style="color:var(--faint);font-size:8px">—</div>
+        </div>
+      </div>
+
+      <!-- POSITIONS OUVERTES -->
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px;flex:1">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em">📂 POSITIONS OUVERTES</div>
+          <button onclick="mt5CloseAll()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:5px;padding:3px 8px;font-size:8px;color:var(--red);cursor:pointer">Tout fermer</button>
+        </div>
+        <div id="mt5-positions" style="font-size:9px">
+          <div style="color:var(--faint);font-size:8px;text-align:center;padding:10px">Aucune position ouverte</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE (tab) -->
+  <div id="mt5-history-wrap" style="display:none;margin-top:10px">
+    <div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:8px">📋 HISTORIQUE (7 derniers jours)</div>
+    <div id="mt5-history-table"></div>
+  </div>
+
+</div><!-- /p-mt5 -->
 
 </div><!-- /main -->
 
@@ -4304,6 +4519,11 @@ function nav(id){
   if(nt)nt.classList.add('on');
   if(pn){pn.classList.add('on');pn.scrollTop=0;}
   if(id==='charts'){setTimeout(buildChartGrid,40);}
+  if(id==='mt5'){setTimeout(function(){
+    if(typeof LightweightCharts==='undefined' && window._mt5Connected){
+      loadLWC(function(){ if(window.mt5LoadChart) mt5LoadChart(); });
+    }
+  },100);}
   if(id==='api'){renderApiPanel();}
   if(id==='community'){renderCommunity();}
   if(id==='ptl'){renderPTL();}
@@ -10847,6 +11067,434 @@ function tvInitChart(symbol) {
     popup_height: '650',
   });
 }
+
+// ══════════════════════════════════════════════════════════════════
+//  MANSA TERMINAL — MODULE MT5 TRADING
+// ══════════════════════════════════════════════════════════════════
+
+(function(){
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────────
+var _ws        = null;   // WebSocket
+var _wsUrl     = '';
+var _connected = false;
+var _chart     = null;   // Lightweight Charts instance
+var _candleSeries = null;
+var _emas      = {};     // { 20: series, 50: series, 200: series }
+var _emaOn     = {};
+var _currentTF = 'H1';
+var _currentSym = 'EURUSD';
+var _pendingCbs = {};    // request id → callback
+var _msgId      = 0;
+var _tickInterval = null;
+var _posInterval  = null;
+
+// ── Lightweight Charts loader ──────────────────────────────────────
+function loadLWC(cb){
+  if(window.LightweightCharts){ cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+// ── WebSocket helpers ──────────────────────────────────────────────
+function wsSend(action, params, cb){
+  if(!_ws || _ws.readyState !== 1){
+    if(cb) cb({ok:false, error:'Non connecté'});
+    return;
+  }
+  var id = ++_msgId;
+  var msg = Object.assign({action: action, _id: id}, params || {});
+  if(cb) _pendingCbs[id] = cb;
+  _ws.send(JSON.stringify(msg));
+}
+
+function mt5Connect(){
+  var host = document.getElementById('mt5-ws-host').value.trim() || 'localhost';
+  var port = document.getElementById('mt5-ws-port').value.trim() || '8765';
+  var login = document.getElementById('mt5-login').value.trim();
+  var pass  = document.getElementById('mt5-pass').value;
+
+  var url = 'ws://' + host + ':' + port;
+  _wsUrl = url;
+  setStatus('connecting');
+
+  if(_ws){ try{ _ws.close(); } catch(e){} }
+
+  _ws = new WebSocket(url);
+
+  _ws.onopen = function(){
+    setStatus('connected');
+    // Auto-connect MT5 if credentials supplied
+    if(login){
+      wsSend('connect', {login: parseInt(login), password: pass, server: ''}, function(r){
+        if(r.ok){ onMT5Connected(r.account); }
+        else{ showFeedback('❌ ' + r.error, 'red'); }
+      });
+    } else {
+      wsSend('ping', {}, function(r){
+        if(r.ok && r.mt5_connected){
+          wsSend('account', {}, function(a){ if(a.ok) onMT5Connected(a); });
+        } else {
+          showFeedback('Bridge connecté — ouvre MT5 puis lance le bridge avec --login', 'gold');
+        }
+      });
+    }
+  };
+
+  _ws.onclose = function(){
+    _connected = false;
+    setStatus('disconnected');
+    clearInterval(_tickInterval);
+    clearInterval(_posInterval);
+    document.getElementById('mt5-account-bar').style.display = 'none';
+    document.getElementById('mt5-main').style.display = 'none';
+  };
+
+  _ws.onerror = function(){
+    setStatus('error');
+    showFeedback('❌ Impossible de joindre le bridge. Lance mt5_bridge.py sur ton PC.', 'red');
+  };
+
+  _ws.onmessage = function(e){
+    var msg;
+    try{ msg = JSON.parse(e.data); } catch(err){ return; }
+
+    // Push events (live ticks)
+    if(msg.event === 'ticks'){
+      renderTicksGrid(msg.data);
+      // Update chart last candle price
+      if(msg.data[_currentSym]){
+        var t = msg.data[_currentSym];
+        var mid = ((t.bid + t.ask) / 2);
+        document.getElementById('mt5-live-price').textContent =
+          _currentSym + ' ' + mid.toFixed(5);
+      }
+      return;
+    }
+
+    // Request-response
+    if(msg._id && _pendingCbs[msg._id]){
+      _pendingCbs[msg._id](msg);
+      delete _pendingCbs[msg._id];
+    }
+  };
+}
+
+function mt5Disconnect(){
+  _connected = false;
+  if(_ws){ _ws.close(); _ws = null; }
+  setStatus('disconnected');
+  clearInterval(_tickInterval);
+  clearInterval(_posInterval);
+  document.getElementById('mt5-account-bar').style.display = 'none';
+  document.getElementById('mt5-main').style.display = 'none';
+}
+
+// ── Post-connection setup ──────────────────────────────────────────
+function onMT5Connected(info){
+  _connected = true;
+  // Update account bar
+  var bar = document.getElementById('mt5-account-bar');
+  bar.style.display = 'block';
+  document.getElementById('mt5-acc-name').textContent =
+    (info.name || '—') + '  #' + (info.login || '');
+  function fmtMoney(v, cur){ return (cur||'$') + Number(v).toLocaleString('fr-FR',{minimumFractionDigits:2}); }
+  var cur = info.currency || '$';
+  document.getElementById('mt5-acc-balance').textContent  = fmtMoney(info.balance  || info.balance,  cur);
+  document.getElementById('mt5-acc-equity').textContent   = fmtMoney(info.equity   || info.equity,   cur);
+  document.getElementById('mt5-acc-free').textContent     = fmtMoney(info.free_margin || info.margin_free || 0, cur);
+  var prof = Number(info.profit || 0);
+  var el = document.getElementById('mt5-acc-profit');
+  el.textContent = (prof >= 0 ? '+' : '') + fmtMoney(prof, cur);
+  el.style.color = prof >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('mt5-acc-leverage').textContent = '1:' + (info.leverage || '—');
+
+  // Show main panel
+  var main = document.getElementById('mt5-main');
+  main.style.display = 'grid';
+
+  // Load chart
+  loadLWC(function(){ mt5LoadChart(); });
+
+  // Start position polling
+  clearInterval(_posInterval);
+  _posInterval = setInterval(function(){ mt5RefreshPositions(); }, 3000);
+  mt5RefreshPositions();
+}
+
+function mt5RefreshAll(){
+  wsSend('account', {}, function(r){ if(r.ok) onMT5Connected(r); });
+  mt5RefreshPositions();
+}
+
+// ── Chart ─────────────────────────────────────────────────────────
+function mt5LoadChart(){
+  var sym = document.getElementById('mt5-chart-symbol').value;
+  _currentSym = sym;
+  document.getElementById('mt5-chart-loading').style.display = 'flex';
+  document.getElementById('mt5-chart-loading').textContent = 'Chargement ' + sym + ' ' + _currentTF + '...';
+
+  wsSend('ohlcv', {symbol: sym, tf: _currentTF, count: 500}, function(r){
+    document.getElementById('mt5-chart-loading').style.display = 'none';
+    if(!r.ok){
+      document.getElementById('mt5-chart-loading').style.display = 'flex';
+      document.getElementById('mt5-chart-loading').textContent = '❌ ' + (r.error || 'Erreur');
+      return;
+    }
+    renderChart(r.candles, sym);
+  });
+}
+
+function renderChart(candles, sym){
+  var container = document.getElementById('mt5-chart');
+  var wrap      = document.getElementById('mt5-chart-wrap');
+
+  // Destroy old chart
+  if(_chart){ _chart.remove(); _chart = null; _candleSeries = null; _emas = {}; }
+
+  _chart = LightweightCharts.createChart(container, {
+    width:  wrap.clientWidth  || 700,
+    height: wrap.clientHeight || 380,
+    layout: {
+      background: { color: '#0e0e12' },
+      textColor:  '#7a7875',
+    },
+    grid: {
+      vertLines:  { color: 'rgba(255,255,255,.04)' },
+      horzLines:  { color: 'rgba(255,255,255,.04)' },
+    },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: {
+      borderColor: 'rgba(255,255,255,.08)',
+      textColor:   '#7a7875',
+    },
+    timeScale: {
+      borderColor:      'rgba(255,255,255,.08)',
+      timeVisible:      true,
+      secondsVisible:   false,
+      rightOffset:      5,
+      barSpacing:       8,
+    },
+  });
+
+  _candleSeries = _chart.addCandlestickSeries({
+    upColor:    '#22c55e',
+    downColor:  '#ef4444',
+    borderUpColor:   '#22c55e',
+    borderDownColor: '#ef4444',
+    wickUpColor:   '#22c55e',
+    wickDownColor: '#ef4444',
+  });
+
+  _candleSeries.setData(candles);
+
+  // Re-apply active EMAs
+  Object.keys(_emaOn).forEach(function(p){
+    if(_emaOn[p]) drawEMA(parseInt(p), candles);
+  });
+
+  // Resize observer
+  var ro = new ResizeObserver(function(){
+    if(_chart){
+      _chart.resize(wrap.clientWidth, wrap.clientHeight);
+    }
+  });
+  ro.observe(wrap);
+
+  // Live price
+  var last = candles[candles.length - 1];
+  if(last) document.getElementById('mt5-live-price').textContent =
+    sym + ' ' + last.close.toFixed(5);
+}
+
+function mt5SetTF(tf){
+  _currentTF = tf;
+  document.querySelectorAll('.mt5-tf').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tf === tf);
+  });
+  if(_connected) mt5LoadChart();
+}
+
+// ── EMA indicators ──────────────────────────────────────────────────
+function calcEMA(candles, period){
+  var k = 2 / (period + 1);
+  var ema = candles[0].close;
+  var result = [];
+  for(var i = 0; i < candles.length; i++){
+    ema = candles[i].close * k + ema * (1 - k);
+    if(i >= period - 1) result.push({ time: candles[i].time, value: ema });
+  }
+  return result;
+}
+
+function drawEMA(period, candles){
+  if(_emas[period]){ _chart.removeSeries(_emas[period]); delete _emas[period]; }
+  var colors = { 20: '#60a5fa', 50: '#f59e0b', 200: '#c8a03c' };
+  var series = _chart.addLineSeries({
+    color: colors[period] || '#999',
+    lineWidth: 1,
+    priceLineVisible: false,
+    lastValueVisible: false,
+  });
+  series.setData(calcEMA(candles, period));
+  _emas[period] = series;
+}
+
+function mt5ToggleEMA(period){
+  _emaOn[period] = !_emaOn[period];
+  var btn = document.getElementById('mt5-ema' + period);
+  btn.classList.toggle('on', _emaOn[period]);
+
+  if(!_chart || !_candleSeries) return;
+  if(_emaOn[period]){
+    // Need candle data — reload
+    wsSend('ohlcv', {symbol: _currentSym, tf: _currentTF, count: 500}, function(r){
+      if(r.ok) drawEMA(period, r.candles);
+    });
+  } else {
+    if(_emas[period]){ _chart.removeSeries(_emas[period]); delete _emas[period]; }
+  }
+}
+
+// ── Place order ────────────────────────────────────────────────────
+function mt5OrderTypeChanged(){
+  var t = document.getElementById('mt5-ord-type').value;
+  var isPending = t !== 'BUY' && t !== 'SELL';
+  document.getElementById('mt5-ord-price-row').style.display = isPending ? 'block' : 'none';
+  // Style BUY/SELL buttons
+  var bBuy  = document.getElementById('mt5-btn-buy');
+  var bSell = document.getElementById('mt5-btn-sell');
+  if(t === 'SELL' || t === 'SELL_LIMIT' || t === 'SELL_STOP'){
+    bBuy.style.opacity  = '.4';
+    bSell.style.opacity = '1';
+  } else if(t === 'BUY' || t === 'BUY_LIMIT' || t === 'BUY_STOP'){
+    bBuy.style.opacity  = '1';
+    bSell.style.opacity = '.4';
+  } else {
+    bBuy.style.opacity = bSell.style.opacity = '1';
+  }
+}
+
+function mt5PlaceOrder(sideOverride){
+  if(!_connected){ showFeedback('❌ Non connecté', 'red'); return; }
+  var sym   = document.getElementById('mt5-ord-sym').value;
+  var vol   = parseFloat(document.getElementById('mt5-ord-vol').value) || 0.01;
+  var type  = sideOverride || document.getElementById('mt5-ord-type').value;
+  var sl    = parseFloat(document.getElementById('mt5-ord-sl').value) || 0;
+  var tp    = parseFloat(document.getElementById('mt5-ord-tp').value) || 0;
+  var price = parseFloat(document.getElementById('mt5-ord-price').value) || 0;
+
+  showFeedback('⏳ Envoi de l\'ordre...', 'muted');
+  wsSend('place_order', {symbol: sym, type: type, volume: vol, sl: sl, tp: tp, price: price}, function(r){
+    if(r.ok){
+      showFeedback('✅ Ordre #' + r.ticket + ' exécuté @ ' + r.price, 'green');
+      setTimeout(function(){ mt5RefreshPositions(); mt5RefreshAll(); }, 1000);
+    } else {
+      showFeedback('❌ ' + r.error, 'red');
+    }
+  });
+}
+
+// ── Positions ─────────────────────────────────────────────────────
+function mt5RefreshPositions(){
+  wsSend('positions', {}, function(r){
+    if(!r.ok) return;
+    var el = document.getElementById('mt5-positions');
+    if(!r.positions || !r.positions.length){
+      el.innerHTML = '<div style="color:var(--faint);font-size:8px;text-align:center;padding:10px">Aucune position ouverte</div>';
+      return;
+    }
+    var html = '';
+    r.positions.forEach(function(p){
+      var pColor = p.profit >= 0 ? 'var(--green)' : 'var(--red)';
+      var typeClass = p.type === 'BUY' ? 'mt5-pos-buy' : 'mt5-pos-sell';
+      html += '<div class="mt5-pos-row ' + typeClass + '">';
+      html += '<span style="font-weight:700;color:var(--text)">' + p.symbol + '</span>';
+      html += '<span style="color:' + (p.type==='BUY'?'var(--green)':'var(--red)') + ';font-weight:700">' + p.type + '</span>';
+      html += '<span>' + p.volume + '</span>';
+      html += '<span style="color:var(--muted)">@' + p.price_open.toFixed(5) + '</span>';
+      html += '<span style="color:' + pColor + ';font-weight:700">' + (p.profit>=0?'+':'') + p.profit.toFixed(2) + '</span>';
+      html += '<button class="mt5-close-btn" onclick="mt5ClosePos(' + p.ticket + ')">✕</button>';
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  });
+}
+
+function mt5ClosePos(ticket){
+  if(!confirm('Fermer la position #' + ticket + ' ?')) return;
+  wsSend('close_position', {ticket: ticket}, function(r){
+    if(r.ok){ showFeedback('✅ Position #' + ticket + ' fermée', 'green'); }
+    else     { showFeedback('❌ ' + r.error, 'red'); }
+    setTimeout(function(){ mt5RefreshPositions(); mt5RefreshAll(); }, 1000);
+  });
+}
+
+function mt5CloseAll(){
+  if(!_connected){ showFeedback('❌ Non connecté', 'red'); return; }
+  if(!confirm('Fermer TOUTES les positions ?')) return;
+  wsSend('close_all', {}, function(r){
+    showFeedback('✅ ' + (r.closed||0) + ' position(s) fermée(s)', 'green');
+    setTimeout(function(){ mt5RefreshPositions(); mt5RefreshAll(); }, 1500);
+  });
+}
+
+// ── Ticks grid ─────────────────────────────────────────────────────
+function renderTicksGrid(ticks){
+  var el = document.getElementById('mt5-ticks-grid');
+  var html = '';
+  Object.keys(ticks).forEach(function(sym){
+    var t = ticks[sym];
+    var mid = ((t.bid + t.ask) / 2).toFixed(sym.includes('JPY') || sym.includes('XAU') ? 3 : 5);
+    html += '<div class="mt5-tick-row"><span style="color:var(--text);font-weight:700">' + sym + '</span>';
+    html += '<span style="color:var(--green)">' + t.bid.toFixed(5) + '</span>';
+    html += '<span style="color:var(--red)">'   + t.ask.toFixed(5) + '</span></div>';
+  });
+  if(html) el.innerHTML = html;
+}
+
+// ── Status ─────────────────────────────────────────────────────────
+function setStatus(state){
+  var dot = document.getElementById('mt5-status-dot');
+  var txt = document.getElementById('mt5-status-txt');
+  var map = {
+    connecting:   ['#f59e0b', 'Connexion...'],
+    connected:    ['#22c55e', 'Bridge connecté'],
+    error:        ['#ef4444', 'Erreur bridge'],
+    disconnected: ['#3a3835', 'Non connecté'],
+  };
+  var s = map[state] || map.disconnected;
+  dot.style.background = s[0];
+  txt.textContent = s[1];
+}
+
+function showFeedback(msg, color){
+  var el = document.getElementById('mt5-ord-feedback');
+  if(!el) return;
+  var colorMap = { green: 'var(--green)', red: 'var(--red)', gold: 'var(--gold)', muted: 'var(--muted)' };
+  el.style.color = colorMap[color] || 'var(--muted)';
+  el.textContent = msg;
+}
+
+// ── Expose globals ─────────────────────────────────────────────────
+window.mt5Connect      = mt5Connect;
+window.mt5Disconnect   = mt5Disconnect;
+window.mt5LoadChart    = mt5LoadChart;
+window.mt5SetTF        = mt5SetTF;
+window.mt5ToggleEMA    = mt5ToggleEMA;
+window.mt5PlaceOrder   = mt5PlaceOrder;
+window.mt5ClosePos     = mt5ClosePos;
+window.mt5CloseAll     = mt5CloseAll;
+window.mt5RefreshAll   = mt5RefreshAll;
+window.mt5RefreshPositions = mt5RefreshPositions;
+window.mt5OrderTypeChanged = mt5OrderTypeChanged;
+
+})(); // end MT5 module IIFE
+
+// ══════════════════════════════════════════════════════════════════
 
 // Init au chargement du panel charts
 document.addEventListener('DOMContentLoaded', function(){
