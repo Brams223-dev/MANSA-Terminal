@@ -3048,51 +3048,106 @@ function actBack(){
 }
 
 /* CRYPTO */
+var _cryptoFG=62;
+var _cryptoDom=54.8;
+function _fgLabel(v){
+  if(v<=20)return{l:'Panique Extrême',c:'#e05252'};
+  if(v<=40)return{l:'Peur',c:'var(--orange)'};
+  if(v<=60)return{l:'Neutre',c:'var(--gold)'};
+  if(v<=80)return{l:'Avidité',c:'var(--green)'};
+  return{l:'Avidité Extrême',c:'#00ffaa'};
+}
+function _correlSignal(fg,dom){
+  if(fg>=60&&dom<55)return{sig:'RISK-ON 🟢',desc:'Appétit au risque · Favoriser longs AUD/USD, NZD/USD, EUR/USD',c:'var(--green)'};
+  if(fg<=35||dom>=58)return{sig:'RISK-OFF 🔴',desc:'Aversion au risque · Favoriser USD, JPY, CHF — éviter paires risquées',c:'#e05252'};
+  return{sig:'NEUTRE ⚪',desc:'Pas de signal directionnel clair — attendre confirmation HTF',c:'var(--gold)'};
+}
 function renderCrypto(){
   var up=CRYPTO.filter(function(d){return d.d>0;}).length;
   var best=CRYPTO.reduce(function(a,b){return a.d>b.d?a:b;});
   var worst=CRYPTO.reduce(function(a,b){return a.d<b.d?a:b;});
   var sorted=[].concat(CRYPTO).sort(function(a,b){return b.d-a.d;});
+  var fg=_cryptoFG; var dom=_cryptoDom;
+  var fgl=_fgLabel(fg); var cor=_correlSignal(fg,dom);
 
   document.getElementById('crypto-stats').innerHTML=
     sc('MARKET CAP TOTAL','$2.48T','var(--gold)','')+
-    sc('BTC DOMINANCE','54.8%','var(--orange)','')+
+    sc('BTC DOMINANCE',dom+'%','var(--orange)','')+
     sc('HAUSSIÈRES 24H',up+'/'+CRYPTO.length,'var(--green)','')+
     sc('BEST 24H',best.s+' +'+best.d.toFixed(2)+'%','var(--green)','');
 
-  /* ── TRENDING CARDS (top 3 most bought / bullish) ── */
-  var trending=['<div style="margin:12px 0 8px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.08em">🔥 LES PLUS ACHETÉES / TRENDING</div>'];
-  trending.push('<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">');
+  /* ── BLOC 1 : Fear & Greed + Corrélation Forex ── */
+  var fgPct=fg;
+  var fgBar='<div style="height:8px;background:var(--border);border-radius:4px;margin:8px 0 4px">'
+    +'<div style="height:8px;border-radius:4px;width:'+fgPct+'%;background:linear-gradient(90deg,#e05252,var(--gold),var(--green));transition:width .4s"></div>'
+    +'</div>';
+  var hedge='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">'
+    /* Fear & Greed */
+    +'<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px">'
+    +'<div style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:.07em;margin-bottom:8px">😱 FEAR &amp; GREED INDEX</div>'
+    +'<div style="display:flex;align-items:baseline;gap:8px">'
+    +'<span style="font-size:36px;font-weight:800;color:'+fgl.c+'">'+fg+'</span>'
+    +'<span style="font-size:11px;font-weight:700;color:'+fgl.c+'">'+fgl.l+'</span>'
+    +'</div>'
+    +fgBar
+    +'<div style="display:flex;justify-content:space-between;font-size:7px;color:var(--dim)"><span>0 Panique</span><span>100 Euphorie</span></div>'
+    +'<div style="margin-top:8px;font-size:8px;color:var(--dim)">BTC Dominance : <strong style="color:var(--orange)">'+dom+'%</strong></div>'
+    +'</div>'
+    /* Corrélation Forex */
+    +'<div style="background:var(--s1);border:1px solid '+cor.c+'44;border-radius:10px;padding:14px">'
+    +'<div style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:.07em;margin-bottom:8px">🔗 SIGNAL FOREX (HEDGE)</div>'
+    +'<div style="font-size:16px;font-weight:800;color:'+cor.c+';margin-bottom:10px">'+cor.sig+'</div>'
+    +'<div style="font-size:9px;color:var(--text);line-height:1.5;margin-bottom:10px">'+cor.desc+'</div>'
+    +'<div style="font-size:8px;color:var(--dim)">Quand crypto risk-off → DXY monte → shorts EUR/USD, GBP/USD</div>'
+    +'</div>'
+    +'</div>';
+
+  /* ── BLOC 2 : Niveaux HTF BTC + ETH ── */
+  var htf='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  [{s:'BTC',p:'68 420',sup:'65 000',res:'72 000',bias:'HAUSSIER',col:'var(--green)'},
+   {s:'ETH',p:'2 620',sup:'2 400',res:'2 800',bias:'NEUTRE',col:'var(--gold)'}].forEach(function(d){
+    htf+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<span style="font-size:13px;font-weight:800;color:var(--text)">'+d.s+'</span>'
+      +'<span style="font-size:9px;font-weight:700;background:'+d.col+'22;color:'+d.col+';padding:2px 8px;border-radius:4px">'+d.bias+'</span>'
+      +'</div>'
+      +'<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:10px">$'+d.p+'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:5px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:8px"><span style="color:var(--dim)">🔴 Résistance HTF</span><span style="color:#e05252;font-weight:700">$'+d.res+'</span></div>'
+      +'<div style="height:2px;background:linear-gradient(90deg,var(--green),#e05252);border-radius:1px;margin:2px 0"></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:8px"><span style="color:var(--dim)">🟢 Support HTF</span><span style="color:var(--green);font-weight:700">$'+d.sup+'</span></div>'
+      +'</div>'
+      +'</div>';
+  });
+  htf+='</div>';
+
+  /* ── BLOC 3 : Trending cards top 3 ── */
+  var trending='<div style="margin:4px 0 8px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.08em">🔥 LES PLUS ACHETÉES / TRENDING</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">';
+  var medals=['🥇','🥈','🥉'];
   sorted.slice(0,3).forEach(function(d,i){
-    var medals=['🥇','🥈','🥉'];
     var barPct=Math.min(100,Math.round((d.d/best.d)*100));
-    trending.push(
-      '<div style="background:var(--green)09;border:1px solid var(--green)33;border-radius:8px;padding:12px 14px">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-      +'<span style="font-size:14px;font-weight:800;color:var(--text)">'+medals[i]+' '+d.s+'</span>'
+    trending+='<div style="background:rgba(0,200,120,.06);border:1px solid rgba(0,200,120,.2);border-radius:8px;padding:12px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
+      +'<span style="font-size:13px;font-weight:800;color:var(--text)">'+medals[i]+' '+d.s+'</span>'
       +'<span style="font-size:10px;font-weight:700;color:var(--green)">+'+d.d.toFixed(2)+'%</span>'
       +'</div>'
-      +'<div style="font-size:9px;color:var(--dim);margin-bottom:8px">'+d.n+' · <span style="color:var(--blue)">'+d.cap+'</span></div>'
-      +'<div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px">$'+d.p+'</div>'
-      +'<div style="height:3px;background:var(--border);border-radius:2px">'
-      +'<div style="height:3px;background:var(--green);border-radius:2px;width:'+barPct+'%"></div>'
-      +'</div>'
-      +'<div style="display:flex;justify-content:space-between;margin-top:4px;font-size:8px;color:var(--dim)">'
-      +'<span>7J: <span style="color:'+(d.w>=0?'var(--green)':'var(--red)')+'">'+(d.w>=0?'+':'')+d.w.toFixed(2)+'%</span></span>'
-      +'<span>Vol: '+d.vol+'</span>'
-      +'</div>'
-      +'</div>'
-    );
+      +'<div style="font-size:8px;color:var(--dim);margin-bottom:6px">'+d.n+' · <span style="color:var(--blue)">'+d.cap+'</span></div>'
+      +'<div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:7px">$'+d.p+'</div>'
+      +'<div style="height:3px;background:var(--border);border-radius:2px"><div style="height:3px;background:var(--green);border-radius:2px;width:'+barPct+'%"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:var(--dim)">'
+      +'<span>7J: <span style="color:'+(d.w>=0?'var(--green)':'#e05252')+'">'+(d.w>=0?'+':'')+d.w.toFixed(2)+'%</span></span>'
+      +'<span>'+d.vol+'</span>'
+      +'</div></div>';
   });
-  trending.push('</div>');
+  trending+='</div>';
 
-  /* ── FULL TABLE ── */
-  var h=trending.join('')+tHead(['#','Crypto','Prix USD','24H ▼','7J','Cap Market','Volume 24H'],'CLASSEMENT COMPLET — '+CRYPTO.length+' ACTIFS');
+  /* ── BLOC 4 : Tableau complet ── */
+  var h=hedge+htf+trending+tHead(['#','Crypto','Prix USD','24H ▼','7J','Cap Market','Volume 24H'],'CLASSEMENT — '+CRYPTO.length+' ACTIFS');
   sorted.forEach(function(d,i){
-    var c=d.d>=0?'up':'dn';var cw=d.w>=0?'up':'dn';
-    var badge='';
-    if(i===0)badge=' <span style="background:var(--green)22;color:var(--green);font-size:7px;padding:1px 5px;border-radius:3px;font-weight:700">HOT</span>';
-    if(d.d<0)badge=' <span style="background:var(--red)22;color:var(--red);font-size:7px;padding:1px 5px;border-radius:3px;font-weight:700">SELL</span>';
+    var c=d.d>=0?'up':'dn'; var cw=d.w>=0?'up':'dn';
+    var badge=i===0?' <span style="background:rgba(0,200,120,.2);color:var(--green);font-size:7px;padding:1px 5px;border-radius:3px;font-weight:700">HOT</span>'
+              :d.d<0?' <span style="background:rgba(224,82,82,.15);color:#e05252;font-size:7px;padding:1px 5px;border-radius:3px;font-weight:700">SELL</span>':'';
     h+=tRow([
       d.r,
       '<strong>'+d.s+'</strong>'+badge+'<br><span class="neu" style="font-size:8px">'+d.n+'</span>',
@@ -9047,21 +9102,7 @@ function renderAlertes(){
 /* ═══════════════════════════════════════════════════════════════
    V21 — EXPORT BUTTONS dans Journal
 ═══════════════════════════════════════════════════════════════ */
-// Patch renderJournal to add export buttons
-var _origRJ = renderJournal;
-function renderJournal(){
-  _origRJ();
-  // Add export buttons after render
-  var jc = document.getElementById('journal-content');
-  if(!jc) return;
-  var existing = document.getElementById('journal-export-btns');
-  if(existing) return;
-  var div=document.createElement('div');
-  div.id='journal-export-btns';
-  div.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border2)';
-  div.innerHTML='<button class="export-btn primary" onclick="exportJournalCSV()">📥 Exporter CSV</button><button class="export-btn" onclick="exportJournalPDF()">🖨️ Rapport PDF</button><button class="export-btn" onclick="nav(\'perf\')">📊 Voir performance</button>';
-  jc.appendChild(div);
-}
+// Export buttons injected directly in renderJournal (see below)
 
 
 /* V21 — CALENDRIER ENRICHI avec impact historique */
