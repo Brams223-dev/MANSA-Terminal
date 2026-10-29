@@ -22,7 +22,8 @@
   --glow-red:0 0 10px rgba(224,82,82,.18)
 }
 html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px}
+body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px;-webkit-text-size-adjust:100%}
+*{-webkit-tap-highlight-color:transparent;tap-highlight-color:transparent}
 
 /* ═══ TOPBAR ═══ */
 #topbar{position:fixed;top:0;left:0;right:0;height:44px;background:linear-gradient(180deg,#0d0d1c 0%,#080812 100%);border-bottom:1px solid rgba(200,160,60,.12);display:flex;align-items:stretch;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.5)}
@@ -81,7 +82,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 /* ═══ NAV TABS ═══ */
 #navtabs{position:fixed;top:44px;left:0;right:0;height:32px;background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;overflow-x:auto;z-index:190;scrollbar-width:none}
 #navtabs::-webkit-scrollbar{display:none}
-.ntab{display:flex;align-items:center;gap:5px;padding:0 14px;height:100%;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-right:1px solid rgba(255,255,255,.04);flex-shrink:0;transition:all .15s;white-space:nowrap;position:relative}
+.ntab{display:flex;align-items:center;gap:5px;padding:0 14px;height:100%;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-right:1px solid rgba(255,255,255,.04);flex-shrink:0;transition:all .15s;white-space:nowrap;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .ntab:hover{color:var(--text);background:rgba(200,160,60,.05)}
 .ntab.on{color:var(--gold2);background:rgba(200,160,60,.06)}
 .ntab.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.9}
@@ -504,11 +505,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 
 /* ═══ V21 — MOBILE RESPONSIVE ═══ */
 @media(max-width:768px){
-  .topbar{flex-wrap:wrap;gap:4px;padding:6px 8px;height:auto}
-  .logo-block{font-size:12px}
+  .topbar{flex-wrap:nowrap;gap:4px;padding:0 8px;height:44px}
+  .logo-block{font-size:11px}
   .ticker-bar{display:none}
-  .navtabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding:6px 4px;gap:4px}
-  .ntab{font-size:7px;padding:5px 8px;white-space:nowrap;flex-shrink:0}
+  #navtabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;touch-action:pan-x}
+  .ntab{font-size:7px;padding:0 10px;white-space:nowrap;flex-shrink:0;scroll-snap-align:start;-webkit-tap-highlight-color:transparent}
   .panel{padding:10px 8px}
   .p-title{flex-direction:column;gap:8px}
   .p-title-right{justify-content:flex-start}
@@ -519,11 +520,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
   .ia-chat-wrap{height:320px}
   .session-bar{gap:4px}
   .sess-item{padding:4px 8px}
+  /* MT5 module mobile */
+  #p-mt5 #mt5-main{grid-template-columns:1fr!important;height:auto!important}
+  #mt5-connect-bar > div:nth-child(2){grid-template-columns:1fr 1fr!important}
 }
 @media(max-width:480px){
-  .ntab{font-size:6px;padding:4px 6px}
+  .topbar{height:40px;padding:0 6px}
+  #navtabs{top:40px;height:30px}
+  #main{top:70px}
+  .ntab{font-size:6.5px;padding:0 8px}
   .topbar-clocks{display:none}
   .topbar-mid{display:none}
+  #mansa-tagline{display:none}
 }
 
 /* ═══ V21 — PERFORMANCE ═══ */
