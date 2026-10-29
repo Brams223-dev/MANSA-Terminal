@@ -82,7 +82,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 /* ═══ NAV TABS ═══ */
 #navtabs{position:fixed;top:44px;left:0;right:0;height:32px;background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;overflow-x:auto;z-index:190;scrollbar-width:none}
 #navtabs::-webkit-scrollbar{display:none}
-.ntab{display:flex;align-items:center;gap:5px;padding:0 14px;height:100%;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-right:1px solid rgba(255,255,255,.04);flex-shrink:0;transition:all .15s;white-space:nowrap;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.ntab{display:flex;align-items:center;gap:5px;padding:0 14px;height:100%;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-right:1px solid rgba(255,255,255,.04);flex-shrink:0;transition:all .15s;white-space:nowrap;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:rgba(200,160,60,.2)}
 .ntab:hover{color:var(--text);background:rgba(200,160,60,.05)}
 .ntab.on{color:var(--gold2);background:rgba(200,160,60,.06)}
 .ntab.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.9}
@@ -91,6 +91,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 #main{position:fixed;top:76px;left:0;right:0;bottom:0;overflow:hidden}
 .panel{display:none;height:100%;overflow-y:auto;overflow-x:hidden;padding:14px 18px 20px}
 .panel.on{display:block;animation:fadeIn .18s ease}
+/* iOS Safari fix — dvh units pour exclure la barre d'adresse */
+@supports(height:100dvh){
+  #main{bottom:env(safe-area-inset-bottom,0px)}
+}
 .panel::-webkit-scrollbar{width:3px}
 .panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .panel::-webkit-scrollbar-track{background:transparent}
@@ -11514,6 +11518,21 @@ document.addEventListener('DOMContentLoaded', function(){
       setTimeout(function(){ tvInitChart('FX:EURUSD'); }, 200);
     }
   };
+
+  // ── iOS Safari fix : onclick sur div ne marche pas sans ce patch ──
+  // On ajoute un listener touchend sur tous les ntab pour déclencher nav()
+  function bindMobileNav(){
+    document.querySelectorAll('.ntab').forEach(function(el){
+      el.addEventListener('touchend', function(e){
+        e.preventDefault();
+        // Récupère l'id du panel depuis l'attribut onclick
+        var onclickStr = el.getAttribute('onclick') || '';
+        var match = onclickStr.match(/nav\('([^']+)'\)/);
+        if(match && match[1]) nav(match[1]);
+      }, {passive:false});
+    });
+  }
+  bindMobileNav();
 });
 </script>
 
