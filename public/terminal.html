@@ -9105,10 +9105,10 @@ function btSimulate(stratKey, months, capital, riskPct, rrOverride){
 
   // Actifs par stratégie PTL
   var stratAssets = {
-    'ds':  [{s:'XAUUSD',w:0.35},{s:'EURUSD',w:0.25},{s:'GBPUSD',w:0.22},{s:'US30',w:0.18}],
-    'mtf': [{s:'EURUSD',w:0.30},{s:'GBPJPY',w:0.25},{s:'XAUUSD',w:0.28},{s:'NAS100',w:0.17}],
-    'sam': [{s:'XAUUSD',w:0.40},{s:'GBPUSD',w:0.25},{s:'EURUSD',w:0.20},{s:'EURJPY',w:0.15}],
-    'ivc': [{s:'US30',w:0.32},{s:'NAS100',w:0.30},{s:'SP500',w:0.22},{s:'XAUUSD',w:0.16}]
+    'ds':  [{s:'XAUUSD',w:0.22},{s:'EURUSD',w:0.16},{s:'GBPUSD',w:0.14},{s:'US30',w:0.12},{s:'GBPJPY',w:0.10},{s:'USDCAD',w:0.08},{s:'AUDUSD',w:0.08},{s:'EURGBP',w:0.06},{s:'SILVER',w:0.04}],
+    'mtf': [{s:'EURUSD',w:0.20},{s:'GBPJPY',w:0.16},{s:'XAUUSD',w:0.18},{s:'NAS100',w:0.12},{s:'USDJPY',w:0.10},{s:'GBPUSD',w:0.09},{s:'EURJPY',w:0.08},{s:'USDCHF',w:0.04},{s:'BTCUSD',w:0.03}],
+    'sam': [{s:'XAUUSD',w:0.25},{s:'GBPUSD',w:0.16},{s:'EURUSD',w:0.14},{s:'EURJPY',w:0.12},{s:'US30',w:0.10},{s:'GBPJPY',w:0.09},{s:'AUDJPY',w:0.06},{s:'NZDUSD',w:0.05},{s:'SILVER',w:0.03}],
+    'ivc': [{s:'US30',w:0.24},{s:'NAS100',w:0.22},{s:'SP500',w:0.18},{s:'XAUUSD',w:0.12},{s:'BTCUSD',w:0.08},{s:'ETHUSD',w:0.06},{s:'DAX40',w:0.06},{s:'FTSE100',w:0.04}]
   };
   var suffix = stratKey.replace('ptl-','').replace('-','');
   var assetList = stratAssets[suffix] || stratAssets['ds'];
@@ -9427,7 +9427,7 @@ function btRenderAssetBreakdown(r){
   function fmtPnlBg(v){ var r=Math.round(v); if(Math.abs(r)<1) return '<span style="color:var(--muted)">—</span>'; var col=r>=0?'rgba(34,197,94,.15)':'rgba(239,68,68,.13)'; var tc=r>=0?'#22c55e':'#ef4444'; var s=(r>=0?'+':'')+r+'$'; return '<span style="background:'+col+';color:'+tc+';font-weight:700;padding:1px 5px;border-radius:3px;font-size:9px">'+s+'</span>'; }
 
   // Asset icons
-  var icons = {XAUUSD:'🥇',EURUSD:'💶',GBPUSD:'💷',GBPJPY:'🇬🇧',EURJPY:'🇯🇵',US30:'🏭',NAS100:'💻',SP500:'📊',default:'📈'};
+  var icons = {XAUUSD:'🥇',SILVER:'🥈',EURUSD:'💶',GBPUSD:'💷',GBPJPY:'🇬🇧',EURJPY:'🇯🇵',USDJPY:'🇯🇵',USDCAD:'🍁',USDCHF:'🇨🇭',AUDUSD:'🦘',AUDJPY:'🦘',NZDUSD:'🥝',EURGBP:'🇪🇺',US30:'🏭',NAS100:'💻',SP500:'📊',DAX40:'🇩🇪',FTSE100:'🇬🇧',BTCUSD:'₿',ETHUSD:'⟠',default:'📈'};
 
   var h = '<div class="bt-section" style="margin-top:16px">';
   h += '<div class="bt-section-title">📊 RENTABILITÉ PAR ACTIF</div>';
