@@ -9103,6 +9103,25 @@ function btSimulate(stratKey, months, capital, riskPct, rrOverride){
   var totalWins = 0, totalLossPnl = 0, totalWinPnl = 0;
   var now = new Date();
 
+  // Actifs par stratégie PTL
+  var stratAssets = {
+    'ds':  [{s:'XAUUSD',w:0.35},{s:'EURUSD',w:0.25},{s:'GBPUSD',w:0.22},{s:'US30',w:0.18}],
+    'mtf': [{s:'EURUSD',w:0.30},{s:'GBPJPY',w:0.25},{s:'XAUUSD',w:0.28},{s:'NAS100',w:0.17}],
+    'sam': [{s:'XAUUSD',w:0.40},{s:'GBPUSD',w:0.25},{s:'EURUSD',w:0.20},{s:'EURJPY',w:0.15}],
+    'ivc': [{s:'US30',w:0.32},{s:'NAS100',w:0.30},{s:'SP500',w:0.22},{s:'XAUUSD',w:0.16}]
+  };
+  var suffix = stratKey.replace('ptl-','').replace('-','');
+  var assetList = stratAssets[suffix] || stratAssets['ds'];
+  // cumulative weights for random selection
+  var assetCumW = [];
+  var cum = 0;
+  assetList.forEach(function(a){ cum+=a.w; assetCumW.push(cum); });
+  var pickAsset = function(r){ for(var ai=0;ai<assetCumW.length;ai++){ if(r<assetCumW[ai]) return assetList[ai].s; } return assetList[assetList.length-1].s; };
+
+  var assetPnl = {}; // { 'XAUUSD': { 'YYYY-M': pnl, ... }, ... }
+  var assetYearPnl = {}; // { 'XAUUSD': { 'YYYY': pnl } }
+  var assetStats = {}; // { 'XAUUSD': { trades, wins, pnl } }
+
   for(var i=0;i<totalTrades;i++){
     var isWin = rand() < wr;
     var riskAmt = equity * (riskPct/100);
@@ -9119,8 +9138,21 @@ function btSimulate(stratKey, months, capital, riskPct, rrOverride){
     var daysBack = Math.floor((totalTrades-i)/totalTrades * months*30);
     var d = new Date(now.getTime() - daysBack*86400000);
     var mKey = d.getFullYear()+'-'+(d.getMonth()+1);
+    var yKey = ''+d.getFullYear();
     if(!monthlyPnl[mKey]) monthlyPnl[mKey]=0;
     monthlyPnl[mKey]+=pnl;
+    // Assign asset
+    var asset = pickAsset(rand());
+    if(!assetPnl[asset]) assetPnl[asset]={};
+    if(!assetPnl[asset][mKey]) assetPnl[asset][mKey]=0;
+    assetPnl[asset][mKey]+=pnl;
+    if(!assetYearPnl[asset]) assetYearPnl[asset]={};
+    if(!assetYearPnl[asset][yKey]) assetYearPnl[asset][yKey]=0;
+    assetYearPnl[asset][yKey]+=pnl;
+    if(!assetStats[asset]) assetStats[asset]={trades:0,wins:0,pnl:0};
+    assetStats[asset].trades++;
+    assetStats[asset].pnl+=pnl;
+    if(isWin) assetStats[asset].wins++;
     if(trades.length < 60){
       trades.push({
         date: d.toLocaleDateString('fr-FR'),
@@ -9128,7 +9160,8 @@ function btSimulate(stratKey, months, capital, riskPct, rrOverride){
         dir: rand()>0.5?'LONG':'SHORT',
         pnl: Math.round(pnl),
         result: isWin?'WIN':'LOSS',
-        rr: isWin ? (rr*(0.70+rand()*0.60)).toFixed(1) : (-1*(0.8+rand()*0.3)).toFixed(1)
+        rr: isWin ? (rr*(0.70+rand()*0.60)).toFixed(1) : (-1*(0.8+rand()*0.3)).toFixed(1),
+        asset: asset
       });
     }
   }
@@ -9153,7 +9186,8 @@ function btSimulate(stratKey, months, capital, riskPct, rrOverride){
     avgWin:avgWin, avgLoss:avgLoss, pf:pf, cagr:cagr, calmar:calmar, sharpe:sharpe,
     maxDD:maxDD, maxDDpct:maxDDpct, expectancy:expectancy,
     maxConsecW:maxConsecW, maxConsecL:maxConsecL,
-    equityCurve:equityCurve, monthlyPnl:monthlyPnl, trades:trades
+    equityCurve:equityCurve, monthlyPnl:monthlyPnl, trades:trades,
+    assetPnl:assetPnl, assetYearPnl:assetYearPnl, assetStats:assetStats
   };
 }
 
@@ -9356,7 +9390,8 @@ function btRunAndRender(){
       +'<div class="bt-chart-wrap">'+btDrawCurve(r.equityCurve, r.capital, 800, 200)+'</div></div>';
     var heatH = '<div class="bt-section"><div class="bt-section-title">HEATMAP MENSUELLE</div>'
       +btDrawMonthlyHeatmap(r.monthlyPnl, _btCurrentMonths)+'</div>';
-    area.innerHTML = kpiH + curveH + statsH + heatH;
+    var assetH = btRenderAssetBreakdown(r);
+    area.innerHTML = kpiH + curveH + statsH + heatH + assetH;
   }, 120);
 }
 
@@ -9364,6 +9399,132 @@ function btShowCompare(){
   var area = document.getElementById('bt-results-area');
   if(!area) return;
   area.innerHTML = '<div class="bt-section"><div class="bt-section-title">COMPARAISON 4 STRATÉGIES PTL — '+_btCurrentMonths+' MOIS</div>'+btRenderCompare(_btCurrentMonths, _btCapital, _btRisk)+'</div>';
+}
+
+/* ── RENTABILITÉ PAR ACTIF (par mois & par année) ── */
+function btRenderAssetBreakdown(r){
+  var assetPnl = r.assetPnl || {};
+  var assetYearPnl = r.assetYearPnl || {};
+  var assetStats = r.assetStats || {};
+  var assets = Object.keys(assetStats).sort(function(a,b){ return assetStats[b].pnl - assetStats[a].pnl; });
+  if(!assets.length) return '';
+
+  // Collect all months and years in order
+  var monthSet = {};
+  var yearSet = {};
+  assets.forEach(function(a){
+    Object.keys(assetPnl[a]||{}).forEach(function(mk){ monthSet[mk]=1; });
+    Object.keys(assetYearPnl[a]||{}).forEach(function(yk){ yearSet[yk]=1; });
+  });
+  var months = Object.keys(monthSet).sort();
+  var years = Object.keys(yearSet).sort();
+  // Keep last 12 months for readability
+  if(months.length > 12) months = months.slice(months.length-12);
+
+  var MONTHS_FR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  function fmtMonth(mk){ var p=mk.split('-'); return MONTHS_FR[parseInt(p[1])-1]+' '+p[0].slice(2); }
+  function fmtPnl(v){ var r=Math.round(v); var col=r>=0?'#22c55e':'#ef4444'; var s=(r>=0?'+':'')+r+'$'; return '<span style="color:'+col+';font-weight:700">'+s+'</span>'; }
+  function fmtPnlBg(v){ var r=Math.round(v); if(Math.abs(r)<1) return '<span style="color:var(--muted)">—</span>'; var col=r>=0?'rgba(34,197,94,.15)':'rgba(239,68,68,.13)'; var tc=r>=0?'#22c55e':'#ef4444'; var s=(r>=0?'+':'')+r+'$'; return '<span style="background:'+col+';color:'+tc+';font-weight:700;padding:1px 5px;border-radius:3px;font-size:9px">'+s+'</span>'; }
+
+  // Asset icons
+  var icons = {XAUUSD:'🥇',EURUSD:'💶',GBPUSD:'💷',GBPJPY:'🇬🇧',EURJPY:'🇯🇵',US30:'🏭',NAS100:'💻',SP500:'📊',default:'📈'};
+
+  var h = '<div class="bt-section" style="margin-top:16px">';
+  h += '<div class="bt-section-title">📊 RENTABILITÉ PAR ACTIF</div>';
+
+  // — Résumé global par actif —
+  h += '<div style="overflow-x:auto;margin-bottom:16px">';
+  h += '<table style="width:100%;border-collapse:collapse;font-size:9px">';
+  h += '<thead><tr style="border-bottom:1px solid var(--border2)">';
+  h += '<th style="text-align:left;padding:6px 8px;color:var(--muted);font-weight:600">ACTIF</th>';
+  h += '<th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:600">TRADES</th>';
+  h += '<th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:600">WIN RATE</th>';
+  h += '<th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:600">P&L TOTAL</th>';
+  h += '<th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:600">CONTRIBUTION</th>';
+  h += '</tr></thead><tbody>';
+  var totalPnl = assets.reduce(function(s,a){ return s+(assetStats[a]?assetStats[a].pnl:0); }, 0) || 1;
+  assets.forEach(function(a){
+    var st = assetStats[a] || {trades:0,wins:0,pnl:0};
+    var wr = st.trades>0 ? Math.round(st.wins/st.trades*100) : 0;
+    var contrib = Math.round(st.pnl/totalPnl*100);
+    var icon = icons[a] || icons.default;
+    h += '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
+    h += '<td style="padding:6px 8px;font-weight:700;color:var(--text)">'+icon+' '+a+'</td>';
+    h += '<td style="padding:6px 8px;text-align:right;color:var(--muted)">'+st.trades+'</td>';
+    h += '<td style="padding:6px 8px;text-align:right;color:'+(wr>=50?'#22c55e':'#f59e0b')+'">'+wr+'%</td>';
+    h += '<td style="padding:6px 8px;text-align:right">'+fmtPnl(st.pnl)+'</td>';
+    h += '<td style="padding:6px 8px;text-align:right">';
+    var barW = Math.min(100,Math.max(0,Math.abs(contrib)));
+    var barC = contrib>=0?'#22c55e':'#ef4444';
+    h += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">';
+    h += '<div style="width:48px;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden"><div style="width:'+barW+'%;height:100%;background:'+barC+';border-radius:3px"></div></div>';
+    h += '<span style="color:'+barC+';font-weight:700;min-width:30px;text-align:right">'+(contrib>=0?'+':'')+contrib+'%</span>';
+    h += '</div></td></tr>';
+  });
+  h += '</tbody></table></div>';
+
+  // — Heatmap par actif × mois (12 derniers mois) —
+  h += '<div style="font-size:9px;font-weight:700;color:var(--gold2);letter-spacing:.05em;margin-bottom:8px">📅 PAR MOIS ('+months.length+' derniers mois)</div>';
+  h += '<div style="overflow-x:auto">';
+  h += '<table style="border-collapse:collapse;font-size:8.5px;min-width:100%">';
+  h += '<thead><tr><th style="padding:4px 8px;text-align:left;color:var(--muted);font-weight:600;white-space:nowrap">ACTIF</th>';
+  months.forEach(function(mk){ h += '<th style="padding:4px 6px;text-align:center;color:var(--muted);font-weight:600;white-space:nowrap">'+fmtMonth(mk)+'</th>'; });
+  h += '<th style="padding:4px 8px;text-align:right;color:var(--muted);font-weight:600">TOTAL</th></tr></thead><tbody>';
+  assets.forEach(function(a){
+    var st = assetStats[a] || {pnl:0};
+    var icon = icons[a] || icons.default;
+    h += '<tr style="border-top:1px solid rgba(255,255,255,.04)">';
+    h += '<td style="padding:5px 8px;font-weight:700;color:var(--text);white-space:nowrap">'+icon+' '+a+'</td>';
+    months.forEach(function(mk){
+      var v = (assetPnl[a]&&assetPnl[a][mk]) || 0;
+      h += '<td style="padding:4px 6px;text-align:center">'+fmtPnlBg(v)+'</td>';
+    });
+    h += '<td style="padding:5px 8px;text-align:right">'+fmtPnl(st.pnl)+'</td>';
+    h += '</tr>';
+  });
+  // Ligne total
+  h += '<tr style="border-top:1px solid var(--border2)">';
+  h += '<td style="padding:5px 8px;font-weight:800;color:var(--gold2)">TOTAL</td>';
+  months.forEach(function(mk){
+    var v = assets.reduce(function(s,a){ return s+((assetPnl[a]&&assetPnl[a][mk])||0); },0);
+    h += '<td style="padding:4px 6px;text-align:center">'+fmtPnlBg(v)+'</td>';
+  });
+  h += '<td style="padding:5px 8px;text-align:right">'+fmtPnl(totalPnl)+'</td>';
+  h += '</tr></tbody></table></div>';
+
+  // — Par année —
+  if(years.length > 1){
+    h += '<div style="font-size:9px;font-weight:700;color:var(--gold2);letter-spacing:.05em;margin:14px 0 8px">📆 PAR ANNÉE</div>';
+    h += '<div style="overflow-x:auto">';
+    h += '<table style="border-collapse:collapse;font-size:8.5px;min-width:100%">';
+    h += '<thead><tr><th style="padding:4px 8px;text-align:left;color:var(--muted);font-weight:600">ACTIF</th>';
+    years.forEach(function(y){ h += '<th style="padding:4px 10px;text-align:center;color:var(--muted);font-weight:600">'+y+'</th>'; });
+    h += '<th style="padding:4px 8px;text-align:right;color:var(--muted);font-weight:600">TOTAL</th></tr></thead><tbody>';
+    assets.forEach(function(a){
+      var st = assetStats[a] || {pnl:0};
+      var icon = icons[a] || icons.default;
+      h += '<tr style="border-top:1px solid rgba(255,255,255,.04)">';
+      h += '<td style="padding:5px 8px;font-weight:700;color:var(--text);white-space:nowrap">'+icon+' '+a+'</td>';
+      years.forEach(function(y){
+        var v = (assetYearPnl[a]&&assetYearPnl[a][y]) || 0;
+        h += '<td style="padding:4px 10px;text-align:center">'+fmtPnlBg(v)+'</td>';
+      });
+      h += '<td style="padding:5px 8px;text-align:right">'+fmtPnl(st.pnl)+'</td>';
+      h += '</tr>';
+    });
+    // Total row
+    h += '<tr style="border-top:1px solid var(--border2)">';
+    h += '<td style="padding:5px 8px;font-weight:800;color:var(--gold2)">TOTAL</td>';
+    years.forEach(function(y){
+      var v = assets.reduce(function(s,a){ return s+((assetYearPnl[a]&&assetYearPnl[a][y])||0); },0);
+      h += '<td style="padding:4px 10px;text-align:center">'+fmtPnlBg(v)+'</td>';
+    });
+    h += '<td style="padding:5px 8px;text-align:right">'+fmtPnl(totalPnl)+'</td>';
+    h += '</tr></tbody></table></div>';
+  }
+
+  h += '</div>';
+  return h;
 }
 
 /* V35 — old renderBacktest/runBacktest stub */
