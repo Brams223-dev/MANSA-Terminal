@@ -9111,12 +9111,20 @@ function btSimulate(stratKey, months, capital, riskPct, rrOverride){
     'ivc': [{s:'US30',w:0.24},{s:'NAS100',w:0.22},{s:'SP500',w:0.18},{s:'XAUUSD',w:0.12},{s:'BTCUSD',w:0.08},{s:'ETHUSD',w:0.06},{s:'DAX40',w:0.06},{s:'FTSE100',w:0.04}]
   };
   var suffix = stratKey.replace('ptl-','').replace('-','');
-  var assetList = stratAssets[suffix] || stratAssets['ds'];
+  var assetListFull = stratAssets[suffix] || stratAssets['ds'];
+  // Filtrer selon _btSelectedAssets si défini
+  var assetList = _btSelectedAssets && _btSelectedAssets.length
+    ? assetListFull.filter(function(a){ return _btSelectedAssets.indexOf(a.s)>=0; })
+    : assetListFull;
+  if(!assetList.length) assetList = assetListFull;
+  // Renormaliser les poids
+  var totalW = assetList.reduce(function(s,a){ return s+a.w; },0) || 1;
+  var assetListN = assetList.map(function(a){ return {s:a.s, w:a.w/totalW}; });
   // cumulative weights for random selection
   var assetCumW = [];
   var cum = 0;
-  assetList.forEach(function(a){ cum+=a.w; assetCumW.push(cum); });
-  var pickAsset = function(r){ for(var ai=0;ai<assetCumW.length;ai++){ if(r<assetCumW[ai]) return assetList[ai].s; } return assetList[assetList.length-1].s; };
+  assetListN.forEach(function(a){ cum+=a.w; assetCumW.push(cum); });
+  var pickAsset = function(r){ for(var ai=0;ai<assetCumW.length;ai++){ if(r<assetCumW[ai]) return assetListN[ai].s; } return assetListN[assetListN.length-1].s; };
 
   var assetPnl = {}; // { 'XAUUSD': { 'YYYY-M': pnl, ... }, ... }
   var assetYearPnl = {}; // { 'XAUUSD': { 'YYYY': pnl } }
@@ -9299,6 +9307,77 @@ var _btCurrentMonths = 60;
 var _btCapital = 10000;
 var _btRisk = 1;
 var _btRR = null; // null = RR réel de la stratégie
+var _btSelectedAssets = null; // null = tous les actifs
+
+/* Actifs disponibles par stratégie (même structure que dans btSimulate) */
+var BT_STRAT_ASSETS = {
+  'ds':  ['XAUUSD','EURUSD','GBPUSD','US30','GBPJPY','USDCAD','AUDUSD','EURGBP','SILVER'],
+  'mtf': ['EURUSD','GBPJPY','XAUUSD','NAS100','USDJPY','GBPUSD','EURJPY','USDCHF','BTCUSD'],
+  'sam': ['XAUUSD','GBPUSD','EURUSD','EURJPY','US30','GBPJPY','AUDJPY','NZDUSD','SILVER'],
+  'ivc': ['US30','NAS100','SP500','XAUUSD','BTCUSD','ETHUSD','DAX40','FTSE100']
+};
+
+function btGetAssetList(stratKey){
+  var suffix = stratKey.replace('ptl-','');
+  return BT_STRAT_ASSETS[suffix] || BT_STRAT_ASSETS['ds'];
+}
+
+function btBuildAssetChecks(stratKeyOrSuffix){
+  var suffix = stratKeyOrSuffix.replace('ptl-','');
+  var assets = BT_STRAT_ASSETS[suffix] || BT_STRAT_ASSETS['ds'];
+  var ASSET_ICONS = {XAUUSD:'🥇',SILVER:'🥈',EURUSD:'💶',GBPUSD:'💷',GBPJPY:'🇬🇧',EURJPY:'🇯🇵',USDJPY:'🇯🇵',USDCAD:'🍁',USDCHF:'🇨🇭',AUDUSD:'🦘',AUDJPY:'🦘',NZDUSD:'🥝',EURGBP:'🇪🇺',US30:'🏭',NAS100:'💻',SP500:'📊',DAX40:'🇩🇪',FTSE100:'🇬🇧',BTCUSD:'₿',ETHUSD:'⟠'};
+  var h = '';
+  assets.forEach(function(a){
+    var icon = ASSET_ICONS[a]||'📈';
+    var checked = !_btSelectedAssets || _btSelectedAssets.indexOf(a)>=0;
+    h += '<label style="display:flex;align-items:center;gap:8px;padding:5px 6px;cursor:pointer;border-radius:5px;font-size:9px;color:var(--text);transition:background .1s" onmouseover="this.style.background=\'rgba(255,255,255,.05)\'" onmouseout="this.style.background=\'none\'">'
+      +'<input type="checkbox" id="bt-cb-'+a+'" data-asset="'+a+'" '+(checked?'checked':'')+' onchange="btToggleAsset(this.dataset.asset)" style="accent-color:var(--gold);width:13px;height:13px;cursor:pointer">'
+      +'<span>'+icon+'</span>'
+      +'<span style="font-weight:600">'+a+'</span>'
+      +'</label>';
+  });
+  return h;
+}
+
+function btToggleAssetMenu(){
+  var m = document.getElementById('bt-asset-menu');
+  if(m) m.style.display = m.style.display==='none' ? 'block' : 'none';
+}
+
+function btToggleAsset(asset){
+  var allAssets = btGetAssetList(_btCurrentStrat);
+  if(!_btSelectedAssets) _btSelectedAssets = allAssets.slice();
+  var idx = _btSelectedAssets.indexOf(asset);
+  if(idx>=0) _btSelectedAssets.splice(idx,1);
+  else _btSelectedAssets.push(asset);
+  if(_btSelectedAssets.length===0) _btSelectedAssets = [allAssets[0]];
+  if(_btSelectedAssets.length===allAssets.length) _btSelectedAssets = null;
+  btUpdateAssetBtn();
+  btRunAndRender();
+}
+
+function btSelectAllAssets(){
+  _btSelectedAssets = null;
+  btUpdateAssetBtn();
+  btRunAndRender();
+}
+
+function btUpdateAssetBtn(){
+  var btn = document.getElementById('bt-asset-btn');
+  if(!btn) return;
+  var allAssets = btGetAssetList(_btCurrentStrat);
+  var sel = _btSelectedAssets;
+  if(!sel || sel.length===allAssets.length){
+    btn.textContent = '📈 Tous les actifs ('+allAssets.length+') ▾';
+  } else {
+    btn.textContent = '📈 '+sel.length+' actif'+(sel.length>1?'s':'')+' sélectionné'+(sel.length>1?'s':'')+' ▾';
+  }
+  // sync checkboxes
+  allAssets.forEach(function(a){
+    var cb = document.getElementById('bt-cb-'+a);
+    if(cb) cb.checked = !sel || sel.indexOf(a)>=0;
+  });
+}
 
 function renderBacktest(){
   var el = document.getElementById('backtest-content');
@@ -9328,6 +9407,14 @@ function renderBacktest(){
     +'<option value="12">1 an</option><option value="24">2 ans</option><option value="36">3 ans</option>'
     +'<option value="60" selected>5 ans</option><option value="120">10 ans</option><option value="180">15 ans</option>'
     +'</select>'
+    +'<label class="bt-label" style="margin-top:8px">Actifs</label>'
+    +'<div style="position:relative">'
+    +'<button id="bt-asset-btn" onclick="btToggleAssetMenu()" style="width:100%;text-align:left;padding:6px 10px;font-size:9px;font-weight:600;color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;letter-spacing:.03em">📈 Tous les actifs ('+btGetAssetList(_btCurrentStrat).length+') ▾</button>'
+    +'<div id="bt-asset-menu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#12121e;border:1px solid var(--border2);border-radius:8px;z-index:100;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)">'
+    +'<div onclick="btSelectAllAssets()" style="font-size:8.5px;color:var(--gold2);font-weight:700;cursor:pointer;padding:4px 6px;margin-bottom:4px;border-bottom:1px solid var(--border2)">✓ Sélectionner tout</div>'
+    +btBuildAssetChecks(_btCurrentStrat)
+    +'</div>'
+    +'</div>'
     +'<div class="bt-row2">'
     +'<div><label class="bt-label">Capital ($)</label>'
     +'<input type="number" class="bt-num" id="bt-capital" value="'+_btCapital+'" min="1000" step="500" onchange="_btCapital=+this.value;btRunAndRender()"></div>'
@@ -9346,9 +9433,18 @@ function renderBacktest(){
 
 function btSelectStrat(k){
   _btCurrentStrat = k;
+  _btSelectedAssets = null; // reset sélection actifs quand on change de strat
   document.querySelectorAll('.bt-strat-card').forEach(function(c){ c.classList.remove('bt-selected'); });
   var card = document.getElementById('btcard-'+k);
   if(card) card.classList.add('bt-selected');
+  // Reconstruire le menu actifs pour la nouvelle stratégie
+  var menu = document.getElementById('bt-asset-menu');
+  if(menu){
+    var allItems = menu.querySelectorAll('label');
+    allItems.forEach(function(l){ l.parentNode.removeChild(l); });
+    menu.insertAdjacentHTML('beforeend', btBuildAssetChecks(k));
+  }
+  btUpdateAssetBtn();
   btRunAndRender();
 }
 
@@ -11694,6 +11790,15 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
   bindMobileNav();
+
+  // Fermer le dropdown actifs backtest en cliquant en dehors
+  document.addEventListener('click', function(e){
+    var menu = document.getElementById('bt-asset-menu');
+    var btn = document.getElementById('bt-asset-btn');
+    if(menu && btn && !menu.contains(e.target) && e.target!==btn){
+      menu.style.display = 'none';
+    }
+  });
 });
 </script>
 
