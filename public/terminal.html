@@ -11759,9 +11759,6 @@ function renderMacroFilter(impact){
 
 
 /* CALC PTL — Calculateur de position complet */
-/* ══════════════════════════════════════════════════════
-   CALCULATEUR DE POSITION — TYPE CASHBACKFOREX
-   ══════════════════════════════════════════════════════ */
 
 /* Données pip par instrument (valeur pip par lot standard en USD) */
 var CALC_INSTRUMENTS = {
@@ -11818,223 +11815,161 @@ function renderCalc(){
   var el = document.getElementById('calc-content');
   if(!el) return;
 
-  // Groupes d'instruments pour le select
+  // ── Construire les options instruments ──
   var groups = {forex:'Forex',metal:'Métaux',index:'Indices',crypto:'Crypto',africa:'Africaines'};
   var instOpts = '';
   Object.keys(groups).forEach(function(cat){
     instOpts += '<optgroup label="── '+groups[cat]+' ──">';
     Object.keys(CALC_INSTRUMENTS).forEach(function(k){
-      if(CALC_INSTRUMENTS[k].cat===cat){
+      if(CALC_INSTRUMENTS[k].cat===cat)
         instOpts += '<option value="'+k+'"'+(k==='EUR/USD'?' selected':'')+'>'+k+'</option>';
-      }
     });
     instOpts += '</optgroup>';
   });
+  var depOpts = DEPOSIT_CURRENCIES.map(function(c){
+    return '<option value="'+c+'"'+(c==='USD'?' selected':'')+'>'+c+'</option>';
+  }).join('');
 
-  var depOpts = DEPOSIT_CURRENCIES.map(function(c){return '<option value="'+c+'"'+(c==='USD'?' selected':'')+'>'+c+'</option>';}).join('');
-  var stratOpts = '<option value="ptl-ds">🏗️ Double Structure (RR 2.5)</option><option value="ptl-mtf">📐 Multi-Timeframes (RR 2.5)</option><option value="ptl-sam">📈 Swing Action Market (RR 2)</option><option value="ptl-ivc">📊 IVC Indices (RR 2.2)</option>';
+  // ── Styles inline communs ──
+  var inp = 'width:100%;background:#1a1f2e;border:1px solid rgba(255,255,255,.12);color:#e8e8e8;padding:11px 14px;border-radius:8px;font-size:14px;font-family:monospace;box-sizing:border-box;outline:none';
+  var lbl = 'display:block;font-size:11px;font-weight:700;color:#8a95b0;margin-bottom:6px;letter-spacing:.04em';
+  var field = 'margin-bottom:16px';
 
   var h = '';
 
-  // ── SECTION PRINCIPALE ──
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">';
+  // ── CARD PRINCIPALE ──
+  h += '<div style="max-width:680px;background:linear-gradient(145deg,#0d2a3a,#0a1f2e);border:1px solid rgba(0,160,200,.25);border-radius:16px;overflow:hidden">';
 
-  // ── COLONNE GAUCHE : inputs ──
-  h += '<div style="background:var(--s1);border:1px solid rgba(200,160,60,.2);border-radius:10px;padding:16px">';
-  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:14px">⚙️ PARAMÈTRES</div>';
+  // Header card
+  h += '<div style="background:linear-gradient(90deg,#0070a0,#005580);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">';
+  h += '<div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:.05em">📐 CALCULATEUR DE POSITION PTL</div>';
+  h += '<div style="font-size:9px;color:rgba(255,255,255,.6);background:rgba(0,0,0,.2);padding:3px 10px;border-radius:20px">Mis à jour en temps réel</div>';
+  h += '</div>';
 
+  // Corps : grille 2 colonnes
+  h += '<div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+
+  // COL 1
+  h += '<div>';
   // Instrument
-  h += '<div style="margin-bottom:10px">';
-  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">📊 Instrument</label>';
-  h += '<select id="c-inst" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fm);font-size:10px">'+instOpts+'</select>';
+  h += '<div style="'+field+'"><label style="'+lbl+'">Instrument</label>';
+  h += '<select id="c-inst" onchange="calcPosition()" style="'+inp+';cursor:pointer">'+instOpts+'</select></div>';
+  // Stop loss (pips) — label cliquable pour basculer mode
+  h += '<div style="'+field+'">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+  h += '<label style="'+lbl.replace('margin-bottom:6px','margin-bottom:0')+'" id="c-sl-label">⚙ Stop loss (pips)</label>';
+  h += '<button onclick="calcToggleSLMode()" style="font-size:9px;padding:2px 9px;background:rgba(0,160,200,.15);border:1px solid rgba(0,160,200,.35);border-radius:20px;color:#5bc8e8;cursor:pointer;font-family:monospace" id="c-sl-toggle-btn">Basculer sur le prix</button>';
   h += '</div>';
+  h += '<input id="c-sl" type="number" step="0.1" value="20" min="0.1" oninput="calcPosition()" style="'+inp+';border-color:rgba(224,82,82,.4);color:#ff7c7c">';
+  h += '</div>';
+  // Info pip instrument
+  h += '<div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-bottom:16px">';
+  h += '<div style="display:flex;justify-content:space-between"><span id="c-inst-pip-label" style="font-size:10px;color:#8a95b0">EUR/USD 1 pip</span><span id="c-inst-pip-val" style="font-size:10px;font-weight:700;color:#e8e8e8;font-family:monospace">0,0001</span></div>';
+  h += '</div>';
+  // Taille du contrat
+  h += '<div style="'+field+'"><label style="'+lbl+'">Taille du contrat (unités par lot)</label>';
+  h += '<input id="c-contract" type="number" value="100000" min="1" oninput="calcPosition()" style="'+inp+'">';
+  h += '<div style="font-size:9px;color:#5a6580;margin-top:5px">Forex std = 100 000 · Voir MT5 → Spécification</div>';
+  h += '</div>';
+  h += '</div>'; // fin col 1
 
+  // COL 2
+  h += '<div>';
   // Devise de dépôt
-  h += '<div style="margin-bottom:10px">';
-  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">💱 Devise de dépôt</label>';
-  h += '<select id="c-depcur" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fm);font-size:10px">'+depOpts+'</select>';
-  h += '</div>';
-
-  // Prix d'entrée
-  h += '<div style="margin-bottom:10px">';
-  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">📍 Prix d\'ouverture</label>';
-  h += '<input id="c-entry" type="number" step="0.00001" value="1.08400" oninput="calcPosition()" placeholder="Ex: 1.08400" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:11px">';
-  h += '</div>';
-
-  // Stop Loss (mode pips / mode prix)
-  h += '<div style="margin-bottom:10px">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  h += '<label style="font-size:8px;color:var(--red)">🛑 Stop Loss</label>';
-  h += '<div style="display:flex;gap:4px">';
-  h += '<button id="c-sl-pips-btn" onclick="calcToggleSLMode(\'pips\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid rgba(224,82,82,.4);cursor:pointer;background:rgba(224,82,82,.15);color:var(--red);font-family:var(--fm)">En pips</button>';
-  h += '<button id="c-sl-price-btn" onclick="calcToggleSLMode(\'price\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);cursor:pointer;background:transparent;color:var(--dim);font-family:var(--fm)">En prix</button>';
-  h += '</div></div>';
-  h += '<input id="c-sl" type="number" step="0.1" value="20" min="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(224,82,82,.35);color:var(--red);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:12px">';
-  h += '<div id="c-sl-hint" style="font-size:7.5px;color:var(--dim);margin-top:3px">pips = distance à l\'entrée en pips</div>';
-  h += '</div>';
-
-  // Take Profit
-  h += '<div style="margin-bottom:10px">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  h += '<label style="font-size:8px;color:var(--green)">🎯 Take Profit</label>';
-  h += '<span id="c-rr-inline" style="font-size:8px;font-weight:700;color:var(--gold)"></span>';
-  h += '</div>';
-  h += '<div style="display:flex;gap:4px;margin-bottom:6px">';
-  h += ['1.5R','2R','2.5R','3R'].map(function(r){
-    var mult=parseFloat(r);
-    return '<button onclick="calcSetTPFromRR('+mult+')" style="flex:1;padding:5px 2px;background:rgba(0,200,120,.07);border:1px solid rgba(0,200,120,.2);border-radius:4px;font-size:9px;color:var(--green);cursor:pointer;font-family:var(--fm)">'+r+'</button>';
-  }).join('');
-  h += '</div>';
-  h += '<input id="c-tp" type="number" step="0.1" value="50" min="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(0,200,120,.3);color:var(--green);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:12px">';
-  h += '<div id="c-tp-hint" style="font-size:7.5px;color:var(--dim);margin-top:3px">pips = distance à l\'entrée en pips</div>';
-  h += '</div>';
-
-  // Taille du contrat (avancé)
-  h += '<div style="margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:8px;color:var(--dim)">📦 Taille du contrat (unités/lot)</span><span id="c-contract-label" style="font-size:8px;color:var(--gold)">100 000</span></div>';
-  h += '<input id="c-contract" type="number" value="100000" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--dim);padding:6px 8px;border-radius:5px;font-family:var(--fd);font-size:10px">';
-  h += '<div style="font-size:7px;color:var(--faint);margin-top:3px">Forex std = 100 000 · Indices/Crypto = variable · Vérifier chez votre broker (MT5 → clic droit → Spécification)</div>';
-  h += '</div>';
-
-  h += '</div>'; // fin colonne gauche
-
-  // ── COLONNE DROITE : capital + risque + résultat ──
-  h += '<div>';
-
-  // Capital + Risque
-  h += '<div style="background:var(--s1);border:1px solid rgba(200,160,60,.2);border-radius:10px;padding:16px;margin-bottom:12px">';
-  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:12px">💰 CAPITAL & RISQUE</div>';
-
+  h += '<div style="'+field+'"><label style="'+lbl+'">Devise de dépôt</label>';
+  h += '<select id="c-depcur" onchange="calcPosition()" style="'+inp+';cursor:pointer">'+depOpts+'</select></div>';
   // Solde du compte
-  h += '<div style="margin-bottom:10px">';
-  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Solde du compte</label>';
-  h += '<input id="c-capital" type="number" value="10000" min="100" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:13px">';
-  h += '</div>';
-
-  // Preset balances prop firms
-  h += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">';
-  h += [5000,10000,25000,50000,100000,200000].map(function(v){
-    var label=v>=1000?(v/1000)+'K':v;
-    return '<button onclick="document.getElementById(\'c-capital\').value='+v+';calcPosition()" style="padding:3px 7px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;font-size:8px;color:var(--dim);cursor:pointer;font-family:var(--fm)">$'+label+'</button>';
+  h += '<div style="'+field+'"><label style="'+lbl+'">Solde du compte</label>';
+  h += '<input id="c-capital" type="number" value="10000" min="100" oninput="calcPosition()" style="'+inp+'">';
+  h += '<div style="display:flex;gap:5px;margin-top:7px">';
+  h += [5000,10000,25000,50000,100000].map(function(v){
+    var lv=v>=1000?(v/1000)+'K':v;
+    return '<button onclick="document.getElementById(\'c-capital\').value='+v+';calcPosition()" style="flex:1;padding:4px 2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:8.5px;color:#8a95b0;cursor:pointer;font-family:monospace">'+lv+'</button>';
+  }).join('');
+  h += '</div></div>';
+  // Risque avec toggle % / montant
+  h += '<div style="'+field+'">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+  h += '<label style="'+lbl.replace('margin-bottom:6px','margin-bottom:0')+'">Risque</label>';
+  h += '<div style="display:flex;gap:0;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden">';
+  h += '<button id="c-risk-pct-btn" onclick="calcToggleRiskMode(\'pct\')" style="padding:3px 12px;background:rgba(0,160,200,.25);border:none;color:#5bc8e8;font-size:9px;cursor:pointer;font-family:monospace;font-weight:700">%</button>';
+  h += '<button id="c-risk-amt-btn" onclick="calcToggleRiskMode(\'amount\')" style="padding:3px 12px;background:transparent;border:none;color:#5a6580;font-size:9px;cursor:pointer;font-family:monospace">Montant</button>';
+  h += '</div></div>';
+  h += '<div style="display:flex;gap:5px;margin-bottom:7px">';
+  h += ['0.5','1','1.5','2','3'].map(function(r){
+    return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:5px 2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:9px;color:#8a95b0;cursor:pointer;font-family:monospace">'+r+'%</button>';
   }).join('');
   h += '</div>';
+  h += '<input id="c-risk" type="number" value="1" min="0.01" step="0.1" oninput="calcPosition()" style="'+inp+';border-color:rgba(200,160,60,.4);color:#f0c040">';
+  h += '<div id="c-risk-equiv" style="font-size:9px;color:#f0c040;margin-top:5px;text-align:right"></div>';
+  h += '</div>';
+  h += '</div>'; // fin col 2
 
-  // Risque % ou montant fixe
-  h += '<div style="margin-bottom:10px">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  h += '<label style="font-size:8px;color:var(--dim)">Risque</label>';
-  h += '<div style="display:flex;gap:4px">';
-  h += '<button id="c-risk-pct-btn" onclick="calcToggleRiskMode(\'pct\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid rgba(200,160,60,.4);cursor:pointer;background:rgba(200,160,60,.15);color:var(--gold);font-family:var(--fm)">%</button>';
-  h += '<button id="c-risk-amt-btn" onclick="calcToggleRiskMode(\'amount\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);cursor:pointer;background:transparent;color:var(--dim);font-family:var(--fm)">Montant</button>';
-  h += '</div></div>';
-  h += '<div style="display:flex;gap:4px;margin-bottom:6px">'+['0.5','1','1.5','2','3'].map(function(r){
-    return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:4px 2px;background:var(--s2);border:1px solid var(--border2);border-radius:4px;font-size:8.5px;color:var(--dim);cursor:pointer;font-family:var(--fm)">'+r+'%</button>';
-  }).join('')+'</div>';
-  h += '<input id="c-risk" type="number" value="1" min="0.01" step="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(200,160,60,.35);color:var(--gold);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:13px">';
-  h += '<div id="c-risk-equiv" style="font-size:8px;color:var(--gold);margin-top:4px;text-align:right"></div>';
+  h += '</div>'; // fin grid
+
+  // ── BOUTON CALCULER ──
+  h += '<div style="padding:0 22px 22px">';
+  h += '<button onclick="calcPosition()" style="width:100%;padding:14px;background:linear-gradient(90deg,#0090cc,#0070a0);border:none;border-radius:10px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;letter-spacing:.05em;transition:opacity .15s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">Calculer</button>';
   h += '</div>';
 
-  // Stratégie PTL
-  h += '<div>';
-  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">⚡ Stratégie PTL</label>';
-  h += '<select id="c-strat" onchange="updateStratDefaults()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-family:var(--fm);font-size:10px">'+stratOpts+'</select>';
-  h += '</div>';
-  h += '</div>'; // fin capital & risque
-
-  // ── RÉSULTATS ──
-  h += '<div style="background:linear-gradient(135deg,rgba(200,160,60,.09),rgba(0,0,0,.0));border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px">';
-  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:12px">📐 RÉSULTAT</div>';
-
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+  // ── RÉSULTATS 3 GRANDS OUTPUTS (style CashBackForex) ──
+  h += '<div id="c-result-area" style="border-top:1px solid rgba(255,255,255,.08);padding:22px">';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden">';
   // Lots
-  h += '<div style="background:var(--s2);border:1px solid rgba(200,160,60,.3);border-radius:8px;padding:11px;text-align:center">';
-  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">LOTS (taille deal)</div>';
-  h += '<div id="c-lot" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--gold)">—</div>';
-  h += '<div id="c-lotm" style="font-size:8px;color:var(--dim);margin-top:1px"></div>';
+  h += '<div style="background:#0d2a3a;padding:20px;text-align:center">';
+  h += '<div style="font-size:10px;color:#5bc8e8;margin-bottom:6px;font-weight:700;letter-spacing:.03em">Lots <span style="font-size:8px;color:#5a6580">(taille de deal)</span></div>';
+  h += '<div id="c-lot" style="font-size:32px;font-weight:900;color:#5bc8e8;font-family:monospace;letter-spacing:-.02em">—</div>';
   h += '</div>';
   // Unités
-  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:11px;text-align:center">';
-  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">UNITÉS (taille deal)</div>';
-  h += '<div id="c-units" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--text)">—</div>';
+  h += '<div style="background:#0d2a3a;padding:20px;text-align:center">';
+  h += '<div style="font-size:10px;color:#8a95b0;margin-bottom:6px;font-weight:700;letter-spacing:.03em">Unités <span style="font-size:8px;color:#5a6580">(taille de deal)</span></div>';
+  h += '<div id="c-units" style="font-size:32px;font-weight:900;color:#c8d0e0;font-family:monospace;letter-spacing:-.02em">—</div>';
   h += '</div>';
   // Fonds à risque
-  h += '<div style="background:rgba(224,82,82,.06);border:1px solid rgba(224,82,82,.25);border-radius:8px;padding:11px;text-align:center">';
-  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">FONDS À RISQUE</div>';
-  h += '<div id="c-max-loss" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--red)">—</div>';
-  h += '<div id="c-risk-amt" style="font-size:8px;color:var(--dim);margin-top:1px"></div>';
+  h += '<div style="background:#0d2a3a;padding:20px;text-align:center">';
+  h += '<div style="font-size:10px;color:#8a95b0;margin-bottom:6px;font-weight:700;letter-spacing:.03em">Fonds à risque</div>';
+  h += '<div id="c-max-loss" style="font-size:32px;font-weight:900;color:#c8d0e0;font-family:monospace;letter-spacing:-.02em">—</div>';
   h += '</div>';
-  // RR
-  h += '<div style="background:rgba(0,200,120,.06);border:1px solid rgba(0,200,120,.2);border-radius:8px;padding:11px;text-align:center">';
-  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">RATIO R/R</div>';
-  h += '<div id="c-rr" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--green)">—</div>';
-  h += '<div id="c-rr-label" style="font-size:8px;margin-top:1px"></div>';
-  h += '</div>';
-  h += '</div>'; // fin grid résultats
-
-  // Profit potentiel
-  h += '<div style="background:rgba(0,200,120,.05);border:1px solid rgba(0,200,120,.2);border-radius:8px;padding:11px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
-  h += '<div><div style="font-size:7.5px;color:var(--dim)">Profit potentiel (TP atteint)</div><div id="c-profit" style="font-family:var(--fd);font-size:16px;font-weight:900;color:var(--green)">—</div></div>';
-  h += '<div style="text-align:right"><div style="font-size:7.5px;color:var(--dim)">Valeur pip/lot</div><div id="c-pipval" style="font-size:11px;font-weight:700;color:var(--dim)">—</div></div>';
   h += '</div>';
 
-  h += '</div>'; // fin résultats
-  h += '</div>'; // fin colonne droite
-  h += '</div>'; // fin grid 2 colonnes
+  // Infos secondaires (RR, profit, valeur pip)
+  h += '<div id="c-extras" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"></div>';
+  h += '</div>'; // fin result area
 
   // ── TABLEAU MULTI-RISQUE ──
-  h += '<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:14px">';
-  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:10px">📊 TABLEAU DE RISQUE — Plusieurs niveaux en un coup d\'œil</div>';
-  h += '<div style="overflow-x:auto"><table id="c-risk-table" style="width:100%;border-collapse:collapse;font-size:8.5px"></table></div>';
+  h += '<div style="border-top:1px solid rgba(255,255,255,.08);padding:18px 22px">';
+  h += '<div style="font-size:10px;font-weight:800;color:#8a95b0;margin-bottom:10px;letter-spacing:.05em">TABLEAU DE RISQUE</div>';
+  h += '<div style="overflow-x:auto"><table id="c-risk-table" style="width:100%;border-collapse:collapse;font-size:9px"></table></div>';
   h += '</div>';
 
-  // ── RÈGLES PTL MM ──
-  h += '<div style="background:rgba(0,200,120,.03);border:1px solid rgba(0,200,120,.12);border-radius:8px;padding:14px">';
-  h += '<div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:10px">📏 RÈGLES PTL MONEY MANAGEMENT</div>';
-  h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
-  [{r:'Risque standard',v:'1% / trade'},{r:'Setup fort 🔥',v:'Max 2%'},{r:'Double Structure RR',v:'Min 2.5:1'},{r:'Multi-TF RR',v:'Min 2.5:1'},{r:'SAM RR',v:'Min 2:1'},{r:'IVC RR',v:'2 à 3:1'}].forEach(function(r){
-    h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:7px 9px"><div style="font-size:7.5px;color:var(--dim)">'+r.r+'</div><div style="font-size:9px;font-weight:700;color:var(--green)">'+r.v+'</div></div>';
-  });
-  h += '</div></div>';
+  h += '</div>'; // fin card
 
   el.innerHTML = h;
-  // Initialiser les valeurs pip selon instrument par défaut
   calcUpdateContractForInst();
   setTimeout(calcPosition, 80);
 }
 
 function calcToggleSLMode(mode){
+  // Si appelé sans argument → toggle
+  if(mode===undefined) mode = (_calcSLMode==='pips') ? 'price' : 'pips';
   _calcSLMode = mode;
-  var pipsBtn = document.getElementById('c-sl-pips-btn');
-  var priceBtn = document.getElementById('c-sl-price-btn');
-  var hint = document.getElementById('c-sl-hint');
-  var tphint = document.getElementById('c-tp-hint');
-  if(pipsBtn){
-    pipsBtn.style.background = mode==='pips'?'rgba(224,82,82,.15)':'transparent';
-    pipsBtn.style.borderColor = mode==='pips'?'rgba(224,82,82,.4)':'var(--border2)';
-    pipsBtn.style.color = mode==='pips'?'var(--red)':'var(--dim)';
-  }
-  if(priceBtn){
-    priceBtn.style.background = mode==='price'?'rgba(224,82,82,.15)':'transparent';
-    priceBtn.style.borderColor = mode==='price'?'rgba(224,82,82,.4)':'var(--border2)';
-    priceBtn.style.color = mode==='price'?'var(--red)':'var(--dim)';
-  }
-  if(hint) hint.textContent = mode==='pips'?'pips = distance à l\'entrée en pips':'prix = niveau exact du SL sur le chart';
-  if(tphint) tphint.textContent = mode==='pips'?'pips = distance à l\'entrée en pips':'prix = niveau exact du TP sur le chart';
+  var lbl = document.getElementById('c-sl-label');
+  var btn = document.getElementById('c-sl-toggle-btn');
+  if(lbl) lbl.textContent = mode==='pips' ? '⚙ Stop loss (pips)' : '⚙ Stop loss (prix)';
+  if(btn) btn.textContent = mode==='pips' ? 'Basculer sur le prix' : 'Basculer sur les pips';
   // Convertir la valeur actuelle
-  var entry = parseFloat((document.getElementById('c-entry')||{}).value)||1.084;
+  var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
+  var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
+  var ps = info.pipSize||0.0001;
   var slEl = document.getElementById('c-sl');
-  var tpEl = document.getElementById('c-tp');
-  if(slEl && tpEl){
+  if(slEl){
     var slVal = parseFloat(slEl.value)||20;
-    var tpVal = parseFloat(tpEl.value)||50;
     if(mode==='price'){
-      var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
-      var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
-      var ps = info.pipSize||0.0001;
-      slEl.value = (entry - slVal*ps).toFixed(5);
-      tpEl.value = (entry + tpVal*ps).toFixed(5);
+      // On n'a plus d'entrée prix dans le nouveau UI, on utilise une valeur référence
+      var refPrice = 1.08400;
+      slEl.value = (refPrice - slVal*ps).toFixed(5);
     } else {
-      slEl.value = 20; tpEl.value = 50;
+      slEl.value = 20;
     }
   }
   calcPosition();
@@ -12075,6 +12010,12 @@ function calcUpdateContractForInst(){
   var lbl = document.getElementById('c-contract-label');
   if(el) el.value = info.contract;
   if(lbl) lbl.textContent = info.contract.toLocaleString();
+  // Mettre à jour le label pip dans le nouveau UI
+  var pipLbl = document.getElementById('c-inst-pip-label');
+  var pipVal = document.getElementById('c-inst-pip-val');
+  var ps = info.pipSize||0.0001;
+  if(pipLbl) pipLbl.textContent = inst+' 1 pip';
+  if(pipVal) pipVal.textContent = ps.toString().replace('.',',');
 }
 
 function calcSetTPFromRR(rr){
@@ -12101,7 +12042,7 @@ function calcPosition(){
   var risk = parseFloat((document.getElementById('c-risk')||{}).value)||1;
   var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
   var depCur = (document.getElementById('c-depcur')||{}).value||'USD';
-  var entry = parseFloat((document.getElementById('c-entry')||{}).value)||1.084;
+  var entry = parseFloat((document.getElementById('c-entry')||{}).value)||1.084; // optionnel (ancien UI)
   var slRaw = parseFloat((document.getElementById('c-sl')||{}).value)||20;
   var tpRaw = parseFloat((document.getElementById('c-tp')||{}).value)||50;
   var contract = parseFloat((document.getElementById('c-contract')||{}).value)||100000;
@@ -12110,6 +12051,8 @@ function calcPosition(){
 
   var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
   var pipSize = info.pipSize||0.0001;
+  // Mettre à jour le label pip (si nouveau UI présent)
+  calcUpdateContractForInst();
 
   // Convertir SL/TP en pips si mode prix
   var slPips, tpPips;
@@ -12147,11 +12090,16 @@ function calcPosition(){
   var set = function(id, val){ var e=document.getElementById(id); if(e) e.textContent=val; };
   var setC = function(id,c){ var e=document.getElementById(id); if(e) e.style.color=c; };
 
-  set('c-lot', lotSize>=0.01 ? lotSize.toFixed(2)+' lot' : lotSize.toFixed(4)+' lot');
-  set('c-lotm', 'Mini: '+(lotSize*10).toFixed(2)+' · Micro: '+(lotSize*100).toFixed(1));
-  set('c-units', units>=1000 ? (units/1000).toFixed(1)+'K' : units.toFixed(0));
-  set('c-max-loss', '-'+riskAmt.toFixed(0)+' '+depCur);
-  set('c-risk-amt', (_calcRiskMode==='pct'?risk+'% du capital':'Montant fixe')+' · '+riskAmt.toFixed(0)+' '+depCur);
+  // Format nombre à la française (virgule comme séparateur décimal)
+  var fmt = function(n,dec){ return n.toFixed(dec).replace('.',','); };
+  var fmtUnits = function(n){
+    // afficher avec espace milliers
+    return n.toFixed(3).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+  };
+
+  set('c-lot', fmt(lotSize, lotSize>=0.01?3:5));
+  set('c-units', fmtUnits(units));
+  set('c-max-loss', fmt(riskAmt,2)+' '+depCur);
   set('c-rr', rrRatio.toFixed(2)+':1');
   setC('c-rr', rrRatio>=2?'var(--green)':rrRatio>=1.5?'var(--gold)':'var(--red)');
   set('c-rr-label', rrRatio>=2.5?'✅ PTL validé':rrRatio>=2?'⚠️ Limite acceptable':'❌ Sous seuil PTL');
@@ -12159,6 +12107,32 @@ function calcPosition(){
   set('c-profit', '+'+profit.toFixed(0)+' '+depCur);
   set('c-pipval', pipValDep.toFixed(3)+' '+depCur+'/pip');
   set('c-rr-inline', 'RR → '+rrRatio.toFixed(2)+':1');
+
+  // Extras info (RR, profit, pip val) dans le nouveau UI
+  var extEl = document.getElementById('c-extras');
+  if(extEl){
+    var rrColor = rrRatio>=2?'#4cd97b':rrRatio>=1.5?'#f0c040':'#ff7c7c';
+    extEl.innerHTML =
+      '<div style="background:rgba(0,0,0,.2);border-radius:8px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:#5a6580;margin-bottom:3px">Ratio R/R</div>'
+        +'<div style="font-size:18px;font-weight:800;color:'+rrColor+';font-family:monospace">'+rrRatio.toFixed(2)+':1</div>'
+        +'<div style="font-size:8px;color:'+rrColor+';margin-top:2px">'+(rrRatio>=2.5?'✅ PTL validé':rrRatio>=2?'⚠️ Limite':'❌ Sous seuil')+'</div>'
+      +'</div>'
+      +'<div style="background:rgba(0,0,0,.2);border-radius:8px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:#5a6580;margin-bottom:3px">Profit potentiel</div>'
+        +'<div style="font-size:18px;font-weight:800;color:#4cd97b;font-family:monospace">+'+profit.toFixed(0)+' '+depCur+'</div>'
+        +'<div style="font-size:8px;color:#5a6580;margin-top:2px">Si TP atteint</div>'
+      +'</div>'
+      +'<div style="background:rgba(0,0,0,.2);border-radius:8px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:#5a6580;margin-bottom:3px">Valeur pip / lot</div>'
+        +'<div style="font-size:18px;font-weight:800;color:#8a95b0;font-family:monospace">'+pipValDep.toFixed(2)+' '+depCur+'</div>'
+        +'<div style="font-size:8px;color:#5a6580;margin-top:2px">Pour '+inst+'</div>'
+      +'</div>';
+  }
+
+  // Ancien champ lotm (peut ne plus exister)
+  set('c-lotm', 'Mini: '+(lotSize*10).toFixed(2)+' · Micro: '+(lotSize*100).toFixed(1));
+  set('c-risk-amt', (_calcRiskMode==='pct'?risk+'% du capital':'Montant fixe')+' · '+riskAmt.toFixed(0)+' '+depCur);
 
   // Équivalent risque (montant / %)
   var eqEl = document.getElementById('c-risk-equiv');
