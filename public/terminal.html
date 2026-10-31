@@ -171,6 +171,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .pill:hover{color:var(--text);border-color:var(--border3);background:rgba(255,255,255,.02)}
 .pill.on{background:rgba(200,160,60,.12);border-color:rgba(200,160,60,.45);color:var(--gold2);box-shadow:0 0 8px rgba(200,160,60,.1)}
 
+/* ═══ FX SUB-NAV ═══ */
+.fx-snav-btn{font-size:8px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);color:var(--dim);cursor:pointer;font-family:var(--fm);transition:all .13s;background:transparent;letter-spacing:.04em;white-space:nowrap}
+.fx-snav-btn:hover{color:var(--text);border-color:var(--border3);background:rgba(255,255,255,.02)}
+.fx-snav-active{background:rgba(200,160,60,.12)!important;border-color:rgba(200,160,60,.45)!important;color:var(--gold2)!important;box-shadow:0 0 8px rgba(200,160,60,.1)}
+
 /* ═══ SAISON CHART ═══ */
 .sz-chart{display:flex;align-items:center;gap:4px;height:120px;padding:0 4px;margin-bottom:12px}
 .sz-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;height:100%;justify-content:center}
@@ -921,27 +926,48 @@ body{padding-top:22px;}
 
 <div class="panel" id="p-fx">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">💱</span><div><div class="p-title-text">FOREX — TOUTES PAIRES</div><div class="p-title-sub">Majeures · Croisées · Métaux · Exotiques</div></div></div>
+    <div class="p-title-left"><span class="p-title-icon">💱</span><div><div class="p-title-text">FOREX — SCANNER & ANALYSE</div><div class="p-title-sub">Confluences · Force devises · COT · DMX · Sizing</div></div></div>
     <span class="badge badge-live">LIVE</span>
   </div>
-  <div class="pills" id="fx-pills"></div>
-  <!-- TradingView Forex Cross Rates -->
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js" async>
-      {"width":"100%","height":400,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD"],"isTransparent":true,"colorTheme":"dark","locale":"fr"}</script>
+  <!-- Sous-navigation FX -->
+  <div id="fx-subnav" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="fx-snav-btn fx-snav-active" id="fxsn-scan" onclick="fxShowView('scan')">🎯 TOP SETUPS</div>
+    <div class="fx-snav-btn" id="fxsn-table" onclick="fxShowView('table')">📊 TOUTES LES PAIRES</div>
+    <div class="fx-snav-btn" id="fxsn-force" onclick="fxShowView('force')">💪 FORCE DEVISES</div>
+    <div class="fx-snav-btn" id="fxsn-heatmap" onclick="fxShowView('heatmap')">🌡️ HEATMAP</div>
+    <div class="fx-snav-btn" id="fxsn-calc" onclick="fxShowView('calc')">📐 SIZING</div>
+  </div>
+  <!-- VUE SCAN -->
+  <div id="fx-view-scan"></div>
+  <!-- VUE TABLE -->
+  <div id="fx-view-table" style="display:none">
+    <div class="pills" id="fx-pills"></div>
+    <div id="fx-table"></div>
+  </div>
+  <!-- VUE FORCE -->
+  <div id="fx-view-force" style="display:none">
+    <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js" async>
+        {"width":"100%","height":400,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD"],"isTransparent":true,"colorTheme":"dark","locale":"fr"}</script>
+      </div>
+    </div>
+    <div id="fx-force-bars"></div>
+  </div>
+  <!-- VUE HEATMAP -->
+  <div id="fx-view-heatmap" style="display:none">
+    <div style="border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js" async>
+        {"width":"100%","height":500,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD","CNY"],"isTransparent":true,"colorTheme":"dark","locale":"fr"}</script>
+      </div>
     </div>
   </div>
-  <!-- TradingView Forex Heatmap -->
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js" async>
-      {"width":"100%","height":350,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD","CNY"],"isTransparent":true,"colorTheme":"dark","locale":"fr"}</script>
-    </div>
-  </div>
-  <div id="fx-table"></div>
+  <!-- VUE SIZING -->
+  <div id="fx-view-calc" style="display:none"></div>
+  <!-- DETAIL PAIRE -->
   <div id="fx-detail" style="display:none"></div>
 </div>
 
@@ -2759,6 +2785,232 @@ function renderWEI(){
 }
 
 /* FX */
+/* ── Calcule un score de confluence 0-100 pour chaque paire ── */
+function fxConfluenceScore(d){
+  var score=0;
+  // COT (30 pts)
+  if(d.cot==='Long')score+=d.cotP>=75?30:d.cotP>=60?20:10;
+  else if(d.cot==='Short')score+=d.cotP>=75?0:d.cotP>=60?10:20;
+  else score+=15;
+  // DMX contrarien (25 pts) : retail <30% = instit Long = haussier pour base
+  if(d.dmx<=25)score+=25;
+  else if(d.dmx<=35)score+=18;
+  else if(d.dmx>=75)score+=0;
+  else if(d.dmx>=65)score+=5;
+  else score+=12;
+  // Signal (20 pts)
+  if(d.sig==='Haussier')score+=20;
+  else if(d.sig==='Baissier')score+=0;
+  else score+=10;
+  // Saisonnalité (15 pts)
+  if(d.szC==='bull')score+=15;
+  else if(d.szC==='bear')score+=0;
+  else score+=7;
+  // Force devises base > quote (10 pts)
+  var parts=d.p.split('/');
+  if(parts.length===2){
+    var bS=CURRENCY_STRENGTH[parts[0]]?CURRENCY_STRENGTH[parts[0]].score:50;
+    var qS=CURRENCY_STRENGTH[parts[1]]?CURRENCY_STRENGTH[parts[1]].score:50;
+    var diff=bS-qS;
+    score+=diff>=20?10:diff>=10?7:diff>0?4:0;
+  }
+  return Math.min(100,Math.max(0,score));
+}
+
+/* Détermine le biais d'une paire (LONG/SHORT) selon les signaux */
+function fxBias(d){
+  var bullPts=0,bearPts=0;
+  if(d.cot==='Long')bullPts+=2; else if(d.cot==='Short')bearPts+=2;
+  if(d.dmx<=35)bullPts+=2; else if(d.dmx>=65)bearPts+=2;
+  if(d.sig==='Haussier')bullPts+=2; else if(d.sig==='Baissier')bearPts+=2;
+  if(d.szC==='bull')bullPts+=1; else if(d.szC==='bear')bearPts+=1;
+  if(bullPts>bearPts) return 'LONG';
+  if(bearPts>bullPts) return 'SHORT';
+  return 'NEUTRE';
+}
+
+var _fxView='scan'; // vue active
+
+function fxShowView(v){
+  _fxView=v;
+  ['scan','table','force','heatmap','calc'].forEach(function(k){
+    var el=document.getElementById('fx-view-'+k);
+    var btn=document.getElementById('fxsn-'+k);
+    if(el) el.style.display=k===v?'':'none';
+    if(btn){btn.classList.toggle('fx-snav-active',k===v);}
+  });
+  document.getElementById('fx-detail').style.display='none';
+  if(v==='scan') renderFXScan();
+  if(v==='table'){
+    var pills=document.getElementById('fx-pills');
+    if(pills&&!pills.innerHTML) renderFX('all');
+  }
+  if(v==='force') renderFXForceBars();
+  if(v==='calc') renderFXSizing();
+}
+
+function renderFXScan(){
+  var el=document.getElementById('fx-view-scan');
+  if(!el) return;
+  // Calculer score pour chaque paire tradeable (pas africaines sans COT)
+  var scored=FX.filter(function(d){return d.cat!=='africa'||d.cot!=='—';}).map(function(d){
+    var sc=fxConfluenceScore(d);
+    var bias=fxBias(d);
+    return {d:d,sc:sc,bias:bias};
+  }).sort(function(a,b){return b.sc-a.sc;});
+  var top=scored.slice(0,6);
+
+  var h='';
+  // Score global du marché
+  var avgSc=Math.round(scored.reduce(function(a,b){return a+b.sc;},0)/scored.length);
+  var mktMood=avgSc>=65?'RISK ON 🟢':avgSc<=40?'RISK OFF 🔴':'MIXTE 🟡';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:12px 14px;background:rgba(200,160,60,.06);border:1px solid rgba(200,160,60,.2);border-radius:10px">'
+    +'<div><div style="font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--dim)">SENTIMENT MARCHÉ</div>'
+    +'<div style="font-size:13px;font-weight:900;color:var(--gold2);margin-top:3px">'+mktMood+'</div></div>'
+    +'<div style="text-align:right"><div style="font-size:8px;color:var(--dim)">Score confluence moyen</div>'
+    +'<div style="font-size:18px;font-weight:900;color:'+(avgSc>=60?'var(--green)':avgSc<=40?'var(--red)':'var(--gold)')+';font-family:var(--fd)">'+avgSc+'<span style="font-size:10px;color:var(--dim)">/100</span></div></div>'
+    +'</div>';
+
+  h+='<div style="font-size:8px;font-weight:800;letter-spacing:.1em;color:var(--dim);margin-bottom:8px">🎯 TOP SETUPS — CONFLUENCES AUJOURD\'HUI</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  top.forEach(function(item,i){
+    var d=item.d; var sc=item.sc; var bias=item.bias;
+    var bColor=bias==='LONG'?'var(--green)':bias==='SHORT'?'var(--red)':'var(--gold)';
+    var bIcon=bias==='LONG'?'▲':bias==='SHORT'?'▼':'—';
+    var parts=d.p.split('/');
+    var bS=parts.length===2&&CURRENCY_STRENGTH[parts[0]]?CURRENCY_STRENGTH[parts[0]].score:50;
+    var qS=parts.length===2&&CURRENCY_STRENGTH[parts[1]]?CURRENCY_STRENGTH[parts[1]].score:50;
+    var cotOk=d.cot!=='—'&&((bias==='LONG'&&d.cot==='Long')||(bias==='SHORT'&&d.cot==='Short'));
+    var dmxOk=(bias==='LONG'&&d.dmx<=35)||(bias==='SHORT'&&d.dmx>=65);
+    var szOk=(bias==='LONG'&&d.szC==='bull')||(bias==='SHORT'&&d.szC==='bear');
+    var sigOk=d.sig===((bias==='LONG')?'Haussier':'Baissier');
+    h+='<div style="cursor:pointer;border:1px solid rgba('+(sc>=70?'0,200,120':sc>=50?'200,160,60':'255,255,255')+',.2);border-radius:10px;padding:12px;background:rgba('+(sc>=70?'0,200,120':sc>=50?'200,160,60':'255,255,255')+',.04);transition:all .15s" onclick="fxShowView(\'table\');renderFX(\'all\');setTimeout(function(){showFXDetail(\''+d.p+'\')},80)">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:11px;font-weight:900;color:var(--text);font-family:var(--fd)">'+d.p+'</span>'
+      +'<span style="font-size:9px;font-weight:800;color:'+bColor+'">'+bIcon+' '+bias+'</span>'
+      +'</div>'
+      +'<div style="text-align:right">'
+      +'<div style="font-size:15px;font-weight:900;color:'+(sc>=70?'var(--green)':sc>=50?'var(--gold)':'var(--dim)')+';font-family:var(--fd)">'+sc+'</div>'
+      +'<div style="font-size:7px;color:var(--dim);letter-spacing:.05em">SCORE</div>'
+      +'</div>'
+      +'</div>'
+      // barre de score
+      +'<div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:8px">'
+      +'<div style="width:'+sc+'%;height:100%;background:'+(sc>=70?'var(--green)':sc>=50?'var(--gold)':'var(--red)')+';border-radius:2px"></div>'
+      +'</div>'
+      // checkmarks confluences
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+      +'<span style="font-size:7.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba('+(cotOk?'0,200,120':'255,80,80')+',.1);color:'+(cotOk?'var(--green)':'#ff6b6b')+'">COT '+(cotOk?'✓':'✗')+'</span>'
+      +'<span style="font-size:7.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba('+(dmxOk?'0,200,120':'255,80,80')+',.1);color:'+(dmxOk?'var(--green)':'#ff6b6b')+'">DMX '+(dmxOk?'✓':'✗')+'</span>'
+      +'<span style="font-size:7.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba('+(szOk?'0,200,120':'255,80,80')+',.1);color:'+(szOk?'var(--green)':'#ff6b6b')+'">SAISON '+(szOk?'✓':'✗')+'</span>'
+      +'<span style="font-size:7.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba('+(sigOk?'0,200,120':'255,80,80')+',.1);color:'+(sigOk?'var(--green)':'#ff6b6b')+'">SIGNAL '+(sigOk?'✓':'✗')+'</span>'
+      +'</div>'
+      // force devises
+      +'<div style="margin-top:8px;font-size:8px;color:var(--dim)">Force : <span style="color:'+(CURRENCY_STRENGTH[parts[0]]?CURRENCY_STRENGTH[parts[0]].col:'var(--dim)')+'">'+parts[0]+' '+bS+'</span> / <span style="color:'+(CURRENCY_STRENGTH[parts[1]]?CURRENCY_STRENGTH[parts[1]].col:'var(--dim)')+'">'+parts[1]+' '+qS+'</span></div>'
+      +'</div>';
+  });
+  h+='</div>';
+  h+='<div style="margin-top:10px;font-size:7.5px;color:var(--dim);text-align:center">Score = COT 30pts + DMX 25pts + Signal 20pts + Saisonnalité 15pts + Force devises 10pts · Cliquer pour détail complet</div>';
+  el.innerHTML=h;
+}
+
+function renderFXForceBars(){
+  var el=document.getElementById('fx-force-bars');
+  if(!el) return;
+  var devises=['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD'];
+  var sorted=devises.map(function(k){
+    return {k:k,s:CURRENCY_STRENGTH[k]?CURRENCY_STRENGTH[k].score:50,col:CURRENCY_STRENGTH[k]?CURRENCY_STRENGTH[k].col:'var(--dim)'};
+  }).sort(function(a,b){return b.s-a.s;});
+  var h='<div style="font-size:8px;font-weight:800;letter-spacing:.1em;color:var(--dim);margin-bottom:10px">💪 FORCE RELATIVE DES 8 DEVISES MAJEURES</div>';
+  sorted.forEach(function(item){
+    h+='<div style="margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+      +'<span style="font-size:10px;font-weight:800;color:'+item.col+'">'+item.k+'</span>'
+      +'<span style="font-size:10px;font-weight:900;color:'+item.col+';font-family:var(--fd)">'+item.s+'</span>'
+      +'</div>'
+      +'<div style="height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden">'
+      +'<div style="width:'+item.s+'%;height:100%;background:'+item.col+';border-radius:4px;transition:width .4s ease"></div>'
+      +'</div>'
+      +'</div>';
+  });
+  // paires recommandées depuis la force
+  h+='<div style="margin-top:16px;font-size:8px;font-weight:800;letter-spacing:.1em;color:var(--dim);margin-bottom:8px">🔗 PAIRES À FORT ÉCART DE FORCE</div>';
+  var pairs=[['USD','JPY'],['USD','AUD'],['USD','NZD'],['EUR','JPY'],['GBP','JPY'],['EUR','AUD'],['GBP','AUD']];
+  pairs.forEach(function(p){
+    var bS=CURRENCY_STRENGTH[p[0]]?CURRENCY_STRENGTH[p[0]].score:50;
+    var qS=CURRENCY_STRENGTH[p[1]]?CURRENCY_STRENGTH[p[1]].score:50;
+    var diff=bS-qS;
+    var absDiff=Math.abs(diff);
+    if(absDiff<10)return;
+    var bias=diff>0?'LONG':'SHORT';
+    var bColor=diff>0?'var(--green)':'var(--red)';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;margin-bottom:6px">'
+      +'<span style="font-size:10px;font-weight:800;color:var(--text)">'+p[0]+'/'+p[1]+'</span>'
+      +'<span style="font-size:8.5px;font-weight:800;color:'+bColor+'">'+bias+' (Δ'+absDiff+')</span>'
+      +'</div>';
+  });
+  el.innerHTML=h;
+}
+
+function renderFXSizing(){
+  var el=document.getElementById('fx-view-calc');
+  if(!el) return;
+  el.innerHTML='<div style="font-size:8px;font-weight:800;letter-spacing:.1em;color:var(--dim);margin-bottom:12px">📐 CALCULATEUR DE POSITION — FOREX</div>'
+  +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'
+  +'<div><label style="display:block;font-size:8px;color:var(--dim);margin-bottom:4px">Capital ($)</label>'
+  +'<input type="number" id="fxc-capital" value="10000" min="100" style="width:100%;padding:7px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;font-size:10px;color:var(--text);font-family:var(--fd)" oninput="calcFXSizing()"></div>'
+  +'<div><label style="display:block;font-size:8px;color:var(--dim);margin-bottom:4px">Risque/trade (%)</label>'
+  +'<input type="number" id="fxc-risk" value="1" min="0.1" max="5" step="0.1" style="width:100%;padding:7px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;font-size:10px;color:var(--text);font-family:var(--fd)" oninput="calcFXSizing()"></div>'
+  +'<div><label style="display:block;font-size:8px;color:var(--dim);margin-bottom:4px">Stop Loss (pips)</label>'
+  +'<input type="number" id="fxc-sl" value="20" min="1" style="width:100%;padding:7px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;font-size:10px;color:var(--text);font-family:var(--fd)" oninput="calcFXSizing()"></div>'
+  +'<div><label style="display:block;font-size:8px;color:var(--dim);margin-bottom:4px">Paire</label>'
+  +'<select id="fxc-pair" style="width:100%;padding:7px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;font-size:9px;color:var(--text)" onchange="calcFXSizing()">'
+  +'<option value="EURUSD">EUR/USD (pip=$10/lot)</option>'
+  +'<option value="GBPUSD">GBP/USD (pip=$10/lot)</option>'
+  +'<option value="USDJPY">USD/JPY (pip≈$9/lot)</option>'
+  +'<option value="USDCHF">USD/CHF (pip≈$9/lot)</option>'
+  +'<option value="AUDUSD">AUD/USD (pip=$10/lot)</option>'
+  +'<option value="NZDUSD">NZD/USD (pip=$10/lot)</option>'
+  +'<option value="USDCAD">USD/CAD (pip≈$7.5/lot)</option>'
+  +'<option value="GBPJPY">GBP/JPY (pip≈$9/lot)</option>'
+  +'<option value="EURJPY">EUR/JPY (pip≈$9/lot)</option>'
+  +'<option value="XAUUSD">XAU/USD (pip=$1/0.01lot)</option>'
+  +'</select></div>'
+  +'</div>'
+  +'<div id="fxc-result"></div>';
+  calcFXSizing();
+}
+
+function calcFXSizing(){
+  var capital=parseFloat(document.getElementById('fxc-capital').value)||10000;
+  var risk=parseFloat(document.getElementById('fxc-risk').value)||1;
+  var sl=parseFloat(document.getElementById('fxc-sl').value)||20;
+  var pair=document.getElementById('fxc-pair').value||'EURUSD';
+  var pipVal={EURUSD:10,GBPUSD:10,USDJPY:9,USDCHF:9,AUDUSD:10,NZDUSD:10,USDCAD:7.5,GBPJPY:9,EURJPY:9,XAUUSD:100}[pair]||10;
+  var riskAmt=capital*(risk/100);
+  var lotSize=riskAmt/(sl*pipVal);
+  lotSize=Math.floor(lotSize*100)/100;
+  var riskAmt2=Math.round(riskAmt*100)/100;
+  var tp1=Math.round(sl*1.5);var tp2=Math.round(sl*2);var tp3=Math.round(sl*3);
+  var el=document.getElementById('fxc-result');
+  if(!el)return;
+  el.innerHTML='<div style="background:rgba(0,200,120,.06);border:1px solid rgba(0,200,120,.25);border-radius:10px;padding:16px">'
+  +'<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">'
+  +'<div><div style="font-size:8px;color:var(--dim);margin-bottom:3px">TAILLE DE LOT</div><div style="font-size:22px;font-weight:900;color:var(--green);font-family:var(--fd)">'+lotSize.toFixed(2)+'</div><div style="font-size:7.5px;color:var(--dim)">lots standard</div></div>'
+  +'<div><div style="font-size:8px;color:var(--dim);margin-bottom:3px">RISQUE ($)</div><div style="font-size:22px;font-weight:900;color:var(--red);font-family:var(--fd)">'+riskAmt2+'$</div><div style="font-size:7.5px;color:var(--dim)">'+risk+'% du capital</div></div>'
+  +'<div><div style="font-size:8px;color:var(--dim);margin-bottom:3px">MINI-LOTS</div><div style="font-size:22px;font-weight:900;color:var(--gold);font-family:var(--fd)">'+(lotSize*10).toFixed(1)+'</div><div style="font-size:7.5px;color:var(--dim)">0.1 lot = mini</div></div>'
+  +'</div>'
+  +'<div style="font-size:8px;font-weight:800;color:var(--dim);letter-spacing:.08em;margin-bottom:8px">NIVEAUX RR</div>'
+  +'<div style="display:flex;gap:8px">'
+  +'<div style="flex:1;padding:8px;background:rgba(0,200,120,.06);border:1px solid rgba(0,200,120,.2);border-radius:6px;text-align:center"><div style="font-size:7.5px;color:var(--dim)">TP1 (1.5R)</div><div style="font-size:11px;font-weight:800;color:var(--green)">+'+tp1+' pips</div><div style="font-size:8px;color:var(--green)">+'+(Math.round(riskAmt*1.5*100)/100)+'$</div></div>'
+  +'<div style="flex:1;padding:8px;background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.3);border-radius:6px;text-align:center"><div style="font-size:7.5px;color:var(--dim)">TP2 (2R)</div><div style="font-size:11px;font-weight:800;color:var(--green)">+'+tp2+' pips</div><div style="font-size:8px;color:var(--green)">+'+(Math.round(riskAmt*2*100)/100)+'$</div></div>'
+  +'<div style="flex:1;padding:8px;background:rgba(0,200,120,.10);border:1px solid rgba(0,200,120,.35);border-radius:6px;text-align:center"><div style="font-size:7.5px;color:var(--dim)">TP3 (3R)</div><div style="font-size:11px;font-weight:800;color:var(--green)">+'+tp3+' pips</div><div style="font-size:8px;color:var(--green)">+'+(Math.round(riskAmt*3*100)/100)+'$</div></div>'
+  +'</div>'
+  +'<div style="margin-top:10px;font-size:8px;color:var(--dim)">Valeur pip : '+pipVal+'$ par lot standard · SL : '+sl+' pips</div>'
+  +'</div>';
+}
+
 function renderFX(filter){
   FX_FILTER=filter;
   var pills=[{k:'all',l:'Toutes'},{k:'major',l:'Majeures'},{k:'cross',l:'Croisées'},{k:'metal',l:'Métaux'},{k:'africa',l:'Africaines'}];
@@ -4695,6 +4947,17 @@ function nav(id){
   if(id==='saison'){renderSaison(SZ_PAIR||'EUR/USD');}
   if(id==='squawk'){renderSquawk();}
   if(id==='setups'){renderSetups();}
+  if(id==='fx'){
+    _fxView='scan';
+    ['scan','table','force','heatmap','calc'].forEach(function(k){
+      var el=document.getElementById('fx-view-'+k);
+      var btn=document.getElementById('fxsn-'+k);
+      if(el) el.style.display=k==='scan'?'':'none';
+      if(btn){btn.classList.toggle('fx-snav-active',k==='scan');}
+    });
+    var det=document.getElementById('fx-detail');if(det)det.style.display='none';
+    setTimeout(renderFXScan,40);
+  }
 }
 
 /* ═══════════════════════════════════════════
