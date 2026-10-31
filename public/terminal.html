@@ -5546,7 +5546,7 @@ function setupCard(d,sc,strat){
           +'<span class="setup-alert" style="background:'+al.bg+';border:1px solid '+al.border+';color:'+al.col+'">'+al.lbl+'</span>'
         +'</div>'
         +'<div style="display:flex;gap:8px">'
-          +(d.cotD&&d.cotD!=='—'?'<span style="font-size:8px;color:var(--dim)">COT <span style="color:'+(d.cotD==='Long'?'var(--green)':'d.cotD===\'Short\'?\'var(--red)\'':'var(--dim)')+'">'+d.cotD+'</span>'+(d.cotDate?' <span style="color:var(--faint)">'+d.cotDate+'</span>':'')+'</span>':'')
+          +(d.cotD&&d.cotD!=='—'?'<span style="font-size:8px;color:var(--dim)">COT <span style="color:'+(d.cotD==='Long'?'var(--green)':d.cotD==='Short'?'var(--red)':'var(--dim)')+'">'+d.cotD+'</span>'+(d.cotDate?' <span style="color:var(--faint)">'+d.cotDate+'</span>':'')+'</span>':'')
           +'<span style="font-size:8px;color:var(--dim)">Force <span class="'+sigCls+'">'+d.sig+'</span></span>'
           +(d.baseStr!==undefined&&d.quoteStr!==undefined?'<span style="font-size:8px;color:var(--faint)">'+d.baseStr+'% vs '+d.quoteStr+'%</span>':'')
           +(d.saison!=='neu'?'<span style="font-size:8px;color:var(--dim)">Saison <span class="'+(d.saison==='bull'?'up':'dn')+'">'+(d.saison==='bull'?'▲':'▼')+'</span></span>':'')
