@@ -9979,6 +9979,529 @@ function btUpdateAssetBtn(){
   });
 }
 
+/* ══════════════════════════════════════════════════════
+   GUIDE IVC — TUTORIEL COMPLET LECTURE BACKTEST
+   ══════════════════════════════════════════════════════ */
+var _btCurrentTab = 'simulator'; // 'simulator' | 'guide'
+
+function btSwitchTab(tab){
+  _btCurrentTab = tab;
+  ['simulator','guide'].forEach(function(t){
+    var btn = document.getElementById('bt-tab-'+t);
+    if(btn) btn.classList.toggle('bt-tab-active', t===tab);
+  });
+  var simArea = document.getElementById('bt-sim-area');
+  var guideArea = document.getElementById('bt-guide-area');
+  if(simArea) simArea.style.display = tab==='simulator' ? '' : 'none';
+  if(guideArea) guideArea.style.display = tab==='guide' ? '' : 'none';
+}
+
+function renderIVCGuide(){
+  var el = document.getElementById('bt-guide-area');
+  if(!el) return;
+  el.innerHTML = renderIVCGuideHTML();
+  // Active la section ouverte par défaut
+  var first = el.querySelector('.ivcg-section');
+  if(first) first.classList.add('open');
+  var firstBody = el.querySelector('.ivcg-body');
+  if(firstBody) firstBody.style.display = '';
+}
+
+function ivcToggleSection(id){
+  var sec = document.getElementById('ivcg-s'+id);
+  if(!sec) return;
+  var body = sec.querySelector('.ivcg-body');
+  var open = sec.classList.contains('open');
+  // Fermer toutes
+  document.querySelectorAll('.ivcg-section').forEach(function(s){
+    s.classList.remove('open');
+    var b = s.querySelector('.ivcg-body');
+    if(b) b.style.display = 'none';
+  });
+  if(!open){
+    sec.classList.add('open');
+    if(body) body.style.display = '';
+  }
+}
+
+function renderIVCGuideHTML(){
+  return `
+<div class="ivcg-wrap">
+  <div class="ivcg-header">
+    <div style="font-size:9px;font-weight:800;color:#9966ff;letter-spacing:.1em;margin-bottom:4px">⚡ IVC · BACKTEST</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">Comment lire un backtest de stratégie</div>
+    <div style="font-size:9px;color:var(--dim)">DDmax · Pire journée · Win Rate · Profit Factor · Tableau mensuel · Gestion du risque</div>
+  </div>
+
+  <!-- S01 — DDMAX -->
+  <div class="ivcg-section open" id="ivcg-s1" onclick="ivcToggleSection(1)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">01</span>
+      <span class="ivcg-sec-title">DDmax — Drawdown Maximum</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b1">
+    <div class="ivcg-statsbar">
+      <div class="ivcg-stat"><div class="ivcg-stat-label">TRANSACTIONS</div><div class="ivcg-stat-val">908</div></div>
+      <div class="ivcg-stat ivcg-stat-red"><div class="ivcg-stat-label">DDMAX</div><div class="ivcg-stat-val">−11.99 R</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">WIN RATE</div><div class="ivcg-stat-val">26.50%</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">PROFIT FACTOR</div><div class="ivcg-stat-val">1.961</div></div>
+      <div class="ivcg-stat ivcg-stat-green"><div class="ivcg-stat-label">TOTAL RR</div><div class="ivcg-stat-val">+142.62 R</div></div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">📉</div>
+      <div class="ivcg-card-title">C'est quoi le DDmax ?</div>
+      <p>Le DDmax est le plus grand écart entre un sommet de la courbe d'equity et le creux le plus bas qui le suit, avant qu'un nouveau sommet ne soit atteint. C'est la pire chute peak-to-trough jamais enregistrée.</p>
+    </div>
+    <div class="ivcg-2col">
+      <div class="ivcg-alert ivcg-alert-red">
+        <div class="ivcg-alert-label">❌ IDÉE REÇUE</div>
+        <div class="ivcg-alert-title">« C'est une série de pertes consécutives »</div>
+        <p>Faux. Entre le sommet et le creux, il peut y avoir des trades gagnants. Tant que la courbe ne repasse pas au-dessus du sommet précédent, le drawdown continue.</p>
+      </div>
+      <div class="ivcg-alert ivcg-alert-green">
+        <div class="ivcg-alert-label">✅ CE QUI COMPTE</div>
+        <div class="ivcg-alert-title">L'écart net cumulé, pas le nombre de SL</div>
+        <p>Le fichier cumule les R trade après trade, mémorise le peak, et mesure l'écart. Un DDmax de −11.99R = la courbe était 11.99R sous son plus haut avant de remonter.</p>
+      </div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">🔴</div>
+      <div class="ivcg-card-title">Concrètement sur FTMO — Quel risque par trade ?</div>
+      <div class="ivcg-formula">DDmax × risque/trade = drawdown max en % du compte</div>
+      <div class="ivcg-risk-table">
+        <div class="ivcg-risk-row ivcg-risk-bad"><span>1% / trade</span><span>11.99 × 1% = <b>−11.99%</b></span><span class="ivcg-badge red">COMPTE GRILLÉ</span></div>
+        <div class="ivcg-risk-row ivcg-risk-warn"><span>0.83% / trade</span><span>11.99 × 0.83% ≈ <b>−9.95%</b></span><span class="ivcg-badge orange">TOUT JUSTE</span></div>
+        <div class="ivcg-risk-row ivcg-risk-ok"><span>0.5% / trade</span><span>11.99 × 0.5% ≈ <b>−6%</b></span><span class="ivcg-badge green">CONFORTABLE</span></div>
+      </div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">⚠️</div>
+      <div class="ivcg-card-title">Rappel : le DDmax n'est pas figé</div>
+      <p>Le DDmax affiché est le pire drawdown observé jusqu'à aujourd'hui. Ce n'est pas une garantie pour le futur. Les marchés évoluent — nouvelles conditions, crises inédites. Il peut s'aggraver. Garde toujours une marge de sécurité : ne colle jamais au maximum théorique.</p>
+    </div>
+  </div>
+
+  <!-- S02 — DDmax pour débutants -->
+  <div class="ivcg-section" id="ivcg-s2" onclick="ivcToggleSection(2)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">01<sub>bis</sub></span>
+      <span class="ivcg-sec-title">Lire le DDmax sans stresser (débutants)</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b2" style="display:none">
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">🌱</div>
+      <div class="ivcg-card-title">Le DDmax fait peur — et c'est normal</div>
+      <p>Voir un DDmax de −11.99R peut intimider. Mais c'est un événement rare. Sur 20 ans de backtest, ce scénario n'est arrivé qu'une seule fois. La plupart du temps, les drawdowns réels sont bien plus petits.</p>
+    </div>
+    <div class="ivcg-2col">
+      <div class="ivcg-kpi-card ivcg-kpi-red">
+        <div class="ivcg-kpi-label">DDMAX</div>
+        <div class="ivcg-kpi-val">−11.99R</div>
+        <div class="ivcg-kpi-sub">le pire souvenir</div>
+        <p>Arrivé une seule fois. Te sert à calibrer le risque, pas à prévoir le quotidien.</p>
+      </div>
+      <div class="ivcg-kpi-card ivcg-kpi-gold">
+        <div class="ivcg-kpi-label">P90</div>
+        <div class="ivcg-kpi-val">≈ −4R</div>
+        <div class="ivcg-kpi-sub">le quotidien honnête</div>
+        <p>90% des drawdowns historiques sont moins profonds que ça. C'est ce que tu vas vraiment traverser.</p>
+      </div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">📊</div>
+      <div class="ivcg-card-title">Distribution des drawdowns (87 observations)</div>
+      <div class="ivcg-dist-bars">
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">0–1R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar" style="width:73%"></div></div><span class="ivcg-bar-pct">32 · 36.8%</span></div>
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">1–2R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar" style="width:50%"></div></div><span class="ivcg-bar-pct">22 · 25.3%</span></div>
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">2–3R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar" style="width:32%"></div></div><span class="ivcg-bar-pct">14 · 16.1%</span></div>
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">3–4R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar" style="width:21%"></div></div><span class="ivcg-bar-pct">9 · 10.3%</span></div>
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">4–5R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar ivcg-bar-gold" style="width:14%"></div></div><span class="ivcg-bar-pct">6 · 6.9% <b>← P90</b></span></div>
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">5–7R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar ivcg-bar-dim" style="width:7%"></div></div><span class="ivcg-bar-pct">3 · 3.4%</span></div>
+        <div class="ivcg-bar-row"><span class="ivcg-bar-label">7–12R</span><div class="ivcg-bar-wrap"><div class="ivcg-bar ivcg-bar-red" style="width:2%"></div></div><span class="ivcg-bar-pct">1 · 1.1%</span></div>
+      </div>
+    </div>
+    <div class="ivcg-3col">
+      <div class="ivcg-zone ivcg-zone-green"><div class="ivcg-zone-label">ZONE VERTE</div><div class="ivcg-zone-title">DD &lt; P90</div><p>Normal. 90% des replis sont comme ça. Continue sans stress.</p></div>
+      <div class="ivcg-zone ivcg-zone-orange"><div class="ivcg-zone-label">ZONE ORANGE</div><div class="ivcg-zone-title">P90 &lt; DD &lt; DDmax</div><p>Rare mais pas inédit. La stratégie a déjà traversé ça. Tiens bon.</p></div>
+      <div class="ivcg-zone ivcg-zone-red"><div class="ivcg-zone-label">ZONE ROUGE</div><div class="ivcg-zone-title">DD &gt; DDmax</div><p>Territoire inconnu. Pose-toi des vraies questions sur la validité de la stratégie.</p></div>
+    </div>
+  </div>
+
+  <!-- S03 — WIN RATE -->
+  <div class="ivcg-section" id="ivcg-s3" onclick="ivcToggleSection(3)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">02</span>
+      <span class="ivcg-sec-title">Win Rate — Taux de réussite</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b3" style="display:none">
+    <div class="ivcg-statsbar">
+      <div class="ivcg-stat"><div class="ivcg-stat-label">TRANSACTIONS</div><div class="ivcg-stat-val">908</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">DDMAX</div><div class="ivcg-stat-val">−11.99 R</div></div>
+      <div class="ivcg-stat ivcg-stat-gold"><div class="ivcg-stat-label">WIN RATE</div><div class="ivcg-stat-val">26.50%</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">PROFIT FACTOR</div><div class="ivcg-stat-val">1.961</div></div>
+      <div class="ivcg-stat ivcg-stat-green"><div class="ivcg-stat-label">TOTAL RR</div><div class="ivcg-stat-val">+142.62 R</div></div>
+    </div>
+    <div class="ivcg-2col">
+      <div class="ivcg-alert ivcg-alert-red">
+        <div class="ivcg-alert-label">❌ IDÉE REÇUE</div>
+        <div class="ivcg-alert-title">« WR élevé = meilleure stratégie »</div>
+        <p>Un WR de 80% peut cacher une stratégie perdante si les rares pertes sont énormes. Le WR seul ne dit rien sur la rentabilité.</p>
+      </div>
+      <div class="ivcg-alert ivcg-alert-green">
+        <div class="ivcg-alert-label">✅ CE QUI COMPTE</div>
+        <div class="ivcg-alert-title">Win Rate × RR moyen</div>
+        <p>IVC est asymétrique : chaque perte coûte −1R, chaque gain rapporte +2 à +3R. Même en gagnant 1 trade sur 3, tu es largement profitable.</p>
+      </div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">🧩</div>
+      <div class="ivcg-card-title">Le WR bouge selon ta composition de portefeuille</div>
+      <div class="ivcg-wr-compare">
+        <div class="ivcg-wr-box ivcg-wr-low">
+          <div class="ivcg-wr-pct">26.81%</div>
+          <div class="ivcg-wr-tag">WR FAIBLE &lt; 30%</div>
+          <div style="font-size:8px;color:var(--dim);margin-top:4px">NAS100 · JP225 · indices volatils</div>
+          <p>399 gagnants / 1488 trades. 1 trade sur 4. Très rentable mais séries de pertes extrêmes. Réservé aux mentaux d'acier.</p>
+        </div>
+        <div class="ivcg-wr-box ivcg-wr-high">
+          <div class="ivcg-wr-pct">58.63%</div>
+          <div class="ivcg-wr-tag">WR ÉLEVÉ &gt; 50%</div>
+          <div style="font-size:8px;color:var(--dim);margin-top:4px">NVDA · TSLA · AMD · NOC</div>
+          <p>479 gagnants / 817 trades. 3 trades sur 5. Courbe très lisse. Idéal pour tenir mentalement.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">💡</div>
+      <div class="ivcg-card-title">Conseil débutants</div>
+      <p>Construis ton portefeuille avec un Win Rate combiné ≥ 45%. C'est le seuil au-delà duquel les séries de pertes restent courtes et ton mental tient naturellement.</p>
+    </div>
+  </div>
+
+  <!-- S04 — PROFIT FACTOR -->
+  <div class="ivcg-section" id="ivcg-s4" onclick="ivcToggleSection(4)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">03</span>
+      <span class="ivcg-sec-title">Profit Factor — Qualité de la stratégie</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b4" style="display:none">
+    <div class="ivcg-statsbar">
+      <div class="ivcg-stat"><div class="ivcg-stat-label">TRANSACTIONS</div><div class="ivcg-stat-val">908</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">DDMAX</div><div class="ivcg-stat-val">−11.99 R</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">WIN RATE</div><div class="ivcg-stat-val">26.50%</div></div>
+      <div class="ivcg-stat ivcg-stat-gold"><div class="ivcg-stat-label">PROFIT FACTOR</div><div class="ivcg-stat-val">1.961</div></div>
+      <div class="ivcg-stat ivcg-stat-green"><div class="ivcg-stat-label">TOTAL RR</div><div class="ivcg-stat-val">+142.62 R</div></div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">⚖️</div>
+      <div class="ivcg-card-title">C'est quoi le Profit Factor ?</div>
+      <div class="ivcg-formula">Profit Factor = Σ Gains ÷ Σ Pertes</div>
+      <p>Exemple NAS100 : 97 trades gagnants → +280R, 269 perdants → −143R → PF = 280 ÷ 143 = <b>1.96</b></p>
+    </div>
+    <div class="ivcg-pf-scale">
+      <div class="ivcg-pf-item ivcg-pf-bad"><span>&lt; 1.0</span><span>Perd de l'argent</span></div>
+      <div class="ivcg-pf-item ivcg-pf-neutral"><span>1.0 – 1.5</span><span>Correct</span></div>
+      <div class="ivcg-pf-item ivcg-pf-good"><span>1.5 – 2.0</span><span>Très bon ✓</span></div>
+      <div class="ivcg-pf-item ivcg-pf-great"><span>2.0 – 3.5</span><span>Excellent 🔥</span></div>
+    </div>
+    <p style="font-size:8.5px;color:var(--dim);padding:0 4px">💡 Un PF &gt; 1.5 signifie que même avec des frais de broker ou du slippage, la stratégie reste rentable. Certains actifs IVC comme BX (3.376) ou CAT (3.163) ont des PF exceptionnels.</p>
+  </div>
+
+  <!-- S05 — TRANSACTIONS -->
+  <div class="ivcg-section" id="ivcg-s5" onclick="ivcToggleSection(5)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">04</span>
+      <span class="ivcg-sec-title">Transactions — Fiabilité statistique</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b5" style="display:none">
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">📋</div>
+      <div class="ivcg-card-title">Plus il y en a, plus c'est fiable</div>
+      <p>Un actif avec 50 trades sur 10 ans peut avoir un PF de 3.0 par chance. Un actif avec 800 trades sur 20 ans et PF 1.7 est statistiquement beaucoup plus solide.</p>
+    </div>
+    <div class="ivcg-3col">
+      <div class="ivcg-zone ivcg-zone-red"><div class="ivcg-zone-label">FRAGILE</div><div class="ivcg-zone-title">&lt; 100 trades</div><p>Stats peu fiables. Peut être dû au hasard.</p></div>
+      <div class="ivcg-zone ivcg-zone-orange"><div class="ivcg-zone-label">CORRECT</div><div class="ivcg-zone-title">100–300</div><p>Statistiquement acceptable.</p></div>
+      <div class="ivcg-zone ivcg-zone-green"><div class="ivcg-zone-label">ROBUSTE</div><div class="ivcg-zone-title">&gt; 300 trades</div><p>Résultats statistiquement solides. Ex : JP225 = 782 trades.</p></div>
+    </div>
+  </div>
+
+  <!-- S06 — PIRE JOURNÉE -->
+  <div class="ivcg-section" id="ivcg-s6" onclick="ivcToggleSection(6)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">05</span>
+      <span class="ivcg-sec-title">Pire Journée — Limite journalière prop firm</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b6" style="display:none">
+    <div class="ivcg-statsbar-sm">
+      <div class="ivcg-stat ivcg-stat-red"><div class="ivcg-stat-label">PIRE JOURNÉE</div><div class="ivcg-stat-val">−3.42R</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">DATE</div><div class="ivcg-stat-val">14 mars 2020</div></div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">☠️</div>
+      <div class="ivcg-card-title">Règle FTMO — Perte journalière max 5%</div>
+      <div class="ivcg-formula">Risque/trade ≤ 5% ÷ Pire Journée (en R)</div>
+      <p>Avec pire journée à −3.42R : <b>5 ÷ 3.42 = 1.46% max par trade</b>. Avec 2% de risque → −6.84% ce jour → compte grillé.</p>
+    </div>
+  </div>
+
+  <!-- S07 — MAX SIMULTANÉ -->
+  <div class="ivcg-section" id="ivcg-s7" onclick="ivcToggleSection(7)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">06</span>
+      <span class="ivcg-sec-title">Max Simultané — Le piège du latent</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b7" style="display:none">
+    <div class="ivcg-statsbar-sm">
+      <div class="ivcg-stat ivcg-stat-gold"><div class="ivcg-stat-label">MAX SIMULTANÉ</div><div class="ivcg-stat-val">4 positions</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">MAX / JOUR</div><div class="ivcg-stat-val">3</div></div>
+      <div class="ivcg-stat"><div class="ivcg-stat-label">MAX / SEMAINE</div><div class="ivcg-stat-val">8</div></div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">🏦</div>
+      <div class="ivcg-card-title">Le piège du latent sur FTMO</div>
+      <p>La limite de perte journalière inclut les pertes <b>latentes</b>. Si 6 positions sont ouvertes simultanément et toutes en perte, ton compte peut toucher −5.4% à 14h32 — et être grillé — même si tu termines à −3R.</p>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">💡</div>
+      <div class="ivcg-card-title">Règle de calibrage</div>
+      <div class="ivcg-formula">Risque/trade × Max Simultané &lt; Limite journalière</div>
+      <div class="ivcg-risk-table">
+        <div class="ivcg-risk-row ivcg-risk-ok"><span>Max Sim. 3</span><span>→ max <b>1.5%</b> / trade</span><span class="ivcg-badge green">OK</span></div>
+        <div class="ivcg-risk-row ivcg-risk-warn"><span>Max Sim. 5</span><span>→ max <b>0.9%</b> / trade</span><span class="ivcg-badge orange">ATTENTION</span></div>
+        <div class="ivcg-risk-row ivcg-risk-bad"><span>Max Sim. 8</span><span>→ max <b>0.5%</b> / trade</span><span class="ivcg-badge red">SERRÉ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S08 — TABLEAU MENSUEL -->
+  <div class="ivcg-section" id="ivcg-s8" onclick="ivcToggleSection(8)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">07</span>
+      <span class="ivcg-sec-title">Tableau Mensuel — Lire les performances</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b8" style="display:none">
+    <div class="ivcg-monthly-wrap">
+      <table class="ivcg-monthly">
+        <thead><tr><th>ANNÉE</th><th>JAN</th><th>FÉV</th><th>MAR</th><th>AVR</th><th>MAI</th><th>JUN</th><th>JUL</th><th>AOÛ</th><th>SEP</th><th>OCT</th><th>NOV</th><th>DÉC</th><th>TOTAL</th><th>DDMAX/AN</th></tr></thead>
+        <tbody>
+          <tr><td>2022</td><td class="neg">−2.44</td><td class="pos">+3.11</td><td class="pos">+1.87</td><td class="neg">−0.72</td><td class="pos">+4.20</td><td class="neu">—</td><td class="pos">+2.55</td><td class="neg">−1.10</td><td class="pos">+3.80</td><td class="pos">+5.22</td><td class="pos">+2.90</td><td class="neg">−0.34</td><td class="tot pos">+19.05</td><td class="ddmax">−4.12R</td></tr>
+          <tr><td>2023</td><td class="pos">+5.14</td><td class="pos">+2.80</td><td class="neg">−3.44</td><td class="pos">+1.60</td><td class="neu">—</td><td class="pos">+6.90</td><td class="pos">+3.30</td><td class="neg">−2.10</td><td class="neu">—</td><td class="pos">+4.40</td><td class="neg">−1.22</td><td class="pos">+7.81</td><td class="tot pos">+25.19</td><td class="ddmax">−5.44R</td></tr>
+          <tr><td>2024</td><td class="neg">−1.80</td><td class="pos">+8.44</td><td class="pos">+3.10</td><td class="neu">—</td><td class="pos">+2.74</td><td class="neg">−0.55</td><td class="pos">+5.92</td><td class="pos">+1.20</td><td class="neg">−2.30</td><td class="pos">+6.10</td><td class="pos">+3.44</td><td class="pos">+4.22</td><td class="tot pos">+30.51</td><td class="ddmax">−3.80R</td></tr>
+          <tr class="tot-row"><td colspan="13" style="text-align:right;font-weight:700;color:var(--dim)">TOTAL HISTORIQUE</td><td class="tot pos">+142.62R</td><td class="ddmax">−11.99R</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ivcg-monthly-legend">
+      <span class="neg">■ Mois négatif</span>
+      <span class="neu">■ Aucun trade (—)</span>
+      <span class="pos">■ Mois positif</span>
+      <span class="ddmax">■ DDmax annuel</span>
+    </div>
+    <div class="ivcg-2col">
+      <div class="ivcg-alert ivcg-alert-red">
+        <div class="ivcg-alert-label">❌ LE PIÈGE</div>
+        <div class="ivcg-alert-title">Juger sur quelques mois</div>
+        <p>2–3 mois rouges ne disent rien. Ça arrive sur les meilleurs actifs. Juger mois par mois = montagnes russes émotionnelles pour rien.</p>
+      </div>
+      <div class="ivcg-alert ivcg-alert-green">
+        <div class="ivcg-alert-label">✅ CE QU'IL FAUT VOIR</div>
+        <div class="ivcg-alert-title">L'horizon long : 3–5 ans</div>
+        <p>Zoome sur les TOTAL annuels sur 3 à 5 ans. C'est le seul horizon où l'aléa se dissout et la rentabilité réelle apparaît clairement.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- S09 — MONEY MANAGEMENT -->
+  <div class="ivcg-section" id="ivcg-s9" onclick="ivcToggleSection(9)">
+    <div class="ivcg-sec-head">
+      <span class="ivcg-num">08</span>
+      <span class="ivcg-sec-title">Money Management — Calculer son risque/trade</span>
+      <span class="ivcg-arrow">▾</span>
+    </div>
+  </div>
+  <div class="ivcg-body" id="ivcg-b9" style="display:none">
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">🎯</div>
+      <div class="ivcg-card-title">La cascade complète</div>
+      <div class="ivcg-cascade">
+        <div class="ivcg-cascade-step">
+          <span class="ivcg-cs-num">1</span>
+          <div><b>Perte mensuelle max</b> que tu te fixes (ex: 15%)</div>
+        </div>
+        <div class="ivcg-cascade-arrow">÷ 2, 3 ou 4 semaines</div>
+        <div class="ivcg-cascade-step">
+          <span class="ivcg-cs-num">2</span>
+          <div><b>Perte hebdomadaire max</b> = 15% ÷ 3 = <b>5%</b></div>
+        </div>
+        <div class="ivcg-cascade-arrow">÷ jours tradés / semaine</div>
+        <div class="ivcg-cascade-step">
+          <span class="ivcg-cs-num">3</span>
+          <div><b>Perte journalière max</b> = 5% ÷ 3 jours = <b>1.67%</b></div>
+        </div>
+        <div class="ivcg-cascade-arrow">÷ Max/jour du backtest</div>
+        <div class="ivcg-cascade-step ivcg-cs-final">
+          <span class="ivcg-cs-num">4</span>
+          <div><b>Risque / trade</b> = 1.67% ÷ 3 trades = <b>0.56%</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="ivcg-card">
+      <div class="ivcg-card-icon">📐</div>
+      <div class="ivcg-card-title">Exemples concrets selon le Max Simultané</div>
+      <div class="ivcg-risk-table">
+        <div class="ivcg-risk-row ivcg-risk-ok"><span>Max/sem = 3</span><span>5% ÷ 3 → <b>1.5%/trade</b></span><span class="ivcg-badge green">LARGE</span></div>
+        <div class="ivcg-risk-row ivcg-risk-warn"><span>Max/sem = 5</span><span>5% ÷ 5 → <b>1.0%/trade</b></span><span class="ivcg-badge orange">STANDARD</span></div>
+        <div class="ivcg-risk-row ivcg-risk-bad"><span>Max/sem = 8</span><span>5% ÷ 8 → <b>0.63%/trade</b></span><span class="ivcg-badge red">CONSERVATEUR</span></div>
+      </div>
+    </div>
+    <p style="font-size:8.5px;color:var(--dim);padding:0 4px">⚠️ Chaque niveau protège le suivant. Si les 8 trades de ta pire semaine font tous SL → perte = 5% — ta limite hebdo est respectée quoi qu'il arrive.</p>
+  </div>
+
+</div>
+<style>
+.ivcg-wrap{max-width:100%;font-family:var(--fm)}
+.ivcg-header{background:linear-gradient(135deg,rgba(153,102,255,.12),rgba(153,102,255,.04));border:1px solid rgba(153,102,255,.25);border-radius:10px;padding:16px;margin-bottom:12px}
+.ivcg-section{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;margin-bottom:2px;cursor:pointer;user-select:none;transition:border-color .15s}
+.ivcg-section.open{border-color:rgba(153,102,255,.4)}
+.ivcg-section:hover{border-color:rgba(153,102,255,.3)}
+.ivcg-sec-head{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.ivcg-num{font-size:9px;font-weight:800;color:#9966ff;letter-spacing:.05em;min-width:24px}
+.ivcg-sec-title{font-size:10px;font-weight:700;color:var(--text);flex:1}
+.ivcg-arrow{font-size:10px;color:var(--dim);transition:transform .2s}
+.ivcg-section.open .ivcg-arrow{transform:rotate(180deg)}
+.ivcg-body{padding:4px 4px 12px;display:flex;flex-direction:column;gap:8px}
+.ivcg-statsbar{display:flex;gap:6px;flex-wrap:wrap}
+.ivcg-statsbar-sm{display:flex;gap:6px;flex-wrap:wrap}
+.ivcg-stat{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:8px 12px;flex:1;min-width:80px}
+.ivcg-stat-label{font-size:7px;color:var(--dim);font-weight:700;letter-spacing:.06em;margin-bottom:2px}
+.ivcg-stat-val{font-size:11px;font-weight:800;color:var(--text)}
+.ivcg-stat-red .ivcg-stat-val{color:var(--red)}
+.ivcg-stat-green .ivcg-stat-val{color:var(--green)}
+.ivcg-stat-gold .ivcg-stat-val{color:var(--gold)}
+.ivcg-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.ivcg-card-icon{font-size:16px;margin-bottom:6px}
+.ivcg-card-title{font-size:10px;font-weight:700;color:var(--text);margin-bottom:6px}
+.ivcg-card p{font-size:8.5px;color:var(--dim);line-height:1.6;margin:4px 0 0}
+.ivcg-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ivcg-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:600px){.ivcg-2col,.ivcg-3col{grid-template-columns:1fr}}
+.ivcg-alert{border-radius:8px;padding:12px 14px}
+.ivcg-alert-label{font-size:7.5px;font-weight:800;letter-spacing:.06em;margin-bottom:4px}
+.ivcg-alert-title{font-size:9.5px;font-weight:700;margin-bottom:4px}
+.ivcg-alert p{font-size:8px;line-height:1.6;margin:0;color:var(--dim)}
+.ivcg-alert-red{background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.2)}
+.ivcg-alert-red .ivcg-alert-label{color:var(--red)}
+.ivcg-alert-red .ivcg-alert-title{color:var(--red)}
+.ivcg-alert-green{background:rgba(0,220,130,.07);border:1px solid rgba(0,220,130,.2)}
+.ivcg-alert-green .ivcg-alert-label{color:var(--green)}
+.ivcg-alert-green .ivcg-alert-title{color:var(--green)}
+.ivcg-formula{background:rgba(153,102,255,.12);border:1px solid rgba(153,102,255,.25);border-radius:6px;padding:8px 12px;font-size:9px;font-weight:700;color:#b388ff;text-align:center;margin:6px 0}
+.ivcg-risk-table{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.ivcg-risk-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:8.5px}
+.ivcg-risk-row span{flex:1}
+.ivcg-risk-bad{background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.2)}
+.ivcg-risk-warn{background:rgba(255,165,0,.08);border:1px solid rgba(255,165,0,.2)}
+.ivcg-risk-ok{background:rgba(0,220,130,.06);border:1px solid rgba(0,220,130,.2)}
+.ivcg-badge{font-size:7px;font-weight:800;padding:2px 6px;border-radius:4px;white-space:nowrap;letter-spacing:.04em}
+.ivcg-badge.red{background:rgba(255,80,80,.2);color:var(--red)}
+.ivcg-badge.orange{background:rgba(255,165,0,.2);color:orange}
+.ivcg-badge.green{background:rgba(0,220,130,.15);color:var(--green)}
+.ivcg-2kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ivcg-kpi-card{border-radius:8px;padding:12px 14px}
+.ivcg-kpi-card p{font-size:8px;color:var(--dim);line-height:1.5;margin:6px 0 0}
+.ivcg-kpi-label{font-size:7px;font-weight:800;letter-spacing:.08em;margin-bottom:4px}
+.ivcg-kpi-val{font-size:20px;font-weight:900}
+.ivcg-kpi-sub{font-size:7.5px;font-weight:600;margin-bottom:4px}
+.ivcg-kpi-red{background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.2)}
+.ivcg-kpi-red .ivcg-kpi-label,.ivcg-kpi-red .ivcg-kpi-val{color:var(--red)}
+.ivcg-kpi-red .ivcg-kpi-sub{color:rgba(255,80,80,.7)}
+.ivcg-kpi-gold{background:rgba(200,160,60,.07);border:1px solid rgba(200,160,60,.2)}
+.ivcg-kpi-gold .ivcg-kpi-label,.ivcg-kpi-gold .ivcg-kpi-val{color:var(--gold)}
+.ivcg-kpi-gold .ivcg-kpi-sub{color:rgba(200,160,60,.7)}
+.ivcg-dist-bars{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.ivcg-bar-row{display:flex;align-items:center;gap:8px;font-size:8px}
+.ivcg-bar-label{min-width:32px;color:var(--dim);font-weight:600}
+.ivcg-bar-wrap{flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:10px;overflow:hidden}
+.ivcg-bar{height:100%;background:#9966ff;border-radius:3px;transition:width .3s}
+.ivcg-bar-gold{background:var(--gold)}
+.ivcg-bar-dim{background:rgba(255,165,0,.5)}
+.ivcg-bar-red{background:var(--red)}
+.ivcg-bar-pct{min-width:100px;color:var(--dim);font-size:7.5px}
+.ivcg-zone{border-radius:8px;padding:10px 12px}
+.ivcg-zone-label{font-size:7px;font-weight:800;letter-spacing:.07em;margin-bottom:2px}
+.ivcg-zone-title{font-size:10px;font-weight:700;margin-bottom:4px}
+.ivcg-zone p{font-size:8px;color:var(--dim);line-height:1.5;margin:0}
+.ivcg-zone-green{background:rgba(0,220,130,.07);border:1px solid rgba(0,220,130,.2)}
+.ivcg-zone-green .ivcg-zone-label,.ivcg-zone-green .ivcg-zone-title{color:var(--green)}
+.ivcg-zone-orange{background:rgba(255,165,0,.07);border:1px solid rgba(255,165,0,.2)}
+.ivcg-zone-orange .ivcg-zone-label,.ivcg-zone-orange .ivcg-zone-title{color:orange}
+.ivcg-zone-red{background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.2)}
+.ivcg-zone-red .ivcg-zone-label,.ivcg-zone-red .ivcg-zone-title{color:var(--red)}
+.ivcg-wr-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.ivcg-wr-box{border-radius:8px;padding:12px 14px}
+.ivcg-wr-box p{font-size:8px;color:var(--dim);line-height:1.5;margin:6px 0 0}
+.ivcg-wr-pct{font-size:22px;font-weight:900}
+.ivcg-wr-tag{font-size:7.5px;font-weight:800;letter-spacing:.05em}
+.ivcg-wr-low{background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.2)}
+.ivcg-wr-low .ivcg-wr-pct,.ivcg-wr-low .ivcg-wr-tag{color:var(--red)}
+.ivcg-wr-high{background:rgba(0,220,130,.07);border:1px solid rgba(0,220,130,.2)}
+.ivcg-wr-high .ivcg-wr-pct,.ivcg-wr-high .ivcg-wr-tag{color:var(--green)}
+.ivcg-pf-scale{display:flex;gap:4px;margin-top:8px}
+.ivcg-pf-item{flex:1;border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;text-align:center;font-size:8px;font-weight:700}
+.ivcg-pf-item span:first-child{font-size:10px}
+.ivcg-pf-bad{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:var(--red)}
+.ivcg-pf-neutral{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--dim)}
+.ivcg-pf-good{background:rgba(0,220,130,.07);border:1px solid rgba(0,220,130,.2);color:var(--green)}
+.ivcg-pf-great{background:rgba(0,220,130,.12);border:1px solid rgba(0,220,130,.3);color:var(--green)}
+.ivcg-monthly-wrap{overflow-x:auto}
+.ivcg-monthly{width:100%;border-collapse:collapse;font-size:7.5px}
+.ivcg-monthly th{padding:5px 6px;background:rgba(153,102,255,.1);color:#b388ff;font-weight:800;letter-spacing:.04em;text-align:center;white-space:nowrap}
+.ivcg-monthly td{padding:5px 6px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600}
+.ivcg-monthly td:first-child{font-weight:800;color:var(--text)}
+.ivcg-monthly td.pos{color:var(--green)}
+.ivcg-monthly td.neg{color:var(--red)}
+.ivcg-monthly td.neu{color:var(--dim)}
+.ivcg-monthly td.tot{font-weight:900;font-size:9px}
+.ivcg-monthly td.ddmax{color:#ff6b6b;font-weight:700}
+.ivcg-monthly tr.tot-row td{background:rgba(153,102,255,.06);border-top:2px solid rgba(153,102,255,.3)}
+.ivcg-monthly-legend{display:flex;gap:12px;font-size:7.5px;margin-top:6px;flex-wrap:wrap}
+.ivcg-monthly-legend .pos{color:var(--green)}
+.ivcg-monthly-legend .neg{color:var(--red)}
+.ivcg-monthly-legend .neu{color:var(--dim)}
+.ivcg-monthly-legend .ddmax{color:#ff6b6b}
+.ivcg-cascade{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.ivcg-cascade-step{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(153,102,255,.06);border:1px solid rgba(153,102,255,.2);border-radius:6px;font-size:8.5px;color:var(--text)}
+.ivcg-cascade-step b{color:#b388ff}
+.ivcg-cs-num{width:20px;height:20px;border-radius:50%;background:#9966ff;color:#fff;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ivcg-cascade-arrow{text-align:center;font-size:7.5px;color:var(--dim);padding:3px 0;letter-spacing:.04em}
+.ivcg-cs-final{background:rgba(0,220,130,.07);border-color:rgba(0,220,130,.3)}
+.ivcg-cs-final b{color:var(--green)}
+/* onglets backtest */
+.bt-tabs{display:flex;gap:4px;margin-bottom:12px}
+.bt-tab{padding:6px 14px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.05em;cursor:pointer;border:1px solid var(--border2);background:var(--s1);color:var(--dim);transition:all .15s}
+.bt-tab:hover{color:var(--text)}
+.bt-tab-active{background:rgba(153,102,255,.15);border-color:rgba(153,102,255,.4);color:#b388ff}
+</style>
+`;
+}
+
 function renderBacktest(){
   var el = document.getElementById('backtest-content');
   if(!el) return;
@@ -9996,7 +10519,12 @@ function renderBacktest(){
       +'<div class="bt-strat-tag">'+cfg.tag+'</div>'
       +'</div>';
   });
-  el.innerHTML = '<div class="bt-pro-wrap">'
+  // Onglets
+  var tabs = '<div class="bt-tabs">'
+    +'<div class="bt-tab'+(_btCurrentTab==='simulator'?' bt-tab-active':'')+'" id="bt-tab-simulator" onclick="btSwitchTab(\'simulator\')">🔬 SIMULATEUR</div>'
+    +'<div class="bt-tab'+(_btCurrentTab==='guide'?' bt-tab-active':'')+'" id="bt-tab-guide" onclick="btSwitchTab(\'guide\')">📖 GUIDE IVC</div>'
+    +'</div>';
+  el.innerHTML = tabs + '<div id="bt-sim-area"><div class="bt-pro-wrap">'
     +'<div class="bt-pro-params">'
     +'<div style="font-size:10px;font-weight:800;color:var(--gold2);letter-spacing:.08em;margin-bottom:4px">🔬 BACKTESTING PRO</div>'
     +'<div style="font-size:8px;color:var(--dim);margin-bottom:8px">Monte Carlo · 15 ans · Métriques institutionnelles</div>'
@@ -10027,8 +10555,18 @@ function renderBacktest(){
     +'<div class="bt-results-area" id="bt-results-area"><div class="bt-loading">'
     +'<div class="bt-progress-anim"><div class="bt-progress-anim-fill"></div></div>'
     +'<span>Initialisation...</span></div></div>'
-    +'</div>';
-  setTimeout(btRunAndRender, 80);
+    +'</div></div>'  // ferme bt-pro-wrap + bt-sim-area
+  // Zone guide IVC — masquée par défaut
+  el.innerHTML += '<div id="bt-guide-area" style="display:none"></div>';
+  // Afficher selon l'onglet actif
+  if(_btCurrentTab === 'guide'){
+    document.querySelector('.bt-pro-wrap') && (document.querySelector('.bt-pro-wrap').style.display = 'none');
+    renderIVCGuide();
+    var ga = document.getElementById('bt-guide-area');
+    if(ga) ga.style.display = '';
+  } else {
+    setTimeout(btRunAndRender, 80);
+  }
 }
 
 function btSelectStrat(k){
