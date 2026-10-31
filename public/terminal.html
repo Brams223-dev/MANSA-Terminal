@@ -9982,18 +9982,33 @@ function btUpdateAssetBtn(){
 /* ══════════════════════════════════════════════════════
    GUIDE IVC — TUTORIEL COMPLET LECTURE BACKTEST
    ══════════════════════════════════════════════════════ */
-var _btCurrentTab = 'simulator'; // 'simulator' | 'guide'
+var _btCurrentTab = 'simulator'; // 'simulator' | 'guide' | 'ipm'
 
 function btSwitchTab(tab){
   _btCurrentTab = tab;
-  ['simulator','guide'].forEach(function(t){
+  ['simulator','guide','ipm'].forEach(function(t){
     var btn = document.getElementById('bt-tab-'+t);
-    if(btn) btn.classList.toggle('bt-tab-active', t===tab);
+    if(!btn) return;
+    btn.classList.remove('bt-tab-active','bt-tab-active-ipm');
+    if(t===tab){
+      if(t==='ipm') btn.classList.add('bt-tab-active-ipm');
+      else btn.classList.add('bt-tab-active');
+    }
   });
   var simArea = document.getElementById('bt-sim-area');
   var guideArea = document.getElementById('bt-guide-area');
+  var ipmArea = document.getElementById('bt-ipm-area');
   if(simArea) simArea.style.display = tab==='simulator' ? '' : 'none';
   if(guideArea) guideArea.style.display = tab==='guide' ? '' : 'none';
+  if(ipmArea) ipmArea.style.display = tab==='ipm' ? '' : 'none';
+  if(tab==='guide'){
+    var el = document.getElementById('bt-guide-area');
+    if(el && !el.innerHTML.trim()) renderIVCGuide();
+  }
+  if(tab==='ipm'){
+    var el2 = document.getElementById('bt-ipm-area');
+    if(el2 && !el2.innerHTML.trim()) renderIPMGuide();
+  }
 }
 
 function renderIVCGuide(){
@@ -10494,12 +10509,303 @@ function renderIVCGuideHTML(){
 .ivcg-cs-final{background:rgba(0,220,130,.07);border-color:rgba(0,220,130,.3)}
 .ivcg-cs-final b{color:var(--green)}
 /* onglets backtest */
-.bt-tabs{display:flex;gap:4px;margin-bottom:12px}
+.bt-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
 .bt-tab{padding:6px 14px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.05em;cursor:pointer;border:1px solid var(--border2);background:var(--s1);color:var(--dim);transition:all .15s}
 .bt-tab:hover{color:var(--text)}
 .bt-tab-active{background:rgba(153,102,255,.15);border-color:rgba(153,102,255,.4);color:#b388ff}
+.bt-tab-ipm{border-color:rgba(255,180,0,.2)}
+.bt-tab-ipm:hover{color:var(--gold2)}
+.bt-tab-active-ipm{background:rgba(255,180,0,.12)!important;border-color:rgba(255,180,0,.5)!important;color:var(--gold2)!important}
+/* IPM Guide styles */
+.ipm-hero{background:linear-gradient(135deg,rgba(255,180,0,.08) 0%,rgba(255,140,0,.04) 50%,rgba(20,20,40,0) 100%);border:1px solid rgba(255,180,0,.2);border-radius:12px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.ipm-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,180,0,.12),transparent 70%);border-radius:50%}
+.ipm-hero-title{font-size:15px;font-weight:900;color:var(--gold2);letter-spacing:.03em;margin-bottom:6px}
+.ipm-hero-title span{color:#fff}
+.ipm-hero-sub{font-size:9px;color:var(--dim);line-height:1.6;max-width:500px}
+.ipm-hero-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.ipm-tag{padding:3px 10px;border-radius:20px;font-size:7.5px;font-weight:700;letter-spacing:.06em;border:1px solid rgba(255,180,0,.3);color:var(--gold2);background:rgba(255,180,0,.08)}
+.ipm-section{border:1px solid rgba(255,180,0,.15);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.ipm-sec-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:rgba(255,180,0,.04);transition:background .15s}
+.ipm-sec-head:hover{background:rgba(255,180,0,.08)}
+.ipm-sec-num{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,rgba(255,180,0,.3),rgba(255,140,0,.2));border:1px solid rgba(255,180,0,.4);color:var(--gold2);font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ipm-sec-title{font-size:10px;font-weight:800;color:var(--text);letter-spacing:.04em;flex:1}
+.ipm-sec-arrow{font-size:9px;color:var(--dim);transition:transform .2s}
+.ipm-section.open .ipm-sec-arrow{transform:rotate(180deg)}
+.ipm-sec-body{display:none;padding:14px;border-top:1px solid rgba(255,180,0,.1)}
+.ipm-section.open .ipm-sec-body{display:block}
+.ipm-callout{border-radius:8px;padding:12px 14px;margin:10px 0;font-size:8.5px;line-height:1.6}
+.ipm-callout.gold{background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);color:var(--text)}
+.ipm-callout.red{background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.25);color:var(--text)}
+.ipm-callout.green{background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.25);color:var(--text)}
+.ipm-callout.blue{background:rgba(80,160,255,.08);border:1px solid rgba(80,160,255,.25);color:var(--text)}
+.ipm-callout-title{font-size:8px;font-weight:800;letter-spacing:.07em;margin-bottom:5px}
+.ipm-callout.gold .ipm-callout-title{color:var(--gold2)}
+.ipm-callout.red .ipm-callout-title{color:#ff6b6b}
+.ipm-callout.green .ipm-callout-title{color:var(--green)}
+.ipm-callout.blue .ipm-callout-title{color:#5db8fe}
+.ipm-formula{background:rgba(255,180,0,.06);border:1px solid rgba(255,180,0,.2);border-radius:8px;padding:12px;margin:10px 0;font-family:monospace;font-size:9px;color:var(--gold2);text-align:center;letter-spacing:.04em}
+.ipm-cases-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.ipm-case{border-radius:8px;padding:12px;border:1px solid}
+.ipm-case-num{font-size:7.5px;font-weight:800;letter-spacing:.08em;margin-bottom:6px}
+.ipm-case-title{font-size:9.5px;font-weight:800;margin-bottom:5px}
+.ipm-case-body{font-size:8px;color:var(--dim);line-height:1.6}
+.ipm-case.win{background:rgba(0,200,120,.06);border-color:rgba(0,200,120,.25)}
+.ipm-case.win .ipm-case-num{color:var(--green)}
+.ipm-case.win .ipm-case-title{color:var(--green)}
+.ipm-case.lose{background:rgba(255,80,80,.06);border-color:rgba(255,80,80,.25)}
+.ipm-case.lose .ipm-case-num{color:#ff6b6b}
+.ipm-case.lose .ipm-case-title{color:#ff6b6b}
+.ipm-case.neutral{background:rgba(255,180,0,.06);border-color:rgba(255,180,0,.2)}
+.ipm-case.neutral .ipm-case-num{color:var(--gold2)}
+.ipm-case.neutral .ipm-case-title{color:var(--gold2)}
+.ipm-step-list{list-style:none;padding:0;margin:10px 0}
+.ipm-step-list li{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:8.5px;line-height:1.5}
+.ipm-step-list li:last-child{border-bottom:none}
+.ipm-step-list .ipm-step-n{width:22px;height:22px;border-radius:50%;background:rgba(255,180,0,.15);border:1px solid rgba(255,180,0,.3);color:var(--gold2);font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ipm-table{width:100%;border-collapse:collapse;font-size:8px;margin:10px 0}
+.ipm-table th{padding:7px 10px;text-align:left;font-size:7.5px;font-weight:800;letter-spacing:.07em;color:var(--gold2);background:rgba(255,180,0,.08);border-bottom:1px solid rgba(255,180,0,.2)}
+.ipm-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text)}
+.ipm-table tr:last-child td{border-bottom:none}
+.ipm-table .good{color:var(--green);font-weight:700}
+.ipm-table .warn{color:var(--gold2);font-weight:700}
+.ipm-table .bad{color:#ff6b6b;font-weight:700}
+.ipm-divider-label{text-align:center;font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--dim);padding:8px 0;display:flex;align-items:center;gap:8px}
+.ipm-divider-label::before,.ipm-divider-label::after{content:'';flex:1;height:1px;background:rgba(255,180,0,.15)}
 </style>
 `;
+}
+
+/* ══════════════════════════════════════════════════════
+   INFINITE PASS METHOD — GUIDE PROP FIRM
+   ══════════════════════════════════════════════════════ */
+function renderIPMGuide(){
+  var el = document.getElementById('bt-ipm-area');
+  if(!el) return;
+  el.innerHTML = renderIPMGuideHTML();
+  var first = el.querySelector('.ipm-section');
+  if(first){ first.classList.add('open'); var b=first.querySelector('.ipm-sec-body'); if(b) b.style.display='block'; }
+}
+
+function ipmToggleSection(id){
+  var sec = document.getElementById('ipm-s'+id);
+  if(!sec) return;
+  var isOpen = sec.classList.contains('open');
+  document.querySelectorAll('.ipm-section').forEach(function(s){
+    s.classList.remove('open');
+    var b=s.querySelector('.ipm-sec-body'); if(b) b.style.display='none';
+  });
+  if(!isOpen){
+    sec.classList.add('open');
+    var body=sec.querySelector('.ipm-sec-body');
+    if(body) body.style.display='block';
+  }
+}
+
+function renderIPMGuideHTML(){
+  return ''
+  +'<div style="padding:2px 0">'
+  // HERO
+  +'<div class="ipm-hero">'
+  +'<div class="ipm-hero-title"><span>The Infinite</span> Pass Method</div>'
+  +'<div class="ipm-hero-sub">Passer les challenges Prop Firm sans jamais perdre tes frais d\'inscription. Le principe : couvrir le compte challenge avec un compte identique en hedging inversé, afin que la somme des deux comptes reste toujours à zéro. Quoi qu\'il arrive, tu récupères ton capital et tu repasseras indéfiniment jusqu\'à obtenir le funded.</div>'
+  +'<div class="ipm-hero-tags">'
+  +'<span class="ipm-tag">PROP FIRM</span>'
+  +'<span class="ipm-tag">HEDGING INVERSÉ</span>'
+  +'<span class="ipm-tag">FTMO</span>'
+  +'<span class="ipm-tag">VANTAGE</span>'
+  +'<span class="ipm-tag">FXBLUE</span>'
+  +'<span class="ipm-tag">TRADE COPIER</span>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 1 — PRINCIPE
+  +'<div class="ipm-section" id="ipm-s1">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(1)">'
+  +'<div class="ipm-sec-num">01</div>'
+  +'<div class="ipm-sec-title">Le Principe — Comment ça marche ?</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div class="ipm-callout gold"><div class="ipm-callout-title">🧠 L\'IDÉE CENTRALE</div>Tu ouvres deux comptes : le compte <b>CHALLENGE</b> (ex: FTMO 10k) et un compte <b>RÉEL</b> (ton propre capital). Sur le compte réel, tu prends les trades inverses avec un diviseur. À tout moment : gains challenge ≈ pertes réel, et inversement. Le solde net reste proche de zéro — tu ne peux pas tout perdre.</div>'
+  +'<div style="font-size:8.5px;color:var(--dim);line-height:1.6;margin:10px 0">La magie vient du <b style="color:var(--text)">diviseur</b> : sur le compte challenge tu trades à taille normale (ex: 0.5 lot), et sur le compte réel tu trades avec un lot divisé (ex: 0.05 lot). Ça te permet de couvrir tes pertes sur le challenge avec beaucoup moins de capital réel.</div>'
+  +'<div class="ipm-formula">Diviseur = Capital Challenge ÷ Capital Réel utilisé</div>'
+  +'<div class="ipm-callout green"><div class="ipm-callout-title">✅ RÉSULTAT</div>Quoi qu\'il arrive sur le challenge (Pass ou Fail), la somme de tes deux comptes reste sensiblement la même. Si tu perds sur le challenge, tu gagnes sur le réel. Si tu passes, tu gardes le funded ET ton capital réel.</div>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 2 — LES 5 CAS
+  +'<div class="ipm-section" id="ipm-s2">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(2)">'
+  +'<div class="ipm-sec-num">02</div>'
+  +'<div class="ipm-sec-title">Les 5 Cas Possibles — Ce qui peut arriver</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div style="font-size:8.5px;color:var(--dim);margin-bottom:12px;line-height:1.6">Avec l\'Infinite Pass Method, il y a exactement 5 scénarios possibles. Dans tous les cas, tu ne perds jamais ton capital de base.</div>'
+  +'<div class="ipm-cases-grid">'
+  +'<div class="ipm-case win">'
+  +'<div class="ipm-case-num">CAS 1 — IDÉAL ✦</div>'
+  +'<div class="ipm-case-title">Challenge passé + Trades gagnants</div>'
+  +'<div class="ipm-case-body">Tu passes le challenge ET tes trades sont profitables des deux côtés. Résultat net positif + compte funded. Le meilleur scénario possible.</div>'
+  +'</div>'
+  +'<div class="ipm-case neutral">'
+  +'<div class="ipm-case-num">CAS 2 — NEUTRE</div>'
+  +'<div class="ipm-case-title">Challenge passé + Léger négatif réel</div>'
+  +'<div class="ipm-case-body">Tu passes le challenge mais le compte réel perd légèrement plus. Résultat : compte funded acquis. La perte nette minime vaut largement le funded obtenu.</div>'
+  +'</div>'
+  +'<div class="ipm-case win">'
+  +'<div class="ipm-case-num">CAS 3 — BON</div>'
+  +'<div class="ipm-case-title">Challenge échoué + Profit sur réel</div>'
+  +'<div class="ipm-case-body">Tu rates le challenge MAIS le compte réel a compensé les pertes + généré du profit. Tu récupères tes frais de challenge et plus encore. Tu recommences gratuitement.</div>'
+  +'</div>'
+  +'<div class="ipm-case neutral">'
+  +'<div class="ipm-case-num">CAS 4 — ÉQUILIBRÉ</div>'
+  +'<div class="ipm-case-title">Challenge échoué + Parfait équilibre</div>'
+  +'<div class="ipm-case-body">Tu rates le challenge et le compte réel compense exactement. Résultat net = 0. Tu as perdu tes frais d\'inscription... mais récupéré via le réel. Coût réel ≈ 0€.</div>'
+  +'</div>'
+  +'</div>'
+  +'<div class="ipm-case neutral" style="margin-top:8px;border-radius:8px;padding:12px;background:rgba(255,180,0,.06);border:1px solid rgba(255,180,0,.2)">'
+  +'<div class="ipm-case-num" style="color:var(--gold2)">CAS 5 — LE SEUL RISQUE</div>'
+  +'<div class="ipm-case-title" style="color:var(--gold2)">Challenge échoué + Perte nette (rare)</div>'
+  +'<div class="ipm-case-body">Le compte réel ne compense pas entièrement. Cela arrive si la couverture est imparfaite (slippage, latence, diviseur mal calibré). C\'est pour ça que la config FxBlue et le calcul du diviseur sont critiques.</div>'
+  +'</div>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 3 — CAPITAL MINIMUM
+  +'<div class="ipm-section" id="ipm-s3">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(3)">'
+  +'<div class="ipm-sec-num">03</div>'
+  +'<div class="ipm-sec-title">Capital Minimum — Combien tu dois avoir en réel ?</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div class="ipm-callout blue"><div class="ipm-callout-title">📐 PRINCIPE DU CAPITAL MINIMUM</div>Sur le compte réel, tu prends les trades inversés à taille réduite (divisée par le diviseur). Mais tu dois quand même pouvoir absorber les pertes latentes si le challenge fait des gains importants. Le capital minimum = marge pour tenir les positions.</div>'
+  +'<table class="ipm-table">'
+  +'<tr><th>Challenge</th><th>Capital Challenge</th><th>Diviseur recommandé</th><th>Capital Réel minimum</th></tr>'
+  +'<tr><td>FTMO 10k</td><td>10 000$</td><td class="good">10×</td><td class="warn">1 000$</td></tr>'
+  +'<tr><td>FTMO 25k</td><td>25 000$</td><td class="good">10×</td><td class="warn">2 500$</td></tr>'
+  +'<tr><td>FTMO 50k</td><td>50 000$</td><td class="good">10×</td><td class="warn">5 000$</td></tr>'
+  +'<tr><td>FTMO 100k</td><td>100 000$</td><td class="good">10×</td><td class="warn">10 000$</td></tr>'
+  +'<tr><td>Vantage 10k</td><td>10 000$</td><td class="good">8×</td><td class="warn">1 250$</td></tr>'
+  +'</table>'
+  +'<div class="ipm-callout red"><div class="ipm-callout-title">⚠️ ATTENTION — MARGE DE SÉCURITÉ</div>Ces montants sont les minimums théoriques. En pratique, prévois <b>1.5× à 2× le minimum</b> pour absorber les fluctuations et éviter un margin call sur le compte réel. Un margin call sur le réel = couverture nulle = tu perds sur le challenge sans compensation.</div>'
+  +'<div class="ipm-formula">Capital réel conseillé = (Capital Challenge ÷ Diviseur) × 1.5</div>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 4 — CALCUL DU DIVISEUR
+  +'<div class="ipm-section" id="ipm-s4">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(4)">'
+  +'<div class="ipm-sec-num">04</div>'
+  +'<div class="ipm-sec-title">Calcul du Diviseur — La clé de la couverture</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div style="font-size:8.5px;color:var(--dim);line-height:1.6;margin-bottom:10px">Le diviseur est le rapport entre la taille de tes positions sur le challenge et celles sur le compte réel. Un diviseur bien calibré = couverture parfaite. Trop haut = sur-couverture (tu prends trop de risque réel). Trop bas = sous-couverture (le réel ne compense pas assez le challenge).</div>'
+  +'<div class="ipm-formula">Taille lot réel = Taille lot challenge ÷ Diviseur</div>'
+  +'<div style="font-size:9px;font-weight:800;color:var(--text);margin:12px 0 8px">Exemple concret — FTMO 10k avec 0.5 lot :</div>'
+  +'<ul class="ipm-step-list">'
+  +'<li><div class="ipm-step-n">1</div><div>Challenge : 0.5 lot sur EURUSD (= 5€/pip)</div></li>'
+  +'<li><div class="ipm-step-n">2</div><div>Diviseur choisi : 10 → lot réel = 0.5 ÷ 10 = <b style="color:var(--gold2)">0.05 lot</b> (= 0.5€/pip)</div></li>'
+  +'<li><div class="ipm-step-n">3</div><div>Si le challenge perd 100 pips → −50€ sur challenge, +5€ sur réel</div></li>'
+  +'<li><div class="ipm-step-n">4</div><div>Résultat net : −45€ (pas −50€). La couverture réduit le risque de 10%</div></li>'
+  +'<li><div class="ipm-step-n">5</div><div>Avec diviseur 5 : lot réel = 0.10 → +10€ sur réel → résultat net : −40€. Meilleure couverture, plus de capital réel mobilisé.</div></li>'
+  +'</ul>'
+  +'<div class="ipm-callout gold"><div class="ipm-callout-title">💡 DIVISEUR OPTIMAL SELON L\'OBJECTIF</div><b style="color:var(--gold2)">Diviseur 10</b> — Capital minimum requis, couverture partielle (10%). Idéal si capital réel limité.<br><br><b style="color:var(--gold2)">Diviseur 5</b> — Bon équilibre, couverture 20%. Recommandé pour commencer.<br><br><b style="color:var(--gold2)">Diviseur 2</b> — Couverture forte (50%), capital réel important. Pour traders expérimentés.</div>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 5 — COMPTES ET BROKERS
+  +'<div class="ipm-section" id="ipm-s5">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(5)">'
+  +'<div class="ipm-sec-num">05</div>'
+  +'<div class="ipm-sec-title">Comptes & Brokers — Quelle combinaison choisir ?</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div style="font-size:8.5px;color:var(--dim);line-height:1.6;margin-bottom:12px">Pour que le hedging inversé fonctionne, le compte réel doit être chez un broker qui accepte le trade copier entrant depuis MT4/MT5. Le challenge est chez la prop firm (FTMO, Vantage...). Les deux doivent tourner sous MetaTrader.</div>'
+  +'<table class="ipm-table">'
+  +'<tr><th>Prop Firm</th><th>Plateforme</th><th>Broker réel compatible</th><th>Remarque</th></tr>'
+  +'<tr><td><b>FTMO</b></td><td>MT4/MT5</td><td class="good">Vantage Markets</td><td>Spreads proches, exécution rapide</td></tr>'
+  +'<tr><td><b>FTMO</b></td><td>MT4/MT5</td><td class="good">IC Markets</td><td>ECN, très liquide</td></tr>'
+  +'<tr><td><b>Vantage</b></td><td>MT4/MT5</td><td class="good">Vantage (compte réel)</td><td>Même broker = spreads identiques ✦</td></tr>'
+  +'<tr><td><b>The Funded Trader</b></td><td>MT4</td><td class="warn">IC Markets</td><td>Vérifier compatibilité lots</td></tr>'
+  +'</table>'
+  +'<div class="ipm-callout green"><div class="ipm-callout-title">✅ CONSEIL PRO — MÊME BROKER</div>Utiliser Vantage pour le challenge ET Vantage pour le compte réel donne les spreads les plus proches possible. Moins de slippage entre les deux comptes = couverture plus précise = moins de risque net.</div>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 6 — FXBLUE SETUP
+  +'<div class="ipm-section" id="ipm-s6">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(6)">'
+  +'<div class="ipm-sec-num">06</div>'
+  +'<div class="ipm-sec-title">Config FxBlue — Automatiser le hedging inversé</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div class="ipm-callout blue"><div class="ipm-callout-title">🔧 C\'EST QUOI FXBLUE ?</div>FxBlue Trade Copier est un EA (Expert Advisor) pour MetaTrader qui copie automatiquement les trades d\'un compte source vers un compte destination, en temps réel. Il permet d\'inverser les trades ET d\'appliquer un multiplicateur (ton diviseur).</div>'
+  +'<ul class="ipm-step-list">'
+  +'<li><div class="ipm-step-n">1</div><div><b style="color:var(--text)">Télécharger FxBlue</b> — Va sur fxblue.com → Trade Copier → Télécharge le Local Trade Copier (version MT4 ou MT5 selon ta prop firm)</div></li>'
+  +'<li><div class="ipm-step-n">2</div><div><b style="color:var(--text)">Installer sur le compte CHALLENGE (Source)</b> — Ouvre MT4 de ton challenge FTMO. Dans l\'onglet "Expert Advisors", glisse l\'EA FxBlue Sender sur n\'importe quel graphique. Configure le channel name (ex: "IPM_FTMO")</div></li>'
+  +'<li><div class="ipm-step-n">3</div><div><b style="color:var(--text)">Installer sur le compte RÉEL (Receiver)</b> — Ouvre un 2ème MT4 pour ton compte réel Vantage. Glisse l\'EA FxBlue Receiver. Channel name identique : "IPM_FTMO"</div></li>'
+  +'<li><div class="ipm-step-n">4</div><div><b style="color:var(--text)">Paramètre INVERSE</b> — Dans le Receiver, coche <b style="color:var(--gold2)">"Reverse trades"</b> = ✓. Cela inverse automatiquement les directions : Buy sur challenge → Sell sur réel.</div></li>'
+  +'<li><div class="ipm-step-n">5</div><div><b style="color:var(--text)">Paramètre MULTIPLICATEUR</b> — Dans le Receiver, règle le "Lot multiplier" = <b style="color:var(--gold2)">1 ÷ diviseur</b>. Exemple : diviseur 10 → multiplicateur = 0.1. Les lots du réel seront 10× plus petits que le challenge.</div></li>'
+  +'<li><div class="ipm-step-n">6</div><div><b style="color:var(--text)">Tester en démo</b> — Fais un trade manuel sur le challenge et vérifie qu\'un trade inverse apparaît sur le réel avec le bon lot. Si ça fonctionne, tu es prêt.</div></li>'
+  +'</ul>'
+  +'<div class="ipm-callout red"><div class="ipm-callout-title">⚠️ POINTS CRITIQUES</div>'
+  +'<b>Latence</b> : Les deux MT4 doivent tourner en même temps, idéalement sur le même VPS ou PC. Un redémarrage = couverture coupée.<br><br>'
+  +'<b>Autotrading</b> : Vérifie que le bouton "AutoTrading" est vert sur les DEUX MT4 sinon le copier ne fonctionne pas.<br><br>'
+  +'<b>Paires</b> : Les noms des paires doivent correspondre entre les deux brokers (EURUSD vs EURUSDpro). Utilise le paramètre "Symbol mapping" dans FxBlue si nécessaire.</div>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 7 — STRATÉGIE OPTIMALE
+  +'<div class="ipm-section" id="ipm-s7">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(7)">'
+  +'<div class="ipm-sec-num">07</div>'
+  +'<div class="ipm-sec-title">Stratégie Optimale — Comment maximiser les chances ?</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div style="font-size:8.5px;color:var(--dim);line-height:1.6;margin-bottom:12px">L\'Infinite Pass Method n\'est pas une machine à passer les challenges au hasard. Tu dois quand même trader une stratégie rentable. La méthode sert uniquement à éliminer le risque de perdre tes frais d\'inscription — pas à remplacer une vraie edge.</div>'
+  +'<div class="ipm-divider-label">PHASE 1 — CHALLENGE</div>'
+  +'<ul class="ipm-step-list">'
+  +'<li><div class="ipm-step-n">↗</div><div><b style="color:var(--text)">Trade normalement</b> avec ta stratégie (IVC, DS, MTF...). Respecte les règles FTMO : max loss 10%, daily loss 5%, objectif +10%.</div></li>'
+  +'<li><div class="ipm-step-n">↗</div><div><b style="color:var(--text)">Ne surtraze pas</b> pour viser le 10% rapidement. Les meilleurs traders passent en 15-30 jours à risque raisonnable.</div></li>'
+  +'<li><div class="ipm-step-n">↗</div><div><b style="color:var(--text)">FxBlue actif 24/7</b> — Chaque trade pris sur le challenge est automatiquement couvert sur le réel. Tu ne dois rien faire manuellement.</div></li>'
+  +'</ul>'
+  +'<div class="ipm-divider-label">PHASE 2 — SI TU PASSES</div>'
+  +'<ul class="ipm-step-list">'
+  +'<li><div class="ipm-step-n">✓</div><div>Félicitations — tu as un compte funded. <b style="color:var(--green)">Coupe le FxBlue</b> : tu n\'as plus besoin de couverture sur le funded.</div></li>'
+  +'<li><div class="ipm-step-n">✓</div><div>Ton compte réel a des positions inverses ouvertes → ferme-les manuellement. Calcule le P&L net des deux comptes.</div></li>'
+  +'<li><div class="ipm-step-n">✓</div><div>Lance le prochain challenge si tu veux scaler (25k, 50k...). Recommence l\'IPM dessus.</div></li>'
+  +'</ul>'
+  +'<div class="ipm-divider-label">PHASE 2 — SI TU ÉCHOUES</div>'
+  +'<ul class="ipm-step-list">'
+  +'<li><div class="ipm-step-n">→</div><div>Ferme toutes les positions du compte réel. Calcule le gain réel compensateur.</div></li>'
+  +'<li><div class="ipm-step-n">→</div><div>Résultat net = frais challenge − gain réel. Si diviseur bien calibré ≈ 0€ de perte nette.</div></li>'
+  +'<li><div class="ipm-step-n">→</div><div>Rachète un challenge au même prix. Recommence l\'IPM. En théorie : passes illimités sans jamais perdre le capital.</div></li>'
+  +'</ul>'
+  +'</div>'
+  +'</div>'
+
+  // SECTION 8 — RISQUES ET LIMITES
+  +'<div class="ipm-section" id="ipm-s8">'
+  +'<div class="ipm-sec-head" onclick="ipmToggleSection(8)">'
+  +'<div class="ipm-sec-num">08</div>'
+  +'<div class="ipm-sec-title">Risques & Limites — Ce qu\'il faut savoir</div>'
+  +'<div class="ipm-sec-arrow">▼</div>'
+  +'</div>'
+  +'<div class="ipm-sec-body">'
+  +'<div class="ipm-callout red"><div class="ipm-callout-title">🔴 RISQUE #1 — SLIPPAGE & LATENCE</div>Si le trade copier a de la latence (>100ms), la couverture peut être imparfaite. En news importantes (NFP, FOMC), les spreads s\'élargissent : trade challenge à 1.1 pips, trade réel exécuté à 3.2 pips. La couverture partielle peut créer une perte nette inattendue. <b>Solution : évite de trader pendant les grosses news.</b></div>'
+  +'<div class="ipm-callout red"><div class="ipm-callout-title">🔴 RISQUE #2 — RÈGLES PROP FIRM</div>Certaines prop firms interdisent le hedging entre comptes chez eux (pas chez des brokers différents). FTMO interdit le "account management" mais autorise techniquement de couvrir avec un compte réel perso. Vantage est plus permissif. <b>Lis toujours les TOS de ta prop firm avant.</b></div>'
+  +'<div class="ipm-callout red"><div class="ipm-callout-title">🔴 RISQUE #3 — MARGIN CALL SUR LE RÉEL</div>Si le challenge fait un run exceptionnel (ex: +15% en une semaine), le compte réel inverse accuse des pertes latentes importantes. Si le réel n\'a pas assez de marge → margin call → couverture nulle à partir de ce moment. Le challenge continue sans protection. <b>Toujours maintenir 2× le capital minimum sur le réel.</b></div>'
+  +'<div class="ipm-callout gold"><div class="ipm-callout-title">💡 POINT LÉGAL & FISCAL</div>Les profits sur le compte réel (tes gains de couverture) sont imposables comme des gains de trading classique. Les frais de challenge peuvent souvent être déduits en charge professionnelle si tu as une structure juridique. Consulte un comptable spécialisé trading.</div>'
+  +'</div>'
+  +'</div>'
+
+  +'</div>'; // fin du container
 }
 
 function renderBacktest(){
@@ -10523,6 +10829,7 @@ function renderBacktest(){
   var tabs = '<div class="bt-tabs">'
     +'<div class="bt-tab'+(_btCurrentTab==='simulator'?' bt-tab-active':'')+'" id="bt-tab-simulator" onclick="btSwitchTab(\'simulator\')">🔬 SIMULATEUR</div>'
     +'<div class="bt-tab'+(_btCurrentTab==='guide'?' bt-tab-active':'')+'" id="bt-tab-guide" onclick="btSwitchTab(\'guide\')">📖 GUIDE IVC</div>'
+    +'<div class="bt-tab bt-tab-ipm'+(_btCurrentTab==='ipm'?' bt-tab-active-ipm':'')+'" id="bt-tab-ipm" onclick="btSwitchTab(\'ipm\')">♾️ MÉTHODE INFINITE PASS</div>'
     +'</div>';
   el.innerHTML = tabs + '<div id="bt-sim-area"><div class="bt-pro-wrap">'
     +'<div class="bt-pro-params">'
@@ -10556,14 +10863,20 @@ function renderBacktest(){
     +'<div class="bt-progress-anim"><div class="bt-progress-anim-fill"></div></div>'
     +'<span>Initialisation...</span></div></div>'
     +'</div></div>'  // ferme bt-pro-wrap + bt-sim-area
-  // Zone guide IVC — masquée par défaut
+  // Zones guides — masquées par défaut
   el.innerHTML += '<div id="bt-guide-area" style="display:none"></div>';
+  el.innerHTML += '<div id="bt-ipm-area" style="display:none"></div>';
   // Afficher selon l'onglet actif
   if(_btCurrentTab === 'guide'){
     document.querySelector('.bt-pro-wrap') && (document.querySelector('.bt-pro-wrap').style.display = 'none');
     renderIVCGuide();
     var ga = document.getElementById('bt-guide-area');
     if(ga) ga.style.display = '';
+  } else if(_btCurrentTab === 'ipm'){
+    document.querySelector('.bt-pro-wrap') && (document.querySelector('.bt-pro-wrap').style.display = 'none');
+    renderIPMGuide();
+    var ia = document.getElementById('bt-ipm-area');
+    if(ia) ia.style.display = '';
   } else {
     setTimeout(btRunAndRender, 80);
   }
