@@ -5236,24 +5236,82 @@ function showScrDetail(ticker){
    Filtrage auto : COT + DMX + Saison + Macro + W%R
    ═══════════════════════════════════════════════════ */
 
-// Données pré-calculées pour chaque paire FX/Commo/Action
-// cot: % longs institutionnels  dmx: % retail long (>75 = extrême contrarian)
-// saison: 'bull'|'bear'|'neu'  macro: true=pas d'annonce  wpr: Williams%R
-// sig: biais global
-var SETUPS_FX=[
-  {p:'EUR/USD', cot:62,cotD:'Long',dmx:84,saison:'bear', macro:true, wpr:-62, sig:'Neutre',  cat:'fx'},
-  {p:'GBP/USD', cot:58,cotD:'Long',dmx:31,saison:'bear', macro:true, wpr:-44, sig:'Haussier',cat:'fx'},
-  {p:'USD/JPY', cot:55,cotD:'Short',dmx:58,saison:'bull',macro:false,wpr:-38, sig:'Haussier',cat:'fx'},
-  {p:'USD/CHF', cot:60,cotD:'Short',dmx:22,saison:'bull',macro:true, wpr:-44, sig:'Haussier',cat:'fx'},
-  {p:'AUD/USD', cot:52,cotD:'Short',dmx:38,saison:'bear',macro:true, wpr:-78, sig:'Baissier',cat:'fx'},
-  {p:'NZD/USD', cot:50,cotD:'Short',dmx:44,saison:'bear',macro:true, wpr:-82, sig:'Baissier',cat:'fx'},
-  {p:'EUR/GBP', cot:44,cotD:'Short',dmx:96,saison:'neu', macro:true, wpr:-91, sig:'Neutre',  cat:'fx'},
-  {p:'EUR/JPY', cot:65,cotD:'Long', dmx:65,saison:'bull',macro:false,wpr:-55, sig:'Haussier',cat:'fx'},
-  {p:'GBP/JPY', cot:68,cotD:'Long', dmx:68,saison:'bull',macro:false,wpr:-48, sig:'Haussier',cat:'fx'},
-  {p:'EUR/AUD', cot:72,cotD:'Long', dmx:91,saison:'bull',macro:true, wpr:-88, sig:'Haussier',cat:'fx'},
-  {p:'XAU/USD', cot:78,cotD:'Long', dmx:72,saison:'bull',macro:true, wpr:-34, sig:'Haussier',cat:'commo'},
-  {p:'XAG/USD', cot:66,cotD:'Long', dmx:58,saison:'bull',macro:true, wpr:-42, sig:'Haussier',cat:'commo'},
+// ── Cache live COT + Force devises (rechargés à chaque ouverture du panel) ──
+var SETUPS_COT_DATA   = null; // {EUR:{bullPct,cotD,...}, GBP:...}
+var SETUPS_FX_STRENGTH= null; // [{currency:'USD',score:82,...},...]
+var SETUPS_LAST_FETCH = 0;
+
+// Saisonnalité historique par mois pour les paires PTL (hardcoded — pas d'API gratuite)
+var SAISON_DATA={
+  'EUR/USD':{1:'neu',2:'neu',3:'bear',4:'bear',5:'bear',6:'neu',7:'bull',8:'bull',9:'bear',10:'bear',11:'neu',12:'bull'},
+  'GBP/USD':{1:'neu',2:'bear',3:'bear',4:'neu',5:'neu',6:'bear',7:'bull',8:'bull',9:'bear',10:'bear',11:'neu',12:'bull'},
+  'USD/JPY':{1:'bear',2:'neu',3:'bull',4:'bull',5:'neu',6:'bear',7:'bear',8:'bear',9:'bull',10:'bull',11:'bull',12:'neu'},
+  'USD/CHF':{1:'bull',2:'bull',3:'bull',4:'neu',5:'neu',6:'bull',7:'bear',8:'bear',9:'bull',10:'bull',11:'neu',12:'bear'},
+  'AUD/USD':{1:'bull',2:'bull',3:'neu',4:'bear',5:'bear',6:'bear',7:'bear',8:'bear',9:'neu',10:'bull',11:'bull',12:'bull'},
+  'NZD/USD':{1:'bull',2:'bull',3:'neu',4:'bear',5:'bear',6:'bear',7:'bear',8:'bear',9:'neu',10:'bear',11:'neu',12:'bull'},
+  'EUR/GBP':{1:'neu',2:'bull',3:'bull',4:'neu',5:'neu',6:'bull',7:'bear',8:'bear',9:'neu',10:'neu',11:'neu',12:'bear'},
+  'EUR/JPY':{1:'bear',2:'neu',3:'bull',4:'bull',5:'neu',6:'bear',7:'neu',8:'neu',9:'bull',10:'bull',11:'bull',12:'neu'},
+  'GBP/JPY':{1:'bear',2:'neu',3:'bull',4:'bull',5:'neu',6:'bear',7:'neu',8:'neu',9:'bull',10:'bull',11:'bull',12:'neu'},
+  'EUR/AUD':{1:'bear',2:'bear',3:'neu',4:'bull',5:'bull',6:'bull',7:'bull',8:'bull',9:'neu',10:'bear',11:'bear',12:'bear'},
+  'XAU/USD':{1:'bull',2:'bull',3:'bull',4:'bear',5:'neu',6:'bull',7:'bear',8:'bull',9:'bull',10:'neu',11:'bear',12:'bull'},
+  'XAG/USD':{1:'bull',2:'bull',3:'bull',4:'bear',5:'neu',6:'bull',7:'bear',8:'bull',9:'bull',10:'neu',11:'bear',12:'bull'},
+};
+function getSaison(pair){var m=new Date().getMonth()+1;var map=SAISON_DATA[pair];return map?map[m]:'neu';}
+
+// ── Construire SETUPS_FX depuis vraies données COT + Force devises ──
+function buildSetupsFX(cotData,strengthArr){
+  var strengthMap={};
+  if(strengthArr)strengthArr.forEach(function(s){strengthMap[s.currency]=s;});
+  var PAIRS_CFG=[
+    {p:'EUR/USD',base:'EUR',quote:'USD',cat:'fx'},
+    {p:'GBP/USD',base:'GBP',quote:'USD',cat:'fx'},
+    {p:'USD/JPY',base:'USD',quote:'JPY',cat:'fx'},
+    {p:'USD/CHF',base:'USD',quote:'CHF',cat:'fx'},
+    {p:'AUD/USD',base:'AUD',quote:'USD',cat:'fx'},
+    {p:'NZD/USD',base:'NZD',quote:'USD',cat:'fx'},
+    {p:'EUR/GBP',base:'EUR',quote:'GBP',cat:'fx'},
+    {p:'EUR/JPY',base:'EUR',quote:'JPY',cat:'fx'},
+    {p:'GBP/JPY',base:'GBP',quote:'JPY',cat:'fx'},
+    {p:'EUR/AUD',base:'EUR',quote:'AUD',cat:'fx'},
+    {p:'XAU/USD',base:'XAU',quote:'USD',cat:'commo'},
+    {p:'XAG/USD',base:'XAG',quote:'USD',cat:'commo'},
+  ];
+  return PAIRS_CFG.map(function(cfg){
+    var cotKey=(cfg.base==='USD')?cfg.quote:cfg.base;
+    if(cfg.cat==='commo')cotKey=null;
+    var cot=cotKey&&cotData?cotData[cotKey]:null;
+    var cotP=cot?cot.bullPct:50;
+    var cotD=cot?(cot.sentiment==='BULL'?'Long':cot.sentiment==='BEAR'?'Short':'Neutre'):'—';
+    var baseStr=strengthMap[cfg.base]?strengthMap[cfg.base].score:50;
+    var quoteStr=strengthMap[cfg.quote]?strengthMap[cfg.quote].score:50;
+    var diff=baseStr-quoteStr;
+    var sig=diff>=15?'Haussier':diff<=-15?'Baissier':'Neutre';
+    return {
+      p:cfg.p,cat:cfg.cat,
+      cot:cotP,cotD:cotD,
+      dmx:50,saison:getSaison(cfg.p),macro:true,wpr:-50,sig:sig,
+      baseStr:baseStr,quoteStr:quoteStr,
+      cotDate:cot?cot.date:null,cotChange:cot?cot.netChange:0
+    };
+  });
+}
+
+// Fallback statique si les APIs sont KO
+var SETUPS_FX_FALLBACK=[
+  {p:'EUR/USD', cot:62,cotD:'Long',dmx:84,saison:getSaison('EUR/USD')||'bear', macro:true, wpr:-62, sig:'Neutre',  cat:'fx'},
+  {p:'GBP/USD', cot:58,cotD:'Long',dmx:31,saison:getSaison('GBP/USD')||'bear', macro:true, wpr:-44, sig:'Haussier',cat:'fx'},
+  {p:'USD/JPY', cot:55,cotD:'Short',dmx:58,saison:getSaison('USD/JPY')||'bull',macro:false,wpr:-38, sig:'Haussier',cat:'fx'},
+  {p:'USD/CHF', cot:60,cotD:'Short',dmx:22,saison:getSaison('USD/CHF')||'bull',macro:true, wpr:-44, sig:'Haussier',cat:'fx'},
+  {p:'AUD/USD', cot:52,cotD:'Short',dmx:38,saison:getSaison('AUD/USD')||'bear',macro:true, wpr:-78, sig:'Baissier',cat:'fx'},
+  {p:'NZD/USD', cot:50,cotD:'Short',dmx:44,saison:getSaison('NZD/USD')||'bear',macro:true, wpr:-82, sig:'Baissier',cat:'fx'},
+  {p:'EUR/GBP', cot:44,cotD:'Short',dmx:96,saison:getSaison('EUR/GBP')||'neu', macro:true, wpr:-91, sig:'Neutre',  cat:'fx'},
+  {p:'EUR/JPY', cot:65,cotD:'Long', dmx:65,saison:getSaison('EUR/JPY')||'bull',macro:false,wpr:-55, sig:'Haussier',cat:'fx'},
+  {p:'GBP/JPY', cot:68,cotD:'Long', dmx:68,saison:getSaison('GBP/JPY')||'bull',macro:false,wpr:-48, sig:'Haussier',cat:'fx'},
+  {p:'EUR/AUD', cot:72,cotD:'Long', dmx:91,saison:getSaison('EUR/AUD')||'bull',macro:true, wpr:-88, sig:'Haussier',cat:'fx'},
+  {p:'XAU/USD', cot:78,cotD:'Long', dmx:72,saison:getSaison('XAU/USD')||'bull',macro:true, wpr:-34, sig:'Haussier',cat:'commo'},
+  {p:'XAG/USD', cot:66,cotD:'Long', dmx:58,saison:getSaison('XAG/USD')||'bull',macro:true, wpr:-42, sig:'Haussier',cat:'commo'},
 ];
+var SETUPS_FX = SETUPS_FX_FALLBACK.slice(); // sera mis à jour après fetch
 
 var SETUPS_ACTIONS=[
   {p:'MSFT', n:'Microsoft',  wpr:-96.2,buf:9, saison:'bull',macro:true, sig:'Haussier',cat:'action'},
@@ -5305,21 +5363,66 @@ function setupAlertLevel(pts,max){
 }
 
 function renderSetups(){
-  // pills tabs
   var tabs=[['s1','📐 Multi-TF'],['s2','🔄 Double Structure'],['s3','📈 Swing Action']];
   var pills=document.getElementById('setups-pills');
-  pills.innerHTML=tabs.map(function(t){
+  if(pills) pills.innerHTML=tabs.map(function(t){
     return '<span class="pill'+(SETUPS_TAB===t[0]?' on':'')+'" onclick="SETUPS_TAB=\''+t[0]+'\';renderSetups()">'+t[1]+'</span>';
   }).join('');
 
   var cont=document.getElementById('setups-content');
-  var html='';
 
+  // Fetch live si données pas encore chargées ou > 15 min
+  var now=Date.now();
+  if(!SETUPS_COT_DATA||!SETUPS_FX_STRENGTH||(now-SETUPS_LAST_FETCH)>900000){
+    if(cont) cont.innerHTML='<div style="padding:32px;text-align:center;color:var(--dim);font-size:11px">⟳ Chargement données COT + Force devises…</div>';
+    Promise.all([
+      fetch('/api/cot').then(function(r){return r.json();}).catch(function(){return null;}),
+      fetch('/api/forex-strength').then(function(r){return r.json();}).catch(function(){return null;})
+    ]).then(function(results){
+      var cotResp=results[0], fxResp=results[1];
+      var cotOk=cotResp&&cotResp.ok&&cotResp.data;
+      var fxOk =fxResp&&fxResp.ok&&fxResp.strength;
+
+      if(cotOk) SETUPS_COT_DATA=cotResp.data;
+      if(fxOk)  SETUPS_FX_STRENGTH=fxResp.strength;
+
+      if(cotOk||fxOk){
+        SETUPS_FX=buildSetupsFX(SETUPS_COT_DATA,SETUPS_FX_STRENGTH);
+        SETUPS_LAST_FETCH=Date.now();
+      }
+
+      // Afficher badge source
+      var srcBadge='';
+      if(cotOk&&fxOk){
+        var cotDate=cotResp.data[Object.keys(cotResp.data)[0]]?cotResp.data[Object.keys(cotResp.data)[0]].date:'';
+        srcBadge='<div style="font-size:8px;color:var(--green);margin-bottom:8px;display:flex;gap:12px;align-items:center">'
+          +'<span>✅ COT CFTC réel'+(cotDate?' · semaine '+cotDate:'')+'</span>'
+          +'<span>✅ Force devises live</span>'
+          +'<span style="color:var(--dim)">Saisonnalité : moyennes historiques</span>'
+          +'</div>';
+      } else if(cotOk){
+        srcBadge='<div style="font-size:8px;color:var(--gold);margin-bottom:8px">✅ COT CFTC réel · ⚠ Force devises indisponible (fallback)</div>';
+      } else if(fxOk){
+        srcBadge='<div style="font-size:8px;color:var(--gold);margin-bottom:8px">⚠ COT indisponible (fallback) · ✅ Force devises live</div>';
+      } else {
+        srcBadge='<div style="font-size:8px;color:var(--red);margin-bottom:8px">⚠ APIs indisponibles — données de référence affichées</div>';
+        SETUPS_FX=SETUPS_FX_FALLBACK.slice();
+      }
+
+      var html=srcBadge;
+      if(SETUPS_TAB==='s1') html+=renderS1();
+      else if(SETUPS_TAB==='s2') html+=renderS2();
+      else html+=renderS3();
+      if(cont) cont.innerHTML=html;
+    });
+    return; // on attend le fetch
+  }
+
+  var html='';
   if(SETUPS_TAB==='s1') html=renderS1();
   else if(SETUPS_TAB==='s2') html=renderS2();
   else html=renderS3();
-
-  cont.innerHTML=html;
+  if(cont) cont.innerHTML=html;
 }
 
 function setupCritRow(ok,lbl,val){
@@ -5393,8 +5496,9 @@ function setupCard(d,sc,strat){
           +'<span class="setup-alert" style="background:'+al.bg+';border:1px solid '+al.border+';color:'+al.col+'">'+al.lbl+'</span>'
         +'</div>'
         +'<div style="display:flex;gap:8px">'
-          +(d.cotD?'<span style="font-size:8px;color:var(--dim)">COT <span style="color:'+(d.cotD==='Long'?'var(--green)':'var(--red)')+'">'+d.cotD+'</span></span>':'')
-          +'<span style="font-size:8px;color:var(--dim)">Signal <span class="'+sigCls+'">'+d.sig+'</span></span>'
+          +(d.cotD&&d.cotD!=='—'?'<span style="font-size:8px;color:var(--dim)">COT <span style="color:'+(d.cotD==='Long'?'var(--green)':'d.cotD===\'Short\'?\'var(--red)\'':'var(--dim)')+'">'+d.cotD+'</span>'+(d.cotDate?' <span style="color:var(--faint)">'+d.cotDate+'</span>':'')+'</span>':'')
+          +'<span style="font-size:8px;color:var(--dim)">Force <span class="'+sigCls+'">'+d.sig+'</span></span>'
+          +(d.baseStr!==undefined&&d.quoteStr!==undefined?'<span style="font-size:8px;color:var(--faint)">'+d.baseStr+'% vs '+d.quoteStr+'%</span>':'')
           +(d.saison!=='neu'?'<span style="font-size:8px;color:var(--dim)">Saison <span class="'+(d.saison==='bull'?'up':'dn')+'">'+(d.saison==='bull'?'▲':'▼')+'</span></span>':'')
         +'</div>'
       +'</div>'
