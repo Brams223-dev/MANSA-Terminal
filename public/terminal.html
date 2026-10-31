@@ -176,6 +176,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .fx-snav-btn:hover{color:var(--text);border-color:var(--border3);background:rgba(255,255,255,.02)}
 .fx-snav-active{background:rgba(200,160,60,.12)!important;border-color:rgba(200,160,60,.45)!important;color:var(--gold2)!important;box-shadow:0 0 8px rgba(200,160,60,.1)}
 
+/* ═══ MM PANEL ANIMATIONS ═══ */
+@keyframes mmTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes mmPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+#mm-quote-icon{animation:mmPulse 4s ease-in-out infinite}
+#mm-ticker{display:inline-block}
 /* ═══ SAISON CHART ═══ */
 .sz-chart{display:flex;align-items:center;gap:4px;height:120px;padding:0 4px;margin-bottom:12px}
 .sz-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;height:100%;justify-content:center}
@@ -11815,14 +11820,28 @@ function renderCalc(){
   var el = document.getElementById('calc-content');
   if(!el) return;
 
-  // ── Construire les options instruments ──
+  // ── Construire les options instruments (watchlist PTL + catalogue complet) ──
+  // Watchlist TradingView PTL (135795769) — format normalisé
+  var PTL_WATCHLIST = [
+    'EUR/USD','GBP/USD','USD/JPY','USD/CHF','USD/CAD','AUD/USD','NZD/USD',
+    'EUR/GBP','EUR/CHF','EUR/CAD','EUR/JPY','EUR/AUD','EUR/NZD',
+    'GBP/CHF','GBP/CAD','GBP/AUD','GBP/NZD','GBP/JPY',
+    'AUD/CHF','AUD/CAD','AUD/NZD','AUD/JPY',
+    'CAD/CHF','CAD/JPY','NZD/CHF','NZD/CAD','NZD/JPY','CHF/JPY',
+    'XAU/USD','XAG/USD','US30','SPX500','NAS100'
+  ];
+  var instOpts = '<optgroup label="── ⭐ Ma Watchlist PTL ──">';
+  PTL_WATCHLIST.forEach(function(k){
+    var exists = CALC_INSTRUMENTS[k];
+    if(exists) instOpts += '<option value="'+k+'"'+(k==='EUR/USD'?' selected':'')+'>'+k+'</option>';
+  });
+  instOpts += '</optgroup>';
   var groups = {forex:'Forex',metal:'Métaux',index:'Indices',crypto:'Crypto',africa:'Africaines'};
-  var instOpts = '';
   Object.keys(groups).forEach(function(cat){
     instOpts += '<optgroup label="── '+groups[cat]+' ──">';
     Object.keys(CALC_INSTRUMENTS).forEach(function(k){
       if(CALC_INSTRUMENTS[k].cat===cat)
-        instOpts += '<option value="'+k+'"'+(k==='EUR/USD'?' selected':'')+'>'+k+'</option>';
+        instOpts += '<option value="'+k+'">'+k+'</option>';
     });
     instOpts += '</optgroup>';
   });
@@ -11838,7 +11857,66 @@ function renderCalc(){
   var h = '';
 
   // ── CARD PRINCIPALE ──
-  h += '<div style="max-width:680px;background:linear-gradient(145deg,#0d2a3a,#0a1f2e);border:1px solid rgba(0,160,200,.25);border-radius:16px;overflow:hidden">';
+  h += '<div style="display:grid;grid-template-columns:680px 1fr;gap:16px;align-items:start">';
+  // ── PANNEAU DROIT ANIMÉ (MM mantras) ──
+  var mantras = [
+    '"Le money management n\'est pas une option — c\'est un ordre."',
+    '"Un trade sans stop loss n\'est pas du trading, c\'est du gambling."',
+    '"Préserve ton capital. Les opportunités reviennent. L\'argent perdu, non."',
+    '"1% de risque par trade, c\'est la règle numéro 1 chez PTL."',
+    '"Les pros ne cherchent pas à gagner. Ils cherchent à ne pas perdre."',
+    '"Le marché est là demain. Ton compte doit l\'être aussi."',
+    '"Discipline > Talent. Chaque jour, sans exception."',
+    '"Un bon setup avec un mauvais sizing = un mauvais trade."',
+    '"Coupe tes pertes vite. Laisse courir tes gains. Toujours."',
+    '"Le RR n\'est pas une suggestion PTL — c\'est une condition."',
+    '"Protège d\'abord, gagne ensuite. Dans cet ordre."',
+    '"La taille de position, c\'est ton niveau de sérieux."'
+  ];
+  var mantrasJS = JSON.stringify(mantras);
+
+  h += '<div id="mm-panel" style="position:sticky;top:10px;background:linear-gradient(145deg,#060f1a,#0a1520);border:1px solid rgba(0,160,200,.18);border-radius:16px;overflow:hidden;min-height:600px;display:flex;flex-direction:column">';
+
+  // Header panneau droit
+  h += '<div style="background:linear-gradient(90deg,#003850,#002a3d);padding:14px 18px;border-bottom:1px solid rgba(0,160,200,.15)">';
+  h += '<div style="font-size:11px;font-weight:800;color:#5bc8e8;letter-spacing:.08em">⚔ DISCIPLINE PTL</div>';
+  h += '<div style="font-size:8.5px;color:#3a5060;margin-top:2px">Money Management Rules</div>';
+  h += '</div>';
+
+  // Ticker défilant (règles)
+  h += '<div style="overflow:hidden;padding:0;border-bottom:1px solid rgba(0,160,200,.1)">';
+  var tickerText = '&nbsp;&nbsp;⚡ RISK MAX 1% PAR TRADE &nbsp;·&nbsp; ⚡ SL OBLIGATOIRE &nbsp;·&nbsp; ⚡ RR MIN 2:1 PTL &nbsp;·&nbsp; ⚡ NO SL = NO TRADE &nbsp;·&nbsp; ⚡ 2% MAX SETUP FORT &nbsp;·&nbsp; ⚡ SIZING AVANT ENTRÉE &nbsp;·&nbsp; ⚡ CAPITAL D\'ABORD &nbsp;·&nbsp;';
+  h += '<div id="mm-ticker" style="white-space:nowrap;font-size:9px;color:#5bc8e8;font-family:monospace;padding:7px 0;animation:mmTicker 28s linear infinite">';
+  h += tickerText + tickerText; // doublé pour boucle seamless
+  h += '</div></div>';
+
+  // Citation principale (rotative)
+  h += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px">';
+  h += '<div id="mm-quote-icon" style="font-size:36px;margin-bottom:16px;opacity:.7">⚔</div>';
+  h += '<div id="mm-quote" style="font-size:13px;font-weight:700;color:#c8e8f8;text-align:center;line-height:1.6;min-height:80px;transition:opacity .5s"></div>';
+  h += '<div style="width:40px;height:2px;background:linear-gradient(90deg,transparent,#0090cc,transparent);margin:20px auto"></div>';
+  h += '<div style="font-size:9px;color:#2a5060;letter-spacing:.1em">PROCESS TRADING LIFE</div>';
+  h += '</div>';
+
+  // Compteur live
+  h += '<div style="padding:14px 18px;border-top:1px solid rgba(0,160,200,.1)">';
+  h += '<div style="font-size:8px;color:#2a5060;margin-bottom:8px;letter-spacing:.08em">RÈGLES FONDAMENTALES PTL</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
+  [['1%','Risque max'],['2:1','RR min'],['100%','SL requis']].forEach(function(r){
+    h += '<div style="background:rgba(0,160,200,.06);border:1px solid rgba(0,160,200,.15);border-radius:8px;padding:8px;text-align:center">';
+    h += '<div style="font-size:16px;font-weight:900;color:#5bc8e8;font-family:monospace">'+r[0]+'</div>';
+    h += '<div style="font-size:8px;color:#3a6070;margin-top:2px">'+r[1]+'</div>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  h += '</div>'; // fin panneau droit
+
+  // ── CARTE CALCULATEUR (gauche) ──
+  h += '<div style="background:linear-gradient(145deg,#0d2a3a,#0a1f2e);border:1px solid rgba(0,160,200,.25);border-radius:16px;overflow:hidden">';
+
+  // JS animation mantra injecté via setAttribute
+  h += '<script id="mm-anim-src" type="text/x-mantras">'+mantrasJS+'<\/script>';
 
   // Header card
   h += '<div style="background:linear-gradient(90deg,#0070a0,#005580);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">';
@@ -11942,11 +12020,36 @@ function renderCalc(){
   h += '<div style="overflow-x:auto"><table id="c-risk-table" style="width:100%;border-collapse:collapse;font-size:9px"></table></div>';
   h += '</div>';
 
-  h += '</div>'; // fin card
+  h += '</div>'; // fin card calculateur
+  h += '</div>'; // fin grid 2 colonnes
 
   el.innerHTML = h;
   calcUpdateContractForInst();
   setTimeout(calcPosition, 80);
+
+  // ── Animer les mantras ──
+  (function initMMPanel(){
+    var mantrasRaw = document.getElementById('mm-anim-src');
+    if(!mantrasRaw) return;
+    var quotes;
+    try{ quotes = JSON.parse(mantrasRaw.textContent); }catch(e){ return; }
+    var quoteEl = document.getElementById('mm-quote');
+    var iconEl  = document.getElementById('mm-quote-icon');
+    var icons   = ['⚔','🛡','⚡','🎯','🔒','💎','🏆','⚠️'];
+    var idx     = 0;
+    function showQuote(){
+      if(!quoteEl) return;
+      quoteEl.style.opacity = '0';
+      setTimeout(function(){
+        quoteEl.textContent = quotes[idx % quotes.length];
+        if(iconEl) iconEl.textContent = icons[idx % icons.length];
+        quoteEl.style.opacity = '1';
+        idx++;
+      }, 500);
+    }
+    showQuote();
+    setInterval(showQuote, 5000);
+  })();
 }
 
 function calcToggleSLMode(mode){
