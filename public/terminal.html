@@ -451,6 +451,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 
 /* ═══ V20 — SESSION CLOCK ═══ */
 .session-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;background:var(--s1);border:1px solid var(--border2);border-radius:8px;margin-bottom:16px}
+.sess-clock-card{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;transition:.3s}
+.sess-clock-card.active{border-color:var(--gold);background:rgba(200,160,60,.08);box-shadow:0 0 12px rgba(200,160,60,.15)}
+.sess-pair-tag{font-size:8px;font-weight:700;padding:4px 8px;border-radius:6px;border:1px solid;text-align:center;letter-spacing:.5px}
+.cal-filter-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:20px;padding:4px 10px;font-size:8px;font-weight:700;cursor:pointer;transition:.2s;font-family:var(--fd)}
+.cal-filter-btn:hover{border-color:var(--gold2);color:var(--gold2)}
+.cal-filter-btn.on{background:rgba(200,160,60,.15);border-color:var(--gold2);color:var(--gold2)}
 .sess-item{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:20px;border:1px solid transparent;font-size:9px;font-family:var(--fd)}
 .sess-item.open{background:rgba(0,200,120,.1);border-color:rgba(0,200,120,.3)}
 .sess-item.closed{background:rgba(80,80,80,.1);border-color:rgba(80,80,80,.2);opacity:.6}
@@ -1043,19 +1049,43 @@ body{padding-top:22px;}
 
 <div class="panel" id="p-macro">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">📆</span><div><div class="p-title-text">CALENDRIER ÉCONOMIQUE</div><div class="p-title-sub">NFP · CPI · PMI · Banques centrales</div></div></div>
-    <span class="badge badge-live">TODAY</span>
+    <div class="p-title-left"><span class="p-title-icon">📆</span><div><div class="p-title-text">CALENDRIER ÉCONOMIQUE</div><div class="p-title-sub">NFP · CPI · PMI · Banques centrales · Impact sur les paires</div></div></div>
+    <span class="badge badge-live">LIVE</span>
   </div>
-  <!-- TradingView Economic Calendar Widget -->
+  <!-- Filtres -->
+  <div id="cal-filters" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    <div style="font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.05em">IMPACT</div>
+    <button class="cal-filter-btn on" data-filter="all" onclick="calSetFilter('all',this)">Tous</button>
+    <button class="cal-filter-btn" data-filter="high" onclick="calSetFilter('high',this)">🔴 Élevé</button>
+    <button class="cal-filter-btn" data-filter="medium" onclick="calSetFilter('medium',this)">🟡 Moyen</button>
+    <button class="cal-filter-btn" data-filter="low" onclick="calSetFilter('low',this)">⚪ Faible</button>
+    <div style="width:1px;height:16px;background:var(--border2)"></div>
+    <div style="font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.05em">PAYS</div>
+    <button class="cal-filter-btn on" data-country="all" onclick="calSetCountry('all',this)">Tous</button>
+    <button class="cal-filter-btn" data-country="US" onclick="calSetCountry('US',this)">🇺🇸 US</button>
+    <button class="cal-filter-btn" data-country="EU" onclick="calSetCountry('EU',this)">🇪🇺 EU</button>
+    <button class="cal-filter-btn" data-country="GB" onclick="calSetCountry('GB',this)">🇬🇧 GB</button>
+    <button class="cal-filter-btn" data-country="JP" onclick="calSetCountry('JP',this)">🇯🇵 JP</button>
+  </div>
+  <!-- Navigation semaine -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <button onclick="calPrevWeek()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:10px">← Semaine préc.</button>
+    <div id="cal-week-label" style="font-size:10px;font-weight:800;color:var(--gold2)"></div>
+    <button onclick="calNextWeek()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:10px">Semaine suiv. →</button>
+  </div>
+  <!-- Calendrier custom -->
+  <div id="cal-content" style="margin-bottom:16px"></div>
+  <!-- Widget TradingView en complément -->
   <div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
+    <div style="font-size:9px;font-weight:700;color:var(--muted);padding:8px 12px;background:var(--surface2);border-bottom:1px solid var(--border2)">📡 FLUX LIVE TRADINGVIEW</div>
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-      {"colorTheme":"dark","isTransparent":true,"width":"100%","height":500,"locale":"fr","importanceFilter":"-1,0,1","countryFilter":"us,eu,gb,jp,cn,ca,au,ch"}</script>
+      {"colorTheme":"dark","isTransparent":true,"width":"100%","height":400,"locale":"fr","importanceFilter":"0,1","countryFilter":"us,eu,gb,jp,cn,ca,au,ch"}</script>
     </div>
   </div>
   <div id="macro-list"></div>
-  <div style="font-size:8px;color:var(--dim);margin-top:10px;padding:8px 12px;background:var(--s1);border-radius:4px;border:1px solid var(--border);line-height:1.7">🟢 Résultat &gt; Prévision = <strong style="color:var(--green)">Bullish</strong> monnaie &nbsp;·&nbsp; 🔴 Résultat &lt; Prévision = <strong style="color:var(--red)">Bearish</strong> monnaie</div>
+  <div style="font-size:8px;color:var(--dim);margin-top:10px;padding:8px 12px;background:var(--s1);border-radius:4px;border:1px solid var(--border);line-height:1.7">🟢 Résultat &gt; Prévision = <strong style="color:var(--green)">Bullish</strong> monnaie &nbsp;·&nbsp; 🔴 Résultat &lt; Prévision = <strong style="color:var(--red)">Bearish</strong> monnaie &nbsp;·&nbsp; ⚡ Impact PTL = volatilité accrue sur les paires concernées</div>
 </div>
 
 <div class="panel" id="p-heatmap">
@@ -1094,11 +1124,40 @@ body{padding-top:22px;}
 
 <div class="panel" id="p-sessions">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🕐</span><div><div class="p-title-text">SESSIONS &amp; CORRÉLATIONS</div><div class="p-title-sub">Horaires marchés live · Matrice corrélation Forex · Overlap sessions</div></div></div>
-    <div id="world-clock">--:--:-- UTC</div>
+    <div class="p-title-left"><span class="p-title-icon">🕐</span><div><div class="p-title-text">SESSIONS DE TRADING</div><div class="p-title-sub">Horaires live · Timeline 24h · Meilleures paires · Corrélations · Volatilité</div></div></div>
+    <div id="world-clock" style="font-size:9px;font-weight:700;color:var(--gold2);font-family:monospace">--:--:-- UTC</div>
   </div>
-  <!-- Session Clock -->
-  <div class="session-bar" id="session-bar">
+
+  <!-- Horloges mondiales -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+    <div class="sess-clock-card" id="scc-paris">
+      <div style="font-size:16px;margin-bottom:2px">🇫🇷</div>
+      <div style="font-size:9px;color:var(--muted);font-weight:700">PARIS</div>
+      <div id="sct-paris" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
+      <div id="scd-paris" style="font-size:7px;color:var(--dim)">--</div>
+    </div>
+    <div class="sess-clock-card" id="scc-london">
+      <div style="font-size:16px;margin-bottom:2px">🇬🇧</div>
+      <div style="font-size:9px;color:var(--muted);font-weight:700">LONDRES</div>
+      <div id="sct-london" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
+      <div id="scd-london" style="font-size:7px;color:var(--dim)">--</div>
+    </div>
+    <div class="sess-clock-card" id="scc-newyork">
+      <div style="font-size:16px;margin-bottom:2px">🇺🇸</div>
+      <div style="font-size:9px;color:var(--muted);font-weight:700">NEW YORK</div>
+      <div id="sct-newyork" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
+      <div id="scd-newyork" style="font-size:7px;color:var(--dim)">--</div>
+    </div>
+    <div class="sess-clock-card" id="scc-tokyo">
+      <div style="font-size:16px;margin-bottom:2px">🇯🇵</div>
+      <div style="font-size:9px;color:var(--muted);font-weight:700">TOKYO</div>
+      <div id="sct-tokyo" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
+      <div id="scd-tokyo" style="font-size:7px;color:var(--dim)">--</div>
+    </div>
+  </div>
+
+  <!-- Status sessions + countdown -->
+  <div class="session-bar" id="session-bar" style="margin-bottom:16px">
     <div class="sess-item" id="sess-tokyo"><span class="sess-dot" id="sd-tokyo"></span><div><div class="sess-name">🇯🇵 TOKYO</div><div class="sess-time" id="st-tokyo">00:00–09:00 UTC</div></div></div>
     <div class="sess-divider"></div>
     <div class="sess-item" id="sess-london"><span class="sess-dot" id="sd-london"></span><div><div class="sess-name">🇬🇧 LONDRES</div><div class="sess-time" id="st-london">07:00–16:00 UTC</div></div></div>
@@ -1107,25 +1166,110 @@ body{padding-top:22px;}
     <div class="sess-divider"></div>
     <div class="sess-item" id="sess-sydney"><span class="sess-dot" id="sd-sydney"></span><div><div class="sess-name">🇦🇺 SYDNEY</div><div class="sess-time" id="st-sydney">21:00–06:00 UTC</div></div></div>
     <div style="margin-left:auto;font-size:9px;color:var(--dim);line-height:1.6">
-      <div><span style="color:var(--gold)">●</span> Overlap = volatilité maximale</div>
+      <div><span style="color:var(--gold)">●</span> Overlap = volatilité max</div>
       <div id="next-session" style="color:var(--gold2);font-weight:700;margin-top:3px"></div>
     </div>
   </div>
-  <!-- Correlation Matrix -->
-  <div style="margin-bottom:16px">
+
+  <!-- Timeline 24h animée -->
+  <div style="margin-bottom:20px">
     <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      📐 MATRICE DE CORRÉLATION — 30 jours
-      <span style="font-size:8px;color:var(--dim);font-weight:400">(valeurs calculées sur données historiques)</span>
+      🕐 TIMELINE 24H — HEURE UTC
+      <span id="sess-overlap-badge" style="display:none;font-size:8px;padding:2px 8px;border-radius:10px;background:rgba(200,160,60,.2);color:var(--gold2);font-weight:700;animation:pulse 1.5s infinite">⚡ OVERLAP ACTIF</span>
     </div>
-    <div style="overflow-x:auto"><div id="corr-matrix"></div></div>
+    <div style="position:relative;height:56px;background:#0a0a14;border-radius:8px;overflow:hidden;border:1px solid var(--border2)" id="sess-timeline-wrap">
+      <!-- Barres sessions -->
+      <!-- Tokyo: 0-9 UTC -->
+      <div style="position:absolute;left:0%;width:37.5%;top:6px;height:18px;background:rgba(255,136,68,.25);border-radius:3px;border:1px solid rgba(255,136,68,.4)" title="Tokyo"></div>
+      <div style="position:absolute;left:0%;top:6px;font-size:7px;color:#ff8844;padding:3px 5px;font-weight:700">🇯🇵</div>
+      <!-- London: 7-16 UTC (29.2%-66.7%) -->
+      <div style="position:absolute;left:29.2%;width:37.5%;top:28px;height:18px;background:rgba(77,166,255,.25);border-radius:3px;border:1px solid rgba(77,166,255,.4)" title="Londres"></div>
+      <div style="position:absolute;left:30%;top:28px;font-size:7px;color:#4da6ff;padding:3px 5px;font-weight:700">🇬🇧</div>
+      <!-- NY: 12-21 UTC (50%-87.5%) -->
+      <div style="position:absolute;left:50%;width:37.5%;top:6px;height:40px;background:rgba(200,160,60,.18);border-radius:3px;border:1px solid rgba(200,160,60,.35)" title="New York"></div>
+      <div style="position:absolute;left:51%;top:6px;font-size:7px;color:#c8a03c;padding:3px 5px;font-weight:700">🇺🇸</div>
+      <!-- Overlap London/NY: 12-16 UTC (50%-66.7%) = zone chaude -->
+      <div style="position:absolute;left:50%;width:16.7%;top:6px;height:40px;background:rgba(255,200,50,.13);border-radius:2px;border-top:2px solid rgba(255,200,50,.6);border-bottom:2px solid rgba(255,200,50,.6)" title="Overlap Londres/NY"></div>
+      <!-- Aiguille curseur temps actuel -->
+      <div id="sess-time-cursor" style="position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.9);box-shadow:0 0 6px rgba(255,255,255,.6);transition:left .5s linear;z-index:10">
+        <div style="position:absolute;top:-4px;left:-4px;width:10px;height:10px;background:white;border-radius:50%;box-shadow:0 0 8px white"></div>
+      </div>
+      <!-- Labels heures -->
+      <div style="position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:space-between;padding:0 4px">
+        <span style="font-size:6px;color:rgba(255,255,255,.3)">00h</span>
+        <span style="font-size:6px;color:rgba(255,255,255,.3)">06h</span>
+        <span style="font-size:6px;color:rgba(255,255,255,.3)">12h</span>
+        <span style="font-size:6px;color:rgba(255,255,255,.3)">18h</span>
+        <span style="font-size:6px;color:rgba(255,255,255,.3)">24h</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#ff8844">■</span> Tokyo 00h–09h UTC</span>
+      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#4da6ff">■</span> Londres 07h–16h UTC</span>
+      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#c8a03c">■</span> New York 12h–21h UTC</span>
+      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#ffcc33">■</span> Overlap London/NY</span>
+    </div>
   </div>
-  <!-- Session volatility timeline -->
-  <div>
-    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px">📈 PROFIL DE VOLATILITÉ HORAIRE</div>
+
+  <!-- Meilleures paires par session -->
+  <div style="margin-bottom:20px">
+    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px">🎯 MEILLEURES PAIRES PAR SESSION</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div style="background:rgba(255,136,68,.08);border:1px solid rgba(255,136,68,.25);border-radius:8px;padding:10px">
+        <div style="font-size:9px;font-weight:800;color:#ff8844;margin-bottom:8px">🇯🇵 TOKYO (00h–09h UTC)</div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Paris : 02h–11h</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">USD/JPY</div>
+          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">AUD/USD</div>
+          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">GBP/JPY</div>
+          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">EUR/JPY</div>
+          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">NZD/USD</div>
+        </div>
+        <div style="font-size:7px;color:var(--dim);margin-top:8px;line-height:1.5">⚠️ Volatilité modérée<br>Éviter EUR/USD, GBP/USD</div>
+      </div>
+      <div style="background:rgba(77,166,255,.08);border:1px solid rgba(77,166,255,.25);border-radius:8px;padding:10px">
+        <div style="font-size:9px;font-weight:800;color:#4da6ff;margin-bottom:8px">🇬🇧 LONDRES (07h–16h UTC)</div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Paris : 09h–18h ⭐ Prime</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">EUR/USD ⭐</div>
+          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">GBP/USD ⭐</div>
+          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">GBP/JPY</div>
+          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">XAU/USD</div>
+          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">EUR/GBP</div>
+        </div>
+        <div style="font-size:7px;color:var(--green);margin-top:8px;line-height:1.5">✅ Meilleure session PTL<br>Double Structure actif</div>
+      </div>
+      <div style="background:rgba(200,160,60,.08);border:1px solid rgba(200,160,60,.25);border-radius:8px;padding:10px">
+        <div style="font-size:9px;font-weight:800;color:#c8a03c;margin-bottom:8px">🇺🇸 NEW YORK (12h–21h UTC)</div>
+        <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Paris : 14h–23h</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">EUR/USD ⭐</div>
+          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">USD/CAD</div>
+          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">XAU/USD</div>
+          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">US30 / NAS100</div>
+          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">GBP/USD</div>
+        </div>
+        <div style="font-size:7px;color:var(--gold2);margin-top:8px;line-height:1.5">⚡ Overlap 14h–18h Paris<br>Volatilité maximale !</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Volatility timeline -->
+  <div style="margin-bottom:20px">
+    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px">📈 PROFIL DE VOLATILITÉ HORAIRE (EUR/USD)</div>
     <div id="vol-timeline" style="display:flex;gap:2px;align-items:flex-end;height:60px;padding:0 4px"></div>
     <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:var(--dim);padding:0 4px">
       <span>00h</span><span>03h</span><span>06h</span><span>09h</span><span>12h</span><span>15h</span><span>18h</span><span>21h</span>
     </div>
+  </div>
+
+  <!-- Correlation Matrix -->
+  <div style="margin-bottom:16px">
+    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      📐 MATRICE DE CORRÉLATION — 30 jours
+      <span style="font-size:8px;color:var(--dim);font-weight:400">(données historiques)</span>
+    </div>
+    <div style="overflow-x:auto"><div id="corr-matrix"></div></div>
   </div>
 </div>
 
@@ -4550,7 +4694,7 @@ function nav(id){
   if(id==='heatmap'){renderHeatmap();}
   if(id==='sessions'){renderV20Sessions();startV20SessionClock();}
   if(id==='ia'){renderIAPanel();}
-  if(id==='macro'){renderMacroEnriched();}
+  if(id==='macro'){renderMacroEnriched(); renderCalendar();}
   if(id==='backtest'){renderBacktest();}
   if(id==='cot'){renderCOT();}
   if(id==='dmx'){renderDMX();}
@@ -4558,6 +4702,176 @@ function nav(id){
   if(id==='squawk'){renderSquawk();}
   if(id==='setups'){renderSetups();}
 }
+
+/* ═══════════════════════════════════════════
+   CALENDRIER ÉCONOMIQUE
+═══════════════════════════════════════════ */
+var _calWeekOffset = 0;
+var _calFilter = 'all';
+var _calCountry = 'all';
+
+// Base événements récurrents (pattern mensuel)
+var CAL_EVENTS = [
+  // USA
+  {id:'nfp',    country:'US', currency:'USD', name:'Non-Farm Payrolls', impact:'high', dayRule:'first_friday', timeUTC:'12:30', note:'Volatilité extrême XAU/USD, EUR/USD'},
+  {id:'cpi_us', country:'US', currency:'USD', name:'CPI m/m (Inflation US)', impact:'high', dayRule:'day_11', timeUTC:'12:30', note:'Impact majeur USD — surveiller US30, XAUUSD'},
+  {id:'fomc',   country:'US', currency:'USD', name:'Décision Fed (FOMC)', impact:'high', dayRule:'fomc', timeUTC:'18:00', note:'Mouvement violent possible sur tous USD'},
+  {id:'pmi_us', country:'US', currency:'USD', name:'PMI Manufacturier ISM', impact:'medium', dayRule:'first_business', timeUTC:'14:00', note:'Indicateur santé éco US'},
+  {id:'retail', country:'US', currency:'USD', name:'Retail Sales m/m', impact:'medium', dayRule:'day_15', timeUTC:'12:30', note:'Consommation US — impact modéré USD'},
+  {id:'jobless',country:'US', currency:'USD', name:'Jobless Claims', impact:'medium', dayRule:'thursday_weekly', timeUTC:'12:30', note:'Hebdomadaire — impact limité sauf surprise'},
+  {id:'gdp_us', country:'US', currency:'USD', name:'GDP Advance q/q', impact:'high', dayRule:'last_thursday_month', timeUTC:'12:30', note:'Croissance US trimestrielle'},
+  // ZONE EURO
+  {id:'bce',    country:'EU', currency:'EUR', name:'Décision BCE (Taux)', impact:'high', dayRule:'bce', timeUTC:'12:15', note:'EUR/USD, EUR/JPY, GBP/EUR très volatils'},
+  {id:'cpi_eu', country:'EU', currency:'EUR', name:'CPI Flash Zone Euro', impact:'high', dayRule:'day_1_month', timeUTC:'10:00', note:'Inflation EU — impact direct EUR'},
+  {id:'pmi_eu', country:'EU', currency:'EUR', name:'PMI Composite Zone Euro', impact:'medium', dayRule:'day_22', timeUTC:'09:00', note:'Activité économique européenne'},
+  {id:'zew',    country:'EU', currency:'EUR', name:'Sentiment ZEW Allemagne', impact:'medium', dayRule:'second_tuesday', timeUTC:'10:00', note:'Confiance économique allemande'},
+  // UK
+  {id:'boe',    country:'GB', currency:'GBP', name:'Décision BoE (Taux)', impact:'high', dayRule:'boe', timeUTC:'12:00', note:'GBP/USD, GBP/JPY très volatils'},
+  {id:'cpi_gb', country:'GB', currency:'GBP', name:'CPI y/y Royaume-Uni', impact:'high', dayRule:'day_16', timeUTC:'07:00', note:'Inflation UK — pivotal pour GBP'},
+  {id:'gdp_gb', country:'GB', currency:'GBP', name:'GDP m/m UK', impact:'medium', dayRule:'day_11', timeUTC:'07:00', note:'Croissance mensuelle UK'},
+  // JAPON
+  {id:'boj',    country:'JP', currency:'JPY', name:'Décision BoJ (Politique)', impact:'high', dayRule:'boj', timeUTC:'03:00', note:'JPY très volatil — USD/JPY, GBP/JPY'},
+  {id:'cpi_jp', country:'JP', currency:'JPY', name:'CPI National Japon', impact:'medium', dayRule:'day_22', timeUTC:'23:30', note:'Impact modéré JPY la nuit'},
+  {id:'tankan', country:'JP', currency:'JPY', name:'Tankan Survey BoJ', impact:'high', dayRule:'first_biz_quarter', timeUTC:'23:50', note:'Enquête trimestrielle BoJ'},
+];
+
+// Calcule quels événements tombent dans la semaine ciblée
+function calGetWeekEvents(offset){
+  var now = new Date();
+  var monday = new Date(now);
+  var day = monday.getUTCDay() || 7;
+  monday.setUTCDate(monday.getUTCDate() - day + 1 + offset*7);
+  monday.setUTCHours(0,0,0,0);
+
+  var events = [];
+  for(var d=0; d<5; d++){
+    var date = new Date(monday);
+    date.setUTCDate(monday.getUTCDate()+d);
+    var y = date.getUTCFullYear(), m = date.getUTCMonth()+1, dom = date.getUTCDate();
+    var dow = date.getUTCDay(); // 1=Mon,...,5=Fri
+
+    CAL_EVENTS.forEach(function(ev){
+      var match = false;
+      if(ev.dayRule === 'first_friday' && dow===5 && dom<=7) match=true;
+      else if(ev.dayRule === 'first_business' && dow===1 && dom<=3) match=true;
+      else if(ev.dayRule === 'thursday_weekly' && dow===4) match=true;
+      else if(ev.dayRule === 'second_tuesday' && dow===2 && dom>=8 && dom<=14) match=true;
+      else if(ev.dayRule === 'last_thursday_month' && dow===4 && dom>=25) match=true;
+      else if(ev.dayRule === 'first_biz_quarter' && dow===1 && dom<=7 && (m===1||m===4||m===7||m===10)) match=true;
+      else if(ev.dayRule === 'day_11' && dom===11) match=true;
+      else if(ev.dayRule === 'day_15' && dom===15) match=true;
+      else if(ev.dayRule === 'day_1_month' && dom===1) match=true;
+      else if(ev.dayRule === 'day_22' && dom===22) match=true;
+      else if(ev.dayRule === 'fomc' && dom>=15 && dom<=31 && (m===1||m===3||m===5||m===6||m===7||m===9||m===10||m===11) && dow===3) match=true;
+      else if(ev.dayRule === 'bce' && dom>=7 && dom<=14 && dow===4 && (m===1||m===3||m===4||m===6||m===7||m===9||m===10||m===12)) match=true;
+      else if(ev.dayRule === 'boe' && dom>=1 && dom<=8 && dow===4) match=true;
+      else if(ev.dayRule === 'boj' && dom>=23 && dom<=31 && dow===5) match=true;
+      else if(ev.dayRule === 'day_16' && dom===16) match=true;
+
+      if(match){
+        events.push(Object.assign({}, ev, {date:date, dom:dom, dow:dow}));
+      }
+    });
+  }
+  return {events:events, monday:monday};
+}
+
+function calImpactColor(impact){
+  return impact==='high'?'#e05555':impact==='medium'?'#c8a03c':'#666';
+}
+function calImpactDot(impact){
+  return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+calImpactColor(impact)+';margin-right:5px;flex-shrink:0"></span>';
+}
+function calFlagForCountry(c){
+  return {US:'🇺🇸',EU:'🇪🇺',GB:'🇬🇧',JP:'🇯🇵'}[c]||'🌐';
+}
+var CAL_DOW_NAMES = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+var CAL_MONTH_NAMES = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+
+function renderCalendar(){
+  var el = document.getElementById('cal-content');
+  if(!el) return;
+  var res = calGetWeekEvents(_calWeekOffset);
+  var monday = res.monday;
+  var allEvs = res.events;
+
+  // Mettre à jour le label semaine
+  var friday = new Date(monday); friday.setUTCDate(monday.getUTCDate()+4);
+  var lbl = document.getElementById('cal-week-label');
+  if(lbl){
+    var mStr = monday.getUTCDate()+' '+CAL_MONTH_NAMES[monday.getUTCMonth()];
+    var fStr = friday.getUTCDate()+' '+CAL_MONTH_NAMES[friday.getUTCMonth()]+' '+friday.getUTCFullYear();
+    lbl.textContent = mStr+' – '+fStr;
+    lbl.style.color = _calWeekOffset===0?'var(--gold2)':'var(--muted)';
+  }
+
+  // Filtrer
+  var evs = allEvs.filter(function(ev){
+    if(_calFilter !== 'all' && ev.impact !== _calFilter) return false;
+    if(_calCountry !== 'all' && ev.country !== _calCountry) return false;
+    return true;
+  });
+
+  if(!evs.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--dim);font-size:11px">Aucun événement cette semaine avec ces filtres</div>';
+    return;
+  }
+
+  // Grouper par jour
+  var byDay = {};
+  evs.forEach(function(ev){
+    var k = ev.dow;
+    if(!byDay[k]) byDay[k] = [];
+    byDay[k].push(ev);
+  });
+
+  var now = new Date();
+  var todayUTCDay = now.getUTCDay();
+
+  var h = '';
+  [1,2,3,4,5].forEach(function(dow){
+    if(!byDay[dow]) return;
+    var d = byDay[dow][0].date;
+    var isToday = (d.getUTCDate()===now.getUTCDate()&&d.getUTCMonth()===now.getUTCMonth()&&d.getUTCFullYear()===now.getUTCFullYear());
+    h += '<div style="margin-bottom:12px">';
+    h += '<div style="font-size:9px;font-weight:800;color:'+(isToday?'var(--gold2)':'var(--muted)')+';margin-bottom:6px;display:flex;align-items:center;gap:6px">';
+    h += CAL_DOW_NAMES[dow].toUpperCase()+' '+d.getUTCDate()+' '+CAL_MONTH_NAMES[d.getUTCMonth()].toUpperCase();
+    if(isToday) h += '<span style="font-size:7px;padding:1px 6px;border-radius:8px;background:rgba(200,160,60,.2);color:var(--gold2)">AUJOURD\'HUI</span>';
+    h += '</div>';
+    byDay[dow].forEach(function(ev){
+      var isPast = isToday && parseInt(ev.timeUTC)<=now.getUTCHours();
+      h += '<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:7px;margin-bottom:4px;background:'+
+           (isPast?'rgba(255,255,255,.02)':'rgba(255,255,255,.04)')+';border:1px solid '+
+           (isPast?'var(--border)':calImpactColor(ev.impact)+'44')+';opacity:'+(isPast?.6:1)+'">';
+      h += '<div style="min-width:36px;text-align:right;font-size:8px;font-family:monospace;color:var(--muted);margin-top:1px">'+ev.timeUTC+'</div>';
+      h += '<div style="flex:1">';
+      h += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">';
+      h += calImpactDot(ev.impact);
+      h += '<span style="font-size:9px;font-weight:700;color:var(--text)">'+ev.name+'</span>';
+      h += '<span style="margin-left:auto;font-size:8px">'+calFlagForCountry(ev.country)+' '+ev.currency+'</span>';
+      h += '</div>';
+      h += '<div style="font-size:8px;color:var(--dim);font-style:italic">'+ev.note+'</div>';
+      h += '</div></div>';
+    });
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
+function calSetFilter(f, btn){
+  _calFilter = f;
+  document.querySelectorAll('.cal-filter-btn[data-filter]').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  renderCalendar();
+}
+function calSetCountry(c, btn){
+  _calCountry = c;
+  document.querySelectorAll('.cal-filter-btn[data-country]').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  renderCalendar();
+}
+function calPrevWeek(){ _calWeekOffset--; renderCalendar(); }
+function calNextWeek(){ _calWeekOffset++; renderCalendar(); }
 
 /* SESSIONS */
 var SESSIONS=[
@@ -8368,8 +8682,26 @@ function updateSessionClock(){
   var clock = document.getElementById('world-clock');
   if(clock) clock.textContent = utcStr + ' UTC';
 
+  // Horloges mondiales
+  var tzMap = {
+    paris:   'Europe/Paris',
+    london:  'Europe/London',
+    newyork: 'America/New_York',
+    tokyo:   'Asia/Tokyo'
+  };
+  Object.keys(tzMap).forEach(function(id){
+    var tEl = document.getElementById('sct-'+id);
+    var dEl = document.getElementById('scd-'+id);
+    if(!tEl) return;
+    var opts = {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:tzMap[id]};
+    var dOpts = {weekday:'short',day:'numeric',month:'short',timeZone:tzMap[id]};
+    tEl.textContent = now.toLocaleTimeString('fr-FR',opts);
+    if(dEl) dEl.textContent = now.toLocaleDateString('fr-FR',dOpts);
+  });
+
   var h = getUTCHour();
   var openSessions = [];
+  var anyOverlap = false;
 
   Object.keys(SESSIONS).forEach(function(key){
     var s = SESSIONS[key];
@@ -8378,22 +8710,49 @@ function updateSessionClock(){
     var dot = document.getElementById('sd-'+key);
     if(!el || !dot) return;
 
-    // Check overlap
     var other = Object.keys(SESSIONS).filter(function(k){ return k!==key && isSessionOpen(SESSIONS[k].open, SESSIONS[k].close); });
     var overlap = open && other.length > 0;
+    if(overlap) anyOverlap = true;
 
     el.className = 'sess-item ' + (overlap ? 'overlap' : open ? 'open' : 'closed');
     dot.className = 'sess-dot ' + (overlap ? 'overlap' : open ? 'open' : 'closed');
     if(open) openSessions.push(s.label.replace(/[\uD800-\uDFFF]{2}\s*/,''));
+
+    // Highlight horloge card
+    var sessCardMap = {tokyo:'scc-tokyo', london:'scc-london', newyork:'scc-newyork'};
+    var cardId = sessCardMap[key];
+    if(cardId){
+      var card = document.getElementById(cardId);
+      if(card) card.className = 'sess-clock-card' + (open ? ' active' : '');
+    }
   });
+  // Paris est active pendant Londres ou NY
+  var parisCard = document.getElementById('scc-paris');
+  if(parisCard){
+    var lonOpen = isSessionOpen(SESSIONS.london.open, SESSIONS.london.close);
+    var nyOpen  = isSessionOpen(SESSIONS.newyork.open, SESSIONS.newyork.close);
+    parisCard.className = 'sess-clock-card' + (lonOpen || nyOpen ? ' active' : '');
+  }
+
+  // Aiguille timeline 24h
+  var cursor = document.getElementById('sess-time-cursor');
+  if(cursor){
+    var utcHour = now.getUTCHours() + now.getUTCMinutes()/60 + now.getUTCSeconds()/3600;
+    var pct = (utcHour / 24) * 100;
+    cursor.style.left = pct.toFixed(2) + '%';
+  }
+
+  // Badge overlap
+  var badge = document.getElementById('sess-overlap-badge');
+  if(badge) badge.style.display = anyOverlap ? 'inline-block' : 'none';
 
   var next = document.getElementById('next-session');
   if(next){
     if(openSessions.length === 0){
-      var nextH = 0; // Tokyo opens at 0 UTC
+      var nextH = 0;
       var diff = (nextH - h + 24) % 24;
       next.textContent = '⏰ Tokyo ouvre dans '+Math.floor(diff)+'h'+(Math.round((diff%1)*60))+'m';
-    } else if(openSessions.length >= 2){
+    } else if(anyOverlap){
       next.textContent = '⚡ OVERLAP ACTIF — Volatilité maximale !';
     } else {
       next.textContent = '✅ '+openSessions[0]+' ouverte';
@@ -8707,13 +9066,17 @@ function v20UpdateClock(){
 
 function renderV20Sessions(){
   v20UpdateClock();
+  updateSessionClock(); // enrichissements: horloges mondiales + timeline 24h
   v20RenderCorrelation();
   v20RenderVolTimeline();
 }
 
 function startV20SessionClock(){
   if(V20_SESSION_TIMER) clearInterval(V20_SESSION_TIMER);
-  V20_SESSION_TIMER=setInterval(v20UpdateClock,1000);
+  V20_SESSION_TIMER=setInterval(function(){
+    v20UpdateClock();
+    updateSessionClock();
+  },1000);
 }
 
 /* CORRELATION MATRIX V20 */
