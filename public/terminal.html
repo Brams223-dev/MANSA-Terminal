@@ -11759,59 +11759,460 @@ function renderMacroFilter(impact){
 
 
 /* CALC PTL — Calculateur de position complet */
+/* ══════════════════════════════════════════════════════
+   CALCULATEUR DE POSITION — TYPE CASHBACKFOREX
+   ══════════════════════════════════════════════════════ */
+
+/* Données pip par instrument (valeur pip par lot standard en USD) */
+var CALC_INSTRUMENTS = {
+  // Forex Majeures (base/USD)
+  'EUR/USD':{pipVal:10,contract:100000,quote:'USD',cat:'forex'},
+  'GBP/USD':{pipVal:10,contract:100000,quote:'USD',cat:'forex'},
+  'AUD/USD':{pipVal:10,contract:100000,quote:'USD',cat:'forex'},
+  'NZD/USD':{pipVal:10,contract:100000,quote:'USD',cat:'forex'},
+  // Forex USD/quote
+  'USD/JPY':{pipVal:9.09,contract:100000,quote:'JPY',cat:'forex'},
+  'USD/CHF':{pipVal:11.11,contract:100000,quote:'CHF',cat:'forex'},
+  'USD/CAD':{pipVal:7.46,contract:100000,quote:'CAD',cat:'forex'},
+  // Crosses majeures
+  'EUR/GBP':{pipVal:12.5,contract:100000,quote:'GBP',cat:'forex'},
+  'EUR/JPY':{pipVal:9.09,contract:100000,quote:'JPY',cat:'forex'},
+  'GBP/JPY':{pipVal:9.09,contract:100000,quote:'JPY',cat:'forex'},
+  'EUR/CHF':{pipVal:11.11,contract:100000,quote:'CHF',cat:'forex'},
+  'GBP/CHF':{pipVal:11.11,contract:100000,quote:'CHF',cat:'forex'},
+  'EUR/AUD':{pipVal:6.5,contract:100000,quote:'AUD',cat:'forex'},
+  'GBP/AUD':{pipVal:6.5,contract:100000,quote:'AUD',cat:'forex'},
+  'AUD/JPY':{pipVal:9.09,contract:100000,quote:'JPY',cat:'forex'},
+  'CAD/JPY':{pipVal:9.09,contract:100000,quote:'JPY',cat:'forex'},
+  // Métaux
+  'XAU/USD':{pipVal:10,contract:100,quote:'USD',cat:'metal',pipSize:0.01},
+  'XAG/USD':{pipVal:5,contract:5000,quote:'USD',cat:'metal',pipSize:0.001},
+  // Indices
+  'US30':{pipVal:1,contract:1,quote:'USD',cat:'index'},
+  'SPX500':{pipVal:1,contract:1,quote:'USD',cat:'index'},
+  'NAS100':{pipVal:1,contract:1,quote:'USD',cat:'index'},
+  'DAX40':{pipVal:1,contract:1,quote:'EUR',cat:'index'},
+  'UK100':{pipVal:1,contract:1,quote:'GBP',cat:'index'},
+  // Crypto
+  'BTC/USD':{pipVal:1,contract:1,quote:'USD',cat:'crypto'},
+  'ETH/USD':{pipVal:0.1,contract:1,quote:'USD',cat:'crypto'},
+  // Africaines
+  'USD/ZAR':{pipVal:0.55,contract:100000,quote:'ZAR',cat:'africa'},
+  'USD/NGN':{pipVal:0.006,contract:100000,quote:'NGN',cat:'africa'},
+  'USD/KES':{pipVal:0.0077,contract:100000,quote:'KES',cat:'africa'},
+  'USD/GHS':{pipVal:0.067,contract:100000,quote:'GHS',cat:'africa'},
+  'USD/XOF':{pipVal:0.0016,contract:100000,quote:'XOF',cat:'africa'},
+  'USD/MAD':{pipVal:0.1,contract:100000,quote:'MAD',cat:'africa'},
+};
+
+/* Devises de dépôt supportées */
+var DEPOSIT_CURRENCIES = ['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD'];
+
+/* Taux de conversion approximatifs vers USD (pour devises de dépôt) */
+var TO_USD = {USD:1,EUR:1.09,GBP:1.30,JPY:0.0067,CHF:1.11,CAD:0.74,AUD:0.65,NZD:0.60};
+
+var _calcSLMode = 'pips'; // 'pips' | 'price'
+var _calcRiskMode = 'pct'; // 'pct' | 'amount'
+
 function renderCalc(){
   var el = document.getElementById('calc-content');
   if(!el) return;
-  var fxOpts = FX.map(function(f){return '<option value="'+f.p+'"'+(f.p==='EUR/USD'?' selected':'')+'>'+f.p+'</option>';}).join('');
-  var h = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-  h += '<div><div style="background:var(--s1);border:1px solid rgba(200,160,60,.25);border-radius:10px;padding:16px;margin-bottom:12px">';
-  h += '<div style="font-family:var(--fd);font-size:10px;color:var(--gold2);margin-bottom:14px">⚙️ PARAMÈTRES DU TRADE</div>';
-  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">💰 Capital ($)</label><input id="c-capital" type="number" value="10000" min="100" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>';
-  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">⚡ Risque (%)</label>';
-  h += '<div style="display:flex;gap:4px;margin-bottom:6px">'+['0.5','1','1.5','2','3'].map(function(r){return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:5px 2px;background:var(--s2);border:1px solid var(--border2);border-radius:4px;font-size:9px;color:var(--dim);cursor:pointer;font-family:var(--fm)">'+r+'%</button>';}).join('')+'</div>';
-  h += '<input id="c-risk" type="number" value="1" min="0.1" max="5" step="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--gold);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>';
-  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">📊 Paire</label><select id="c-pair" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:11px">'+fxOpts+'</select></div>';
-  h += '<div style="margin-bottom:10px"><label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">⚡ Stratégie PTL</label><select id="c-strat" onchange="updateStratDefaults()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:11px"><option value="ptl-ds">🏗️ Double Structure (RR 2.5)</option><option value="ptl-mtf">📐 Multi-Timeframes (RR 2.5)</option><option value="ptl-sam">📈 Swing Action Market (RR 2)</option><option value="ptl-ivc">📊 IVC Indices (RR 2.2)</option></select></div>';
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label style="font-size:8px;color:var(--red);display:block;margin-bottom:4px">🛑 Stop Loss (pips)</label><input id="c-sl" type="number" value="20" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(224,82,82,.4);color:var(--red);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>';
-  h += '<div><label style="font-size:8px;color:var(--green);display:block;margin-bottom:4px">🎯 Take Profit (pips)</label><input id="c-tp" type="number" value="50" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(0,200,120,.4);color:var(--green);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div></div>';
-  h += '</div></div>';
-  h += '<div><div style="background:linear-gradient(135deg,rgba(200,160,60,.08),var(--s1));border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px;margin-bottom:12px">';
-  h += '<div style="font-family:var(--fd);font-size:10px;color:var(--gold2);margin-bottom:14px">📐 RÉSULTAT</div>';
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
-  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Taille de position</div><div id="c-lot" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--gold)">—</div><div id="c-lotm" style="font-size:8px;color:var(--dim);margin-top:2px"></div></div>';
-  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Ratio R/R</div><div id="c-rr" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--green)">—</div><div id="c-rr-label" style="font-size:8px;margin-top:2px"></div></div>';
-  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Profit potentiel</div><div id="c-profit" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--green)">—</div></div>';
-  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-size:8px;color:var(--dim);margin-bottom:4px">Perte maximale</div><div id="c-max-loss" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--red)">—</div><div id="c-risk-amt" style="font-size:8px;color:var(--dim);margin-top:2px"></div></div>';
-  h += '</div></div>';
-  h += '<div style="background:rgba(0,200,120,.04);border:1px solid rgba(0,200,120,.15);border-radius:8px;padding:14px">';
-  h += '<div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:10px">📏 RÈGLES PTL MONEY MANAGEMENT</div>';
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
-  [{r:'Risque standard',v:'1% / trade'},{r:'Setup fort 🔥',v:'Max 2%'},{r:'Double Structure RR',v:'Min 2.5:1'},{r:'Multi-TF RR',v:'Min 2.5:1'},{r:'SAM RR',v:'Min 2:1'},{r:'IVC RR',v:'2 à 3:1'}].forEach(function(r){h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:7px 9px"><div style="font-size:7.5px;color:var(--dim)">'+r.r+'</div><div style="font-size:9px;font-weight:700;color:var(--green)">'+r.v+'</div></div>';});
-  h += '</div></div></div>';
+
+  // Groupes d'instruments pour le select
+  var groups = {forex:'Forex',metal:'Métaux',index:'Indices',crypto:'Crypto',africa:'Africaines'};
+  var instOpts = '';
+  Object.keys(groups).forEach(function(cat){
+    instOpts += '<optgroup label="── '+groups[cat]+' ──">';
+    Object.keys(CALC_INSTRUMENTS).forEach(function(k){
+      if(CALC_INSTRUMENTS[k].cat===cat){
+        instOpts += '<option value="'+k+'"'+(k==='EUR/USD'?' selected':'')+'>'+k+'</option>';
+      }
+    });
+    instOpts += '</optgroup>';
+  });
+
+  var depOpts = DEPOSIT_CURRENCIES.map(function(c){return '<option value="'+c+'"'+(c==='USD'?' selected':'')+'>'+c+'</option>';}).join('');
+  var stratOpts = '<option value="ptl-ds">🏗️ Double Structure (RR 2.5)</option><option value="ptl-mtf">📐 Multi-Timeframes (RR 2.5)</option><option value="ptl-sam">📈 Swing Action Market (RR 2)</option><option value="ptl-ivc">📊 IVC Indices (RR 2.2)</option>';
+
+  var h = '';
+
+  // ── SECTION PRINCIPALE ──
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">';
+
+  // ── COLONNE GAUCHE : inputs ──
+  h += '<div style="background:var(--s1);border:1px solid rgba(200,160,60,.2);border-radius:10px;padding:16px">';
+  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:14px">⚙️ PARAMÈTRES</div>';
+
+  // Instrument
+  h += '<div style="margin-bottom:10px">';
+  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">📊 Instrument</label>';
+  h += '<select id="c-inst" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fm);font-size:10px">'+instOpts+'</select>';
   h += '</div>';
+
+  // Devise de dépôt
+  h += '<div style="margin-bottom:10px">';
+  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">💱 Devise de dépôt</label>';
+  h += '<select id="c-depcur" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fm);font-size:10px">'+depOpts+'</select>';
+  h += '</div>';
+
+  // Prix d'entrée
+  h += '<div style="margin-bottom:10px">';
+  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">📍 Prix d\'ouverture</label>';
+  h += '<input id="c-entry" type="number" step="0.00001" value="1.08400" oninput="calcPosition()" placeholder="Ex: 1.08400" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:11px">';
+  h += '</div>';
+
+  // Stop Loss (mode pips / mode prix)
+  h += '<div style="margin-bottom:10px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+  h += '<label style="font-size:8px;color:var(--red)">🛑 Stop Loss</label>';
+  h += '<div style="display:flex;gap:4px">';
+  h += '<button id="c-sl-pips-btn" onclick="calcToggleSLMode(\'pips\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid rgba(224,82,82,.4);cursor:pointer;background:rgba(224,82,82,.15);color:var(--red);font-family:var(--fm)">En pips</button>';
+  h += '<button id="c-sl-price-btn" onclick="calcToggleSLMode(\'price\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);cursor:pointer;background:transparent;color:var(--dim);font-family:var(--fm)">En prix</button>';
+  h += '</div></div>';
+  h += '<input id="c-sl" type="number" step="0.1" value="20" min="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(224,82,82,.35);color:var(--red);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:12px">';
+  h += '<div id="c-sl-hint" style="font-size:7.5px;color:var(--dim);margin-top:3px">pips = distance à l\'entrée en pips</div>';
+  h += '</div>';
+
+  // Take Profit
+  h += '<div style="margin-bottom:10px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+  h += '<label style="font-size:8px;color:var(--green)">🎯 Take Profit</label>';
+  h += '<span id="c-rr-inline" style="font-size:8px;font-weight:700;color:var(--gold)"></span>';
+  h += '</div>';
+  h += '<div style="display:flex;gap:4px;margin-bottom:6px">';
+  h += ['1.5R','2R','2.5R','3R'].map(function(r){
+    var mult=parseFloat(r);
+    return '<button onclick="calcSetTPFromRR('+mult+')" style="flex:1;padding:5px 2px;background:rgba(0,200,120,.07);border:1px solid rgba(0,200,120,.2);border-radius:4px;font-size:9px;color:var(--green);cursor:pointer;font-family:var(--fm)">'+r+'</button>';
+  }).join('');
+  h += '</div>';
+  h += '<input id="c-tp" type="number" step="0.1" value="50" min="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(0,200,120,.3);color:var(--green);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:12px">';
+  h += '<div id="c-tp-hint" style="font-size:7.5px;color:var(--dim);margin-top:3px">pips = distance à l\'entrée en pips</div>';
+  h += '</div>';
+
+  // Taille du contrat (avancé)
+  h += '<div style="margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:8px;color:var(--dim)">📦 Taille du contrat (unités/lot)</span><span id="c-contract-label" style="font-size:8px;color:var(--gold)">100 000</span></div>';
+  h += '<input id="c-contract" type="number" value="100000" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--dim);padding:6px 8px;border-radius:5px;font-family:var(--fd);font-size:10px">';
+  h += '<div style="font-size:7px;color:var(--faint);margin-top:3px">Forex std = 100 000 · Indices/Crypto = variable · Vérifier chez votre broker (MT5 → clic droit → Spécification)</div>';
+  h += '</div>';
+
+  h += '</div>'; // fin colonne gauche
+
+  // ── COLONNE DROITE : capital + risque + résultat ──
+  h += '<div>';
+
+  // Capital + Risque
+  h += '<div style="background:var(--s1);border:1px solid rgba(200,160,60,.2);border-radius:10px;padding:16px;margin-bottom:12px">';
+  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:12px">💰 CAPITAL & RISQUE</div>';
+
+  // Solde du compte
+  h += '<div style="margin-bottom:10px">';
+  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">Solde du compte</label>';
+  h += '<input id="c-capital" type="number" value="10000" min="100" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:13px">';
+  h += '</div>';
+
+  // Preset balances prop firms
+  h += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">';
+  h += [5000,10000,25000,50000,100000,200000].map(function(v){
+    var label=v>=1000?(v/1000)+'K':v;
+    return '<button onclick="document.getElementById(\'c-capital\').value='+v+';calcPosition()" style="padding:3px 7px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;font-size:8px;color:var(--dim);cursor:pointer;font-family:var(--fm)">$'+label+'</button>';
+  }).join('');
+  h += '</div>';
+
+  // Risque % ou montant fixe
+  h += '<div style="margin-bottom:10px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+  h += '<label style="font-size:8px;color:var(--dim)">Risque</label>';
+  h += '<div style="display:flex;gap:4px">';
+  h += '<button id="c-risk-pct-btn" onclick="calcToggleRiskMode(\'pct\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid rgba(200,160,60,.4);cursor:pointer;background:rgba(200,160,60,.15);color:var(--gold);font-family:var(--fm)">%</button>';
+  h += '<button id="c-risk-amt-btn" onclick="calcToggleRiskMode(\'amount\')" style="font-size:7.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);cursor:pointer;background:transparent;color:var(--dim);font-family:var(--fm)">Montant</button>';
+  h += '</div></div>';
+  h += '<div style="display:flex;gap:4px;margin-bottom:6px">'+['0.5','1','1.5','2','3'].map(function(r){
+    return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:4px 2px;background:var(--s2);border:1px solid var(--border2);border-radius:4px;font-size:8.5px;color:var(--dim);cursor:pointer;font-family:var(--fm)">'+r+'%</button>';
+  }).join('')+'</div>';
+  h += '<input id="c-risk" type="number" value="1" min="0.01" step="0.1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(200,160,60,.35);color:var(--gold);padding:8px 10px;border-radius:6px;font-family:var(--fd);font-size:13px">';
+  h += '<div id="c-risk-equiv" style="font-size:8px;color:var(--gold);margin-top:4px;text-align:right"></div>';
+  h += '</div>';
+
+  // Stratégie PTL
+  h += '<div>';
+  h += '<label style="font-size:8px;color:var(--dim);display:block;margin-bottom:4px">⚡ Stratégie PTL</label>';
+  h += '<select id="c-strat" onchange="updateStratDefaults()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-family:var(--fm);font-size:10px">'+stratOpts+'</select>';
+  h += '</div>';
+  h += '</div>'; // fin capital & risque
+
+  // ── RÉSULTATS ──
+  h += '<div style="background:linear-gradient(135deg,rgba(200,160,60,.09),rgba(0,0,0,.0));border:1px solid rgba(200,160,60,.3);border-radius:10px;padding:16px">';
+  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:12px">📐 RÉSULTAT</div>';
+
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+  // Lots
+  h += '<div style="background:var(--s2);border:1px solid rgba(200,160,60,.3);border-radius:8px;padding:11px;text-align:center">';
+  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">LOTS (taille deal)</div>';
+  h += '<div id="c-lot" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--gold)">—</div>';
+  h += '<div id="c-lotm" style="font-size:8px;color:var(--dim);margin-top:1px"></div>';
+  h += '</div>';
+  // Unités
+  h += '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:11px;text-align:center">';
+  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">UNITÉS (taille deal)</div>';
+  h += '<div id="c-units" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--text)">—</div>';
+  h += '</div>';
+  // Fonds à risque
+  h += '<div style="background:rgba(224,82,82,.06);border:1px solid rgba(224,82,82,.25);border-radius:8px;padding:11px;text-align:center">';
+  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">FONDS À RISQUE</div>';
+  h += '<div id="c-max-loss" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--red)">—</div>';
+  h += '<div id="c-risk-amt" style="font-size:8px;color:var(--dim);margin-top:1px"></div>';
+  h += '</div>';
+  // RR
+  h += '<div style="background:rgba(0,200,120,.06);border:1px solid rgba(0,200,120,.2);border-radius:8px;padding:11px;text-align:center">';
+  h += '<div style="font-size:7.5px;color:var(--dim);margin-bottom:3px">RATIO R/R</div>';
+  h += '<div id="c-rr" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--green)">—</div>';
+  h += '<div id="c-rr-label" style="font-size:8px;margin-top:1px"></div>';
+  h += '</div>';
+  h += '</div>'; // fin grid résultats
+
+  // Profit potentiel
+  h += '<div style="background:rgba(0,200,120,.05);border:1px solid rgba(0,200,120,.2);border-radius:8px;padding:11px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  h += '<div><div style="font-size:7.5px;color:var(--dim)">Profit potentiel (TP atteint)</div><div id="c-profit" style="font-family:var(--fd);font-size:16px;font-weight:900;color:var(--green)">—</div></div>';
+  h += '<div style="text-align:right"><div style="font-size:7.5px;color:var(--dim)">Valeur pip/lot</div><div id="c-pipval" style="font-size:11px;font-weight:700;color:var(--dim)">—</div></div>';
+  h += '</div>';
+
+  h += '</div>'; // fin résultats
+  h += '</div>'; // fin colonne droite
+  h += '</div>'; // fin grid 2 colonnes
+
+  // ── TABLEAU MULTI-RISQUE ──
+  h += '<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:14px">';
+  h += '<div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--gold2);margin-bottom:10px">📊 TABLEAU DE RISQUE — Plusieurs niveaux en un coup d\'œil</div>';
+  h += '<div style="overflow-x:auto"><table id="c-risk-table" style="width:100%;border-collapse:collapse;font-size:8.5px"></table></div>';
+  h += '</div>';
+
+  // ── RÈGLES PTL MM ──
+  h += '<div style="background:rgba(0,200,120,.03);border:1px solid rgba(0,200,120,.12);border-radius:8px;padding:14px">';
+  h += '<div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:10px">📏 RÈGLES PTL MONEY MANAGEMENT</div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
+  [{r:'Risque standard',v:'1% / trade'},{r:'Setup fort 🔥',v:'Max 2%'},{r:'Double Structure RR',v:'Min 2.5:1'},{r:'Multi-TF RR',v:'Min 2.5:1'},{r:'SAM RR',v:'Min 2:1'},{r:'IVC RR',v:'2 à 3:1'}].forEach(function(r){
+    h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:7px 9px"><div style="font-size:7.5px;color:var(--dim)">'+r.r+'</div><div style="font-size:9px;font-weight:700;color:var(--green)">'+r.v+'</div></div>';
+  });
+  h += '</div></div>';
+
   el.innerHTML = h;
-  setTimeout(calcPosition, 100);
+  // Initialiser les valeurs pip selon instrument par défaut
+  calcUpdateContractForInst();
+  setTimeout(calcPosition, 80);
+}
+
+function calcToggleSLMode(mode){
+  _calcSLMode = mode;
+  var pipsBtn = document.getElementById('c-sl-pips-btn');
+  var priceBtn = document.getElementById('c-sl-price-btn');
+  var hint = document.getElementById('c-sl-hint');
+  var tphint = document.getElementById('c-tp-hint');
+  if(pipsBtn){
+    pipsBtn.style.background = mode==='pips'?'rgba(224,82,82,.15)':'transparent';
+    pipsBtn.style.borderColor = mode==='pips'?'rgba(224,82,82,.4)':'var(--border2)';
+    pipsBtn.style.color = mode==='pips'?'var(--red)':'var(--dim)';
+  }
+  if(priceBtn){
+    priceBtn.style.background = mode==='price'?'rgba(224,82,82,.15)':'transparent';
+    priceBtn.style.borderColor = mode==='price'?'rgba(224,82,82,.4)':'var(--border2)';
+    priceBtn.style.color = mode==='price'?'var(--red)':'var(--dim)';
+  }
+  if(hint) hint.textContent = mode==='pips'?'pips = distance à l\'entrée en pips':'prix = niveau exact du SL sur le chart';
+  if(tphint) tphint.textContent = mode==='pips'?'pips = distance à l\'entrée en pips':'prix = niveau exact du TP sur le chart';
+  // Convertir la valeur actuelle
+  var entry = parseFloat((document.getElementById('c-entry')||{}).value)||1.084;
+  var slEl = document.getElementById('c-sl');
+  var tpEl = document.getElementById('c-tp');
+  if(slEl && tpEl){
+    var slVal = parseFloat(slEl.value)||20;
+    var tpVal = parseFloat(tpEl.value)||50;
+    if(mode==='price'){
+      var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
+      var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
+      var ps = info.pipSize||0.0001;
+      slEl.value = (entry - slVal*ps).toFixed(5);
+      tpEl.value = (entry + tpVal*ps).toFixed(5);
+    } else {
+      slEl.value = 20; tpEl.value = 50;
+    }
+  }
+  calcPosition();
+}
+
+function calcToggleRiskMode(mode){
+  _calcRiskMode = mode;
+  var pctBtn = document.getElementById('c-risk-pct-btn');
+  var amtBtn = document.getElementById('c-risk-amt-btn');
+  var riskEl = document.getElementById('c-risk');
+  if(pctBtn){
+    pctBtn.style.background = mode==='pct'?'rgba(200,160,60,.15)':'transparent';
+    pctBtn.style.borderColor = mode==='pct'?'rgba(200,160,60,.4)':'var(--border2)';
+    pctBtn.style.color = mode==='pct'?'var(--gold)':'var(--dim)';
+  }
+  if(amtBtn){
+    amtBtn.style.background = mode==='amount'?'rgba(200,160,60,.15)':'transparent';
+    amtBtn.style.borderColor = mode==='amount'?'rgba(200,160,60,.4)':'var(--border2)';
+    amtBtn.style.color = mode==='amount'?'var(--gold)':'var(--dim)';
+  }
+  if(riskEl){
+    var capital = parseFloat((document.getElementById('c-capital')||{}).value)||10000;
+    if(mode==='amount'){
+      riskEl.step = '10';
+      riskEl.value = Math.round(capital*0.01);
+    } else {
+      riskEl.step = '0.1';
+      riskEl.value = 1;
+    }
+  }
+  calcPosition();
+}
+
+function calcUpdateContractForInst(){
+  var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
+  var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
+  var el = document.getElementById('c-contract');
+  var lbl = document.getElementById('c-contract-label');
+  if(el) el.value = info.contract;
+  if(lbl) lbl.textContent = info.contract.toLocaleString();
+}
+
+function calcSetTPFromRR(rr){
+  var sl = parseFloat((document.getElementById('c-sl')||{}).value)||20;
+  var tpEl = document.getElementById('c-tp');
+  if(tpEl){
+    if(_calcSLMode==='pips'){
+      tpEl.value = (sl*rr).toFixed(1);
+    } else {
+      var entry = parseFloat((document.getElementById('c-entry')||{}).value)||1.084;
+      var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
+      var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
+      var ps = info.pipSize||0.0001;
+      var slPips = (entry - sl)/ps;
+      if(slPips<0) slPips = -slPips;
+      tpEl.value = (entry + slPips*rr*ps).toFixed(5);
+    }
+  }
+  calcPosition();
 }
 
 function calcPosition(){
-  var capital = parseFloat((document.getElementById('c-capital')||{}).value) || 10000;
-  var risk = parseFloat((document.getElementById('c-risk')||{}).value) || 1;
-  var sl = parseFloat((document.getElementById('c-sl')||{}).value) || 20;
-  var tp = parseFloat((document.getElementById('c-tp')||{}).value) || 50;
-  if(!sl || sl<=0) return;
-  var riskAmt = capital * risk / 100;
-  var pipVal = 10;
-  var lotSize = riskAmt / (sl * pipVal);
-  var rrRatio = tp / sl;
+  var capital = parseFloat((document.getElementById('c-capital')||{}).value)||10000;
+  var risk = parseFloat((document.getElementById('c-risk')||{}).value)||1;
+  var inst = (document.getElementById('c-inst')||{}).value||'EUR/USD';
+  var depCur = (document.getElementById('c-depcur')||{}).value||'USD';
+  var entry = parseFloat((document.getElementById('c-entry')||{}).value)||1.084;
+  var slRaw = parseFloat((document.getElementById('c-sl')||{}).value)||20;
+  var tpRaw = parseFloat((document.getElementById('c-tp')||{}).value)||50;
+  var contract = parseFloat((document.getElementById('c-contract')||{}).value)||100000;
+  // Mettre à jour le label contrat
+  var clbl = document.getElementById('c-contract-label'); if(clbl) clbl.textContent = contract.toLocaleString();
+
+  var info = CALC_INSTRUMENTS[inst]||CALC_INSTRUMENTS['EUR/USD'];
+  var pipSize = info.pipSize||0.0001;
+
+  // Convertir SL/TP en pips si mode prix
+  var slPips, tpPips;
+  if(_calcSLMode==='price'){
+    slPips = Math.abs(entry - slRaw) / pipSize;
+    tpPips = Math.abs(tpRaw - entry) / pipSize;
+  } else {
+    slPips = slRaw;
+    tpPips = tpRaw;
+  }
+  if(!slPips || slPips<=0) return;
+
+  // Valeur pip en devise de dépôt
+  var pipValUSD = info.pipVal; // valeur pip USD par lot standard
+  var depRate = TO_USD[depCur]||1; // 1 USD = 1/depRate devise dépôt
+  var pipValDep = pipValUSD / depRate; // valeur pip en devise dépôt
+
+  // Risque en montant (devise dépôt)
+  var riskAmt;
+  if(_calcRiskMode==='amount'){
+    riskAmt = risk;
+  } else {
+    riskAmt = capital * risk / 100;
+  }
+
+  // Taille lot
+  var lotSize = riskAmt / (slPips * pipValDep);
+  var units = lotSize * contract;
+
+  // RR & profit
+  var rrRatio = tpPips / slPips;
   var profit = riskAmt * rrRatio;
-  var el;
-  el = document.getElementById('c-lot'); if(el) el.textContent = lotSize.toFixed(2) + ' lot';
-  el = document.getElementById('c-lotm'); if(el) el.textContent = (lotSize * 100000).toFixed(0) + ' unités';
-  el = document.getElementById('c-rr'); if(el){ el.textContent = rrRatio.toFixed(1)+':1'; el.style.color = rrRatio>=2?'var(--green)':rrRatio>=1.5?'var(--gold)':'var(--red)'; }
-  el = document.getElementById('c-rr-label'); if(el){ el.textContent = rrRatio>=2.5?'✅ PTL validé':rrRatio>=2?'⚠️ Limite acceptable':'❌ Sous seuil PTL'; el.style.color = rrRatio>=2.5?'var(--green)':rrRatio>=2?'var(--gold)':'var(--red)'; }
-  el = document.getElementById('c-profit'); if(el) el.textContent = '+$'+profit.toFixed(0);
-  el = document.getElementById('c-max-loss'); if(el) el.textContent = '-$'+riskAmt.toFixed(0);
-  el = document.getElementById('c-risk-amt'); if(el) el.textContent = 'Risque : $'+riskAmt.toFixed(0)+' ('+risk+'% du capital)';
+
+  // Afficher résultats
+  var set = function(id, val){ var e=document.getElementById(id); if(e) e.textContent=val; };
+  var setC = function(id,c){ var e=document.getElementById(id); if(e) e.style.color=c; };
+
+  set('c-lot', lotSize>=0.01 ? lotSize.toFixed(2)+' lot' : lotSize.toFixed(4)+' lot');
+  set('c-lotm', 'Mini: '+(lotSize*10).toFixed(2)+' · Micro: '+(lotSize*100).toFixed(1));
+  set('c-units', units>=1000 ? (units/1000).toFixed(1)+'K' : units.toFixed(0));
+  set('c-max-loss', '-'+riskAmt.toFixed(0)+' '+depCur);
+  set('c-risk-amt', (_calcRiskMode==='pct'?risk+'% du capital':'Montant fixe')+' · '+riskAmt.toFixed(0)+' '+depCur);
+  set('c-rr', rrRatio.toFixed(2)+':1');
+  setC('c-rr', rrRatio>=2?'var(--green)':rrRatio>=1.5?'var(--gold)':'var(--red)');
+  set('c-rr-label', rrRatio>=2.5?'✅ PTL validé':rrRatio>=2?'⚠️ Limite acceptable':'❌ Sous seuil PTL');
+  setC('c-rr-label', rrRatio>=2.5?'var(--green)':rrRatio>=2?'var(--gold)':'var(--red)');
+  set('c-profit', '+'+profit.toFixed(0)+' '+depCur);
+  set('c-pipval', pipValDep.toFixed(3)+' '+depCur+'/pip');
+  set('c-rr-inline', 'RR → '+rrRatio.toFixed(2)+':1');
+
+  // Équivalent risque (montant / %)
+  var eqEl = document.getElementById('c-risk-equiv');
+  if(eqEl){
+    if(_calcRiskMode==='pct'){
+      eqEl.textContent = '= '+riskAmt.toFixed(0)+' '+depCur;
+    } else {
+      eqEl.textContent = '= '+(riskAmt/capital*100).toFixed(2)+'% du capital';
+    }
+  }
+
+  // Tableau multi-risque
+  var tbl = document.getElementById('c-risk-table');
+  if(tbl){
+    var risks = [0.25,0.5,1,1.5,2,3];
+    var th = '<thead><tr>';
+    th += '<th style="padding:6px 8px;border-bottom:1px solid var(--border2);text-align:left;color:var(--dim)">Risque</th>';
+    th += '<th style="padding:6px 8px;border-bottom:1px solid var(--border2);text-align:right;color:var(--dim)">Montant</th>';
+    th += '<th style="padding:6px 8px;border-bottom:1px solid var(--border2);text-align:right;color:var(--gold)">Lots</th>';
+    th += '<th style="padding:6px 8px;border-bottom:1px solid var(--border2);text-align:right;color:var(--dim)">Unités</th>';
+    th += '<th style="padding:6px 8px;border-bottom:1px solid var(--border2);text-align:right;color:var(--green)">TP gain</th>';
+    th += '</tr></thead>';
+    var rows = risks.map(function(r){
+      var amt = capital*r/100;
+      var ls = amt/(slPips*pipValDep);
+      var u = ls*contract;
+      var prf = amt*rrRatio;
+      var isSelected = Math.abs(r-(_calcRiskMode==='pct'?risk:(riskAmt/capital*100)))<0.1;
+      var bg = isSelected?'rgba(200,160,60,.08)':'transparent';
+      var fw = isSelected?'font-weight:800':'';
+      return '<tr style="background:'+bg+'">'
+        +'<td style="padding:5px 8px;'+fw+';color:'+(r<=1?'var(--green)':r<=2?'var(--gold)':'var(--red)')+'">'+r+'%</td>'
+        +'<td style="padding:5px 8px;text-align:right;'+fw+';color:var(--text)">'+amt.toFixed(0)+' '+depCur+'</td>'
+        +'<td style="padding:5px 8px;text-align:right;'+fw+';color:var(--gold)">'+ls.toFixed(2)+'</td>'
+        +'<td style="padding:5px 8px;text-align:right;color:var(--dim)">'+Math.round(u).toLocaleString()+'</td>'
+        +'<td style="padding:5px 8px;text-align:right;color:var(--green)">+'+prf.toFixed(0)+' '+depCur+'</td>'
+        +'</tr>';
+    });
+    tbl.innerHTML = th+'<tbody>'+rows.join('')+'</tbody>';
+  }
+}
+
+function updateStratDefaults(){
+  var strat = (document.getElementById('c-strat')||{}).value||'ptl-ds';
+  var defaults = {
+    'ptl-ds':{sl:20,tp:50},
+    'ptl-mtf':{sl:25,tp:62},
+    'ptl-sam':{sl:30,tp:60},
+    'ptl-ivc':{sl:15,tp:33}
+  };
+  var d = defaults[strat]||defaults['ptl-ds'];
+  var slEl=document.getElementById('c-sl'); if(slEl) slEl.value=d.sl;
+  var tpEl=document.getElementById('c-tp'); if(tpEl) tpEl.value=d.tp;
+  calcPosition();
 }
 
 
