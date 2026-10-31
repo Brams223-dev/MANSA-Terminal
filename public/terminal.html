@@ -5409,7 +5409,7 @@ function renderSetups(){
         SETUPS_FX=SETUPS_FX_FALLBACK.slice();
       }
 
-      var html=srcBadge;
+      var html=srcBadge+renderSetupsForce()+'\n';
       if(SETUPS_TAB==='s1') html+=renderS1();
       else if(SETUPS_TAB==='s2') html+=renderS2();
       else html+=renderS3();
@@ -5418,11 +5418,61 @@ function renderSetups(){
     return; // on attend le fetch
   }
 
-  var html='';
-  if(SETUPS_TAB==='s1') html=renderS1();
-  else if(SETUPS_TAB==='s2') html=renderS2();
-  else html=renderS3();
+  var html=renderSetupsForce()+'\n';
+  if(SETUPS_TAB==='s1') html+=renderS1();
+  else if(SETUPS_TAB==='s2') html+=renderS2();
+  else html+=renderS3();
   if(cont) cont.innerHTML=html;
+}
+
+// ── Widget Force des devises affiché en haut de SETUPS PTL ──
+function renderSetupsForce(){
+  var devises=['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD'];
+  var strengthMap={};
+  if(SETUPS_FX_STRENGTH) SETUPS_FX_STRENGTH.forEach(function(s){strengthMap[s.currency]=s;});
+
+  // Si pas de données réelles, afficher placeholder
+  if(!SETUPS_FX_STRENGTH){
+    return '<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;margin-bottom:12px">'
+      +'<div style="font-size:8px;color:var(--dim)">⟳ Force des devises — chargement…</div>'
+      +'</div>';
+  }
+
+  var sorted=devises.map(function(c){
+    var s=strengthMap[c]||{score:50,label:'NEUTRE'};
+    return {c:c,score:s.score,label:s.label};
+  }).sort(function(a,b){return b.score-a.score;});
+
+  var h='<div style="background:var(--s1);border:1px solid rgba(200,160,60,.2);border-radius:8px;padding:12px 14px;margin-bottom:12px">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  h+='<div style="font-family:var(--fd);font-size:9px;color:var(--gold2);font-weight:700">💪 FORCE DEVISES — Live</div>';
+  h+='<div style="font-size:7.5px;color:var(--faint)">open.er-api.com · calculé en temps réel</div>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">';
+  sorted.forEach(function(d){
+    var col=d.score>=65?'var(--green)':d.score<=35?'var(--red)':'var(--gold)';
+    var bg=d.score>=65?'rgba(0,200,120,.06)':d.score<=35?'rgba(224,82,82,.06)':'rgba(200,160,60,.04)';
+    var border=d.score>=65?'rgba(0,200,120,.2)':d.score<=35?'rgba(224,82,82,.2)':'rgba(200,160,60,.15)';
+    var rank=sorted.indexOf(d)+1;
+    var arrow=d.score>=65?'▲':d.score<=35?'▼':'—';
+    h+='<div style="background:'+bg+';border:1px solid '+border+';border-radius:6px;padding:8px 10px;text-align:center">';
+    h+='<div style="font-size:7px;color:var(--faint);margin-bottom:2px">#'+rank+'</div>';
+    h+='<div style="font-size:13px;font-weight:800;color:'+col+'">'+d.c+'</div>';
+    h+='<div style="font-size:8px;color:'+col+';font-weight:700;margin-top:2px">'+arrow+' '+d.score+'</div>';
+    h+='<div style="height:3px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">';
+    h+='<div style="height:100%;width:'+d.score+'%;background:'+col+';opacity:.7"></div>';
+    h+='</div></div>';
+  });
+  h+='</div>';
+  // Légende top 3 vs bottom 3
+  var top=sorted.slice(0,3).map(function(d){return d.c;}).join(' > ');
+  var bot=sorted.slice(-3).map(function(d){return d.c;}).join(' < ');
+  h+='<div style="display:flex;gap:12px;margin-top:8px;font-size:8px">';
+  h+='<span style="color:var(--green)">💪 Fortes : '+top+'</span>';
+  h+='<span style="color:var(--red)">😞 Faibles : '+bot+'</span>';
+  h+='</div>';
+  h+='</div>';
+  return h;
 }
 
 function setupCritRow(ok,lbl,val){
@@ -7705,99 +7755,190 @@ function renderPTL_DS(){
 
 function renderPTL_Ichi(){
   var h='';
+  // ── En-tête ──
   h+='<div style="background:linear-gradient(135deg,rgba(0,204,204,.06) 0%,var(--s1) 100%);border:1px solid rgba(0,204,204,.2);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
-  h+='<div style="font-family:var(--fd);font-size:15px;font-weight:800;color:var(--cyan);margin-bottom:6px">🌊 ICHIMOKU MULTI-TIMEFRAME</div>';
-  h+='<div style="font-size:9.5px;color:var(--dim);line-height:1.8">Lecture du nuage sur <strong style="color:var(--text)">W1 → D1 → H4</strong> simultanément. Signal idéal = 3 TF dans le Kumo dans le même sens. Peut se combiner avec la Double Structure pour le timing précis.</div>';
+  h+='<div style="font-family:var(--fd);font-size:15px;font-weight:800;color:var(--cyan);margin-bottom:6px">🌊 ICHIMOKU MULTI-TIMEFRAME <span style="font-size:9px;background:rgba(0,204,204,.12);border:1px solid rgba(0,204,204,.3);color:var(--cyan);padding:2px 8px;border-radius:3px;margin-left:8px">= Multi-TF Strategy (PTL)</span></div>';
+  h+='<div style="font-size:9.5px;color:var(--dim);line-height:1.8">Lecture du nuage Ichimoku sur <strong style="color:var(--text)">W1 → D1 → H4</strong> simultanément. Signal idéal = 3 TF dans le Kumo dans le même sens + COT institutionnel aligné + Force devises. Se combine avec Double Structure pour le timing H1.</div>';
   h+='</div>';
-  /* ── SCANNER ICHIMOKU LIVE ── */
+
+  // ── Scanner live ──
   h+='<div style="background:var(--s1);border:1px solid rgba(0,204,204,.25);border-radius:8px;padding:14px;margin-bottom:14px">';
-  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--cyan);margin-bottom:10px">⚡ SCANNER ICHIMOKU LIVE <span style="font-size:8px;color:var(--dim);font-family:var(--fm)">[COT W1 + DMX H4 + Force devises + Saisonnalité]</span></div>';
-  h+=tHead(['Paire','Biais W1','Momentum H4','Force','Saisonnalité','Score','Signal']);
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--cyan);margin-bottom:10px">⚡ SCANNER ICHIMOKU LIVE <span style="font-size:8px;color:var(--dim);font-family:var(--fm)">[COT W1 + Force devises + Saisonnalité = score automatique]</span></div>';
+  h+=tHead(['Paire','COT W1','Force Base','Saisonnalité','Score Ichi','Signal']);
   ['EUR/USD','GBP/USD','USD/JPY','EUR/JPY','GBP/JPY','XAU/USD','EUR/GBP','AUD/USD'].forEach(function(pair){
+    // Utiliser SETUPS_FX si disponible (vraies données), sinon FX statique
+    var sf=SETUPS_FX.find(function(f){return f.p===pair;});
     var fx=FX.find(function(f){return f.p===pair;});
-    if(!fx)return;
-    var parts=pair.split('/');
-    var csB=CURRENCY_STRENGTH[parts[0]]||{score:50};
-    var w1Col=fx.cot==='Long'?'var(--green)':'var(--red)';
-    var w1L=fx.cot==='Long'?'📈 Haussier':'📉 Baissier';
-    var dmx=fx.dmx;
-    var h4Col=dmx<=35?'var(--green)':dmx>=65?'var(--red)':'var(--dim)';
-    var h4L=dmx<=35?'⬆ Bull Inst.':dmx>=65?'⬇ Bear Inst.':'↔ Neutre';
-    var fCol=csB.score>=60?'var(--green)':csB.score<=40?'var(--red)':'var(--gold)';
-    var now=new Date();var mIdx=now.getUTCMonth();
-    var szData=SZ[pair];var szVal=szData?szData[mIdx].v:0;
-    var szL=szVal>0.3?'📈':szVal<-0.3?'📉':'—';
-    var szCol=szVal>0.3?'var(--green)':szVal<-0.3?'var(--red)':'var(--dim)';
+    if(!sf&&!fx)return;
+    var cotD=sf?sf.cotD:(fx?fx.cot:'—');
+    var baseStr=sf?sf.baseStr:50;
+    var sig=sf?sf.sig:(fx?fx.sig:'Neutre');
+    var saison=sf?sf.saison:getSaison(pair);
+    var cotOk=cotD==='Long'||cotD==='Short';
+    var forceOk=baseStr>=60||baseStr<=40;
+    var saisonOk=saison!=='neu';
+    var saisonAligned=((sig==='Haussier'&&saison==='bull')||(sig==='Baissier'&&saison==='bear'));
     var s=0;
-    if(fx.cot==='Long')s+=30;if(dmx<=35)s+=30;if(csB.score>=60)s+=20;if(szVal>0.3)s+=20;
-    var sCol=s>=70?'var(--green)':s>=45?'var(--gold)':'var(--dim)';
-    var sig=s>=70?'🌊 SETUP':s>=45?'⏳ Attendre':'⚪ Faible';
+    if(cotOk)s+=35;if(forceOk)s+=35;if(saisonAligned)s+=30;
+    var sCol=s>=70?'var(--green)':s>=40?'var(--gold)':'var(--dim)';
+    var label=s>=70?'🌊 SETUP':s>=40?'⏳ Attendre':'⚪ Faible';
+    var cotCol=cotD==='Long'?'var(--green)':cotD==='Short'?'var(--red)':'var(--dim)';
+    var bCol=baseStr>=60?'var(--green)':baseStr<=40?'var(--red)':'var(--gold)';
+    var szLabel=saison==='bull'?'📈 Fav.':saison==='bear'?'📉 Défav.':'— Neutre';
+    var szCol=saison==='bull'?'var(--green)':saison==='bear'?'var(--red)':'var(--dim)';
     h+=tRow([
-      '<strong style="color:var(--gold);cursor:pointer" data-pair="'+pair+'" onclick="showFXDetailByAttr(this)">'+pair+'</strong>',
-      fx.cot||'—',
-      '<span style="color:'+sCol+';font-weight:700">'+s+'%</span>',
-      '<span style="color:'+sCol+'">'+sig+'</span>'
+      '<strong style="color:var(--gold);cursor:pointer" onclick="showFXDetail(\''+pair+'\')">'+pair+'</strong>',
+      '<span style="color:'+cotCol+';font-weight:700">'+cotD+'</span>',
+      '<span style="color:'+bCol+';font-weight:700">'+baseStr+'%</span>',
+      '<span style="color:'+szCol+'">'+szLabel+'</span>',
+      '<div style="display:flex;align-items:center;gap:4px"><div style="width:40px;height:6px;background:var(--s3);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+s+'%;background:'+sCol+'"></div></div><span style="font-size:8px;color:'+sCol+';font-weight:700">'+s+'%</span></div>',
+      '<span style="font-weight:700;color:'+sCol+'">'+label+'</span>'
     ]);
-  
   });
-  h+='<div style="margin-bottom:12px"><label style="font-size:8.5px;color:var(--dim);display:block;margin-bottom:4px">📊 Paire / Instrument</label>'
-    +'<select id="c-pair" onchange="calcPosition()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:11px">'+fxOpts+'</select></div>';
-  h+='<div style="margin-bottom:12px"><label style="font-size:8.5px;color:var(--dim);display:block;margin-bottom:4px">⚡ Stratégie</label>'
-    +'<select id="c-strat" onchange="updateStratDefaults()" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:11px">'
-    +'<option value="ds">🏗️ Structure Protocol</option>'
-    +'<option value="ichi">🌊 Multi TF Ichimoku</option>'
-    +'<option value="swing">📈 Swing Action Market</option>'
-    +'</select></div>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
-    +'<div><label style="font-size:8.5px;color:var(--red);display:block;margin-bottom:4px">🛑 SL (pips)</label>'
-    +'<input id="c-sl" type="number" value="20" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(224,82,82,.3);color:var(--red);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>'
-    +'<div><label style="font-size:8.5px;color:var(--green);display:block;margin-bottom:4px">🎯 TP (pips)</label>'
-    +'<input id="c-tp" type="number" value="60" min="1" oninput="calcPosition()" style="width:100%;background:var(--s2);border:1px solid rgba(0,200,120,.3);color:var(--green);padding:8px 10px;border-radius:5px;font-family:var(--fm);font-size:12px"></div>'
-    +'</div>';
-  h+='<div><label style="font-size:8.5px;color:var(--dim);display:block;margin-bottom:4px">🏗️ Entrées (pyramiding)</label>'
-    +'<div style="display:flex;gap:6px">'
-    +'<button onclick="document.getElementById(\'c-entries\').value=1;calcPosition()" style="flex:1;padding:6px;background:rgba(200,160,60,.12);border:1px solid var(--gold);color:var(--gold);border-radius:4px;cursor:pointer;font-size:9px">1 entrée</button>'
-    +'<button onclick="document.getElementById(\'c-entries\').value=2;calcPosition()" style="flex:1;padding:6px;background:var(--s3);border:1px solid var(--border2);color:var(--dim);border-radius:4px;cursor:pointer;font-size:9px">2 entrées</button>'
-    +'<button onclick="document.getElementById(\'c-entries\').value=3;calcPosition()" style="flex:1;padding:6px;background:var(--s3);border:1px solid var(--border2);color:var(--dim);border-radius:4px;cursor:pointer;font-size:9px">3 🔥</button>'
-    +'</div>'
-    +'<input id="c-entries" type="hidden" value="1"></div>';
-  h+='</div>';
-  h+='<div>';
-  h+='<div style="background:linear-gradient(135deg,rgba(200,160,60,.06) 0%,var(--s1) 100%);border:1px solid rgba(200,160,60,.25);border-radius:10px;padding:18px;margin-bottom:12px">';
-  h+='<div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:14px">📐 RÉSULTAT DU CALCUL</div>';
+  h+='</tbody></table></div></div>';
+
+  // ── Checklist + Process ──
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
-  [{id:'c-lot',label:'Taille de position',sub:'c-lotm',col:'var(--gold)'},
-   {id:'c-rr',label:'Ratio R/R',sub:'c-rr-label',col:'var(--green)'},
-   {id:'c-profit',label:'Profit potentiel',sub:null,col:'var(--green)'},
-   {id:'c-max-loss',label:'Perte maximale',sub:null,col:'var(--red)'},
-  ].forEach(function(r){
-    h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px 14px">'
-      +'<div style="font-size:8px;color:var(--dim);margin-bottom:6px">'+r.label+'</div>'
-      +'<div id="'+r.id+'" style="font-family:var(--fd);font-size:18px;font-weight:800;color:'+r.col+'">—</div>'
-      +(r.sub?'<div id="'+r.sub+'" style="font-size:8px;color:var(--dim);margin-top:3px"></div>':'')
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--cyan);margin-bottom:12px">✅ CHECKLIST MULTI-TF</div>';
+  h+=makeChecklist('ichi',[
+    {l:'COT W1 institutionnel aligné',sub:'Hedge funds dans le sens de la paire visée'},
+    {l:'Force devises favorables (écart ≥ 15)',sub:'Base forte / Quote faible (ou inverse pour short)'},
+    {l:'Saisonnalité mensuelle favorable',sub:'Historique du mois = même direction que la position'},
+    {l:'Nuage W1 clairement dans le sens',sub:'Prix au-dessus (bull) ou en-dessous (bear) du Kumo'},
+    {l:'Nuage D1 confirme le biais',sub:'Futur Kumo D1 en expansion dans le bon sens'},
+    {l:'Tenkan > Kijun H4 (bull) ou < (bear)',sub:'Croisement Tenkan/Kijun H4 comme déclencheur'},
+    {l:'Chikou libre — pas de résistance',sub:'La Lagging Span H4 ne bute pas sur une structure'},
+    {l:'Ratio R/R ≥ 2.5 · SL sous Kijun H4',sub:'Stop sous le Kijun H4 · TP prochain nuage D1'},
+  ],'var(--cyan)');
+  h+='</div>';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--cyan);margin-bottom:10px">⏱️ PROCESS TOP-DOWN ICHIMOKU</div>';
+  [
+    {tf:'📅 W1',role:'Biais macro',act:'COT + Saisonnalité + position vs Kumo W1'},
+    {tf:'📆 D1',role:'Confirmation',act:'Nuage D1 dans le sens W1 · Chikou D1 libre'},
+    {tf:'⏰ H4',role:'Structure & timing',act:'Tenkan/Kijun croisement · prix vs Kijun · Chikou H4'},
+    {tf:'⏱ H1',role:'Entrée',act:'Break trendline H1 dans le sens H4 · SL Kijun H4'},
+  ].forEach(function(s){
+    h+='<div style="display:flex;gap:10px;margin-bottom:7px;padding:8px 10px;background:var(--s2);border-radius:5px">'
+      +'<div style="font-size:9px;font-weight:700;color:var(--cyan);min-width:68px;flex-shrink:0">'+s.tf+' <span style="color:var(--dim);font-weight:400;font-size:8px">'+s.role+'</span></div>'
+      +'<div style="font-size:8.5px;color:var(--dim)">'+s.act+'</div>'
       +'</div>';
   });
-  h+='</div>';
-  h+='<div style="display:flex;align-items:center;gap:8px">'
-    +'<div id="c-risk-amt" style="font-size:9px;color:var(--orange);font-weight:700"></div>'
-    +'</div>';
-  h+='</div>';
-  h+='<div id="c-pyramid" style="display:none;background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:12px"></div>';
-  h+='<div style="background:rgba(0,200,120,.04);border:1px solid rgba(0,200,120,.15);border-radius:8px;padding:14px">';
-  h+='<div style="font-family:var(--fd);font-size:9px;color:var(--green);margin-bottom:10px">📏 RÈGLES PTL MONEY MANAGEMENT</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
-  [{r:'Risque std',v:'1% / trade'},{r:'Setup 🔥',v:'Max 2%'},{r:'R/R min DS',v:'2.5 : 1'},
-   {r:'R/R objectif',v:'4.5 à 7+'},{r:'Max positions',v:'3 simultanées'},{r:'Expo. totale',v:'Max 6% capital'},
+  h+='<div style="margin-top:12px;padding:10px;background:rgba(0,204,204,.06);border:1px solid rgba(0,204,204,.2);border-radius:6px">';
+  h+='<div style="font-size:8px;color:var(--cyan);font-weight:700;margin-bottom:6px">⚙️ PARAMÈTRES ICHIMOKU PTL</div>';
+  [['Tenkan-Sen','9 périodes'],['Kijun-Sen','26 périodes'],['Senkou Span B','52 périodes'],['Déplacement','26 périodes']].forEach(function(p){
+    h+='<div style="display:flex;justify-content:space-between;font-size:8px;margin-bottom:3px"><span style="color:var(--dim)">'+p[0]+'</span><span style="color:var(--text);font-weight:700">'+p[1]+'</span></div>';
+  });
+  h+='</div></div></div>';
+
+  // ── Règles de gestion ──
+  h+='<div style="background:rgba(0,204,204,.04);border:1px solid rgba(0,204,204,.15);border-radius:8px;padding:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--cyan);margin-bottom:10px">💰 GESTION PTL — MULTI-TF ICHIMOKU</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  [
+    {l:'Risque / Trade',v:'1% std · 2% si 🔥'},
+    {l:'R/R minimum',v:'2.5 · Objectif 4.5+'},
+    {l:'SL placement',v:'Sous Kijun H4'},
+    {l:'TP principal',v:'Nuage D1 opposé'},
+    {l:'Pyramiding',v:'+1 lot si +1R validé'},
+    {l:'Max exposition',v:'3 trades · 6% total'},
   ].forEach(function(r){
-    h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:7px 9px">'
-      +'<div style="font-size:7.5px;color:var(--dim)">'+r.r+'</div>'
-      +'<div style="font-size:9px;font-weight:700;color:var(--green)">'+r.v+'</div>'
+    h+='<div style="background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:8px 10px">'
+      +'<div style="color:var(--dim);font-size:8px;margin-bottom:3px">'+r.l+'</div>'
+      +'<div style="font-weight:700;font-size:9px;color:var(--cyan)">'+r.v+'</div>'
       +'</div>';
   });
   h+='</div></div>';
+  attachScoreListener('ichi',8,['🌊 SETUP ICHIMOKU VALIDÉ — Chercher l\'entrée H1','⏳ Attendre confirmation supplémentaire','❌ Setup incomplet — ne pas trader']);
+  return h;
+}
+
+function renderPTL_Swing(){
+  var h='';
+  // ── En-tête ──
+  h+='<div style="background:linear-gradient(135deg,rgba(68,136,255,.06) 0%,var(--s1) 100%);border:1px solid rgba(68,136,255,.2);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
+  h+='<div style="font-family:var(--fd);font-size:15px;font-weight:800;color:var(--blue);margin-bottom:6px">📈 SWING ACTION MARKET <span style="font-size:9px;background:rgba(68,136,255,.12);border:1px solid rgba(68,136,255,.3);color:var(--blue);padding:2px 8px;border-radius:3px;margin-left:8px">Actions US/EU · H4 · Daily</span></div>';
+  h+='<div style="font-size:9.5px;color:var(--dim);line-height:1.8">Actions à fort momentum (croissance US/EU). Entrée sur <strong style="color:var(--text)">patterns techniques</strong> : Double Bottom, ÉTÉi, Triangle, Drapeau. MA100 plate ou en direction. Cible : 15–30% · RR min 2:1.</div>';
+  h+='</div>';
+
+  // ── Scanner Actions ──
+  h+='<div style="background:var(--s1);border:1px solid rgba(68,136,255,.25);border-radius:8px;padding:14px;margin-bottom:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--blue);margin-bottom:10px">⚡ WATCHLIST SWING PTL <span style="font-size:8px;color:var(--dim);font-family:var(--fm)">[Score Buffett + Saisonnalité + W%R]</span></div>';
+  h+=tHead(['Action','Secteur','Score Buffett','Saisonnalité','W%R','Signal']);
+  SETUPS_ACTIONS.forEach(function(d){
+    var sc=scoreS3(d);
+    var sCol=sc.pts>=3?'var(--green)':sc.pts>=2?'var(--gold)':'var(--dim)';
+    var sig=sc.pts>=3?'🔥 FORT':sc.pts>=2?'⚡ Modéré':'⚪ Faible';
+    var szCol=d.saison==='bull'?'var(--green)':d.saison==='bear'?'var(--red)':'var(--dim)';
+    var szL=d.saison==='bull'?'📈 Fav.':d.saison==='bear'?'📉 Déf.':'— Neutre';
+    var wprCol=d.wpr<=-80?'var(--green)':d.wpr>=-20?'var(--red)':'var(--dim)';
+    var bufCol=d.buf>=8?'var(--green)':d.buf>=6?'var(--gold)':'var(--dim)';
+    h+=tRow([
+      '<div><div style="font-size:10px;font-weight:700;color:var(--gold)">'+d.p+'</div><div style="font-size:8px;color:var(--dim)">'+d.n+'</div></div>',
+      '<span style="font-size:8px;color:var(--dim)">'+(d.secteur||'Tech')+'</span>',
+      '<span style="color:'+bufCol+';font-weight:700">'+d.buf+'/10</span>',
+      '<span style="color:'+szCol+'">'+szL+'</span>',
+      '<span style="color:'+wprCol+';font-weight:700">'+d.wpr.toFixed(0)+'</span>',
+      '<span style="font-weight:700;color:'+sCol+'">'+sig+'</span>'
+    ]);
+  });
+  h+='</tbody></table></div></div>';
+
+  // ── Checklist + Patterns ──
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--blue);margin-bottom:12px">✅ CHECKLIST SWING ACTION</div>';
+  h+=makeChecklist('sw',[
+    {l:'W%R ≤ −80 (survente prononcée)',sub:'Williams %R H4/Daily en zone extrême bearish'},
+    {l:'Score Buffett ≥ 7/10',sub:'Qualité fondamentale : croissance, moat, bilan sain'},
+    {l:'Saisonnalité haussière du mois',sub:'Oct–Nov : saison de force pour les actions US/EU'},
+    {l:'MA100 plate ou orientée haut',sub:'La MA100 Daily n\'est pas en sur-extension baissière'},
+    {l:'Pattern technique identifié',sub:'Double Bottom · ETEi · Triangle · Drapeau · Cup&H'},
+    {l:'Cassure en clôture bougie H4/Daily',sub:'Pas de fausse cassure — attendre la clôture'},
+    {l:'Volume en hausse sur la cassure',sub:'Volume > moyenne 20j = confirmation institutionnelle'},
+    {l:'R/R ≥ 2:1 · SL sous dernier bas',sub:'SL sous le pattern · TP prochain niveau de résistance'},
+  ],'var(--blue)');
+  h+='</div>';
+  h+='<div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--blue);margin-bottom:10px">🎯 PATTERNS PTL SWING</div>';
+  [
+    {p:'Double Bottom',when:'Après tendance baissière · 2 creux au même niveau',rr:'2.5–4'},
+    {p:'ÉTÉi (ETEi)',when:'Tête-épaules inverse · Cassure de la ligne de cou',rr:'3–5'},
+    {p:'Triangle ascendant',when:'Bases plates + sommets croissants · Compression',rr:'2–3.5'},
+    {p:'Drapeau haussier',when:'Après impulsion forte · Correction courte avant suite',rr:'2–4'},
+    {p:'Cup & Handle',when:'Arrondi base → cassure handle · Volumes décroissants',rr:'3–6'},
+  ].forEach(function(pt){
+    h+='<div style="margin-bottom:8px;padding:8px 10px;background:var(--s2);border-radius:5px;border-left:2px solid rgba(68,136,255,.4)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+      +'<span style="font-size:9.5px;font-weight:700;color:var(--blue)">'+pt.p+'</span>'
+      +'<span style="font-size:8px;background:rgba(68,136,255,.1);color:var(--blue);padding:1px 6px;border-radius:2px">RR '+pt.rr+'</span>'
+      +'</div>'
+      +'<div style="font-size:8px;color:var(--dim)">'+pt.when+'</div>'
+      +'</div>';
+  });
   h+='</div></div>';
-  el.innerHTML=h;
-  setTimeout(calcPosition,100);
+
+  // ── Gestion ──
+  h+='<div style="background:rgba(68,136,255,.04);border:1px solid rgba(68,136,255,.15);border-radius:8px;padding:14px">';
+  h+='<div style="font-family:var(--fd);font-size:10px;color:var(--blue);margin-bottom:10px">💰 GESTION PTL — SWING ACTION</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  [
+    {l:'Risque / Trade',v:'1% std · 2% si 🔥'},
+    {l:'R/R minimum',v:'2:1 · Objectif 3–6'},
+    {l:'SL placement',v:'Sous pattern (last low)'},
+    {l:'TP partiel 1',v:'+1R → déplacer SL BE'},
+    {l:'TP partiel 2',v:'+2R → trailing stop'},
+    {l:'Max exposition',v:'3 actions · 6% total'},
+  ].forEach(function(r){
+    h+='<div style="background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:8px 10px">'
+      +'<div style="color:var(--dim);font-size:8px;margin-bottom:3px">'+r.l+'</div>'
+      +'<div style="font-weight:700;font-size:9px;color:var(--blue)">'+r.v+'</div>'
+      +'</div>';
+  });
+  h+='</div></div>';
+  attachScoreListener('sw',8,['🔥 SWING VALIDÉ — Attendre le pattern puis entrer','⏳ Surveiller — manque 1-2 critères','❌ Setup incomplet — passer à la prochaine']);
+  return h;
 }
 
 function updateStratDefaults(){
