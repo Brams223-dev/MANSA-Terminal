@@ -178,14 +178,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 
 /* ═══ MM PANEL ANIMATIONS ═══ */
 @keyframes mmTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@keyframes mmPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
-@keyframes mmGlow{0%,100%{text-shadow:0 0 8px rgba(91,200,232,.4)}50%{text-shadow:0 0 22px rgba(91,200,232,.95),0 0 40px rgba(91,200,232,.4)}}
-@keyframes mmBgShift{0%,100%{opacity:.08}50%{opacity:.14}}
-@keyframes mmFlash{0%{opacity:0;transform:translateY(10px)}15%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-8px)}}
-@keyframes mmScan{0%{top:-20%}100%{top:120%}}
-#mm-quote-icon{animation:mmPulse 2s ease-in-out infinite}
-#mm-quote{animation:mmGlow 3s ease-in-out infinite}
-#mm-ticker{display:inline-block}
+@keyframes mmPulse{0%{opacity:.55;transform:scale(.92) rotate(-4deg)}25%{opacity:1;transform:scale(1.18) rotate(2deg)}50%{opacity:.8;transform:scale(1.05) rotate(-1deg)}75%{opacity:1;transform:scale(1.2) rotate(3deg)}100%{opacity:.55;transform:scale(.92) rotate(-4deg)}}
+@keyframes mmGlowPurple{0%,100%{text-shadow:0 0 10px rgba(160,80,255,.5),0 0 2px #fff}50%{text-shadow:0 0 28px rgba(160,80,255,1),0 0 50px rgba(91,200,232,.6),0 0 4px #fff}}
+@keyframes mmBgBreath{0%,100%{opacity:.18;transform:scale(1)}50%{opacity:.32;transform:scale(1.04)}}
+@keyframes mmScan{0%{top:-4px}100%{top:100%}}
+@keyframes mmBorderPulse{0%,100%{box-shadow:0 0 0 0 rgba(160,80,255,0),inset 0 0 30px rgba(160,80,255,.04)}50%{box-shadow:0 0 30px 4px rgba(160,80,255,.35),inset 0 0 60px rgba(160,80,255,.12)}}
+@keyframes mmRuleFlash{0%,100%{background:rgba(0,144,204,.08);border-color:rgba(91,200,232,.2);transform:scale(1)}33%{background:rgba(160,80,255,.18);border-color:rgba(160,80,255,.6);transform:scale(1.06)}66%{background:rgba(0,200,120,.1);border-color:rgba(0,200,120,.4);transform:scale(1.04)}}
+@keyframes mmTickerColor{0%{color:#5bc8e8}25%{color:#c060ff}50%{color:#00e87c}75%{color:#ffd040}100%{color:#5bc8e8}}
+#mm-quote-icon{animation:mmPulse 1.8s cubic-bezier(.4,0,.6,1) infinite}
+#mm-quote{animation:mmGlowPurple 2.5s ease-in-out infinite}
+#mm-ticker{display:inline-block;animation:mmTickerColor 8s linear infinite}
+.mm-rule-card{animation:mmRuleFlash 6s ease-in-out infinite}
+.mm-rule-card:nth-child(2){animation-delay:2s}
+.mm-rule-card:nth-child(3){animation-delay:4s}
 /* ═══ SAISON CHART ═══ */
 .sz-chart{display:flex;align-items:center;gap:4px;height:120px;padding:0 4px;margin-bottom:12px}
 .sz-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;height:100%;justify-content:center}
@@ -11880,46 +11885,56 @@ function renderCalc(){
   ];
   var mantrasJS = JSON.stringify(mantras);
 
-  h += '<div id="mm-panel" style="position:sticky;top:10px;background:#060c14;border:1px solid rgba(91,200,232,.22);border-radius:16px;overflow:hidden;min-height:600px;display:flex;flex-direction:column">';
+  h += '<div id="mm-panel" style="position:sticky;top:10px;background:#06080f;border:1px solid rgba(160,80,255,.3);border-radius:16px;overflow:hidden;min-height:640px;display:flex;flex-direction:column;animation:mmBorderPulse 3s ease-in-out infinite">';
 
-  // Fond image PTL (bull/bear) avec overlay
-  h += '<div style="position:absolute;inset:0;background:url(ptl-bg.png) center/cover no-repeat;opacity:.13;animation:mmBgShift 4s ease-in-out infinite;pointer-events:none"></div>';
-  // Scan line animée
-  h += '<div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(91,200,232,.6),transparent);animation:mmScan 3s linear infinite;pointer-events:none;z-index:1"></div>';
+  // ── IMAGE PTL EN ARRIÈRE-PLAN ──
+  h += '<div style="position:absolute;inset:0;background:url(ptl-bg.png) center 40%/cover no-repeat;opacity:.22;animation:mmBgBreath 4s ease-in-out infinite;pointer-events:none"></div>';
+  // Overlay dégradé pour lisibilité (violet→bleu→noir)
+  h += '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,0,60,.75) 0%,rgba(0,10,30,.6) 40%,rgba(6,8,15,.92) 100%);pointer-events:none"></div>';
+  // Scan line néon violet
+  h += '<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(160,80,255,.9),rgba(91,200,232,.7),transparent);animation:mmScan 2s linear infinite;pointer-events:none;z-index:3"></div>';
 
-  // Header panneau droit
-  h += '<div style="position:relative;z-index:2;background:linear-gradient(90deg,rgba(0,40,60,.95),rgba(0,25,40,.9));padding:14px 18px;border-bottom:1px solid rgba(91,200,232,.2)">';
-  h += '<div style="font-size:11px;font-weight:800;color:#5bc8e8;letter-spacing:.1em;text-shadow:0 0 12px rgba(91,200,232,.6)">⚔ DISCIPLINE PTL</div>';
-  h += '<div style="font-size:8.5px;color:#3a6070;margin-top:2px;letter-spacing:.06em">Money Management · No Mercy</div>';
+  // ── HEADER ──
+  h += '<div style="position:relative;z-index:4;background:linear-gradient(90deg,rgba(80,0,140,.85),rgba(0,30,70,.9));padding:13px 18px;border-bottom:1px solid rgba(160,80,255,.35);display:flex;align-items:center;justify-content:space-between">';
+  h += '<div>';
+  h += '<div style="font-size:12px;font-weight:900;letter-spacing:.12em;background:linear-gradient(90deg,#c060ff,#5bc8e8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⚔ DISCIPLINE PTL</div>';
+  h += '<div style="font-size:8px;color:#6040a0;margin-top:2px;letter-spacing:.08em">Money Management · No Mercy</div>';
+  h += '</div>';
+  h += '<div id="mm-live-dot" style="width:8px;height:8px;background:#c060ff;border-radius:50%;box-shadow:0 0 10px 3px rgba(160,80,255,.7);animation:mmPulse 1s ease-in-out infinite"></div>';
   h += '</div>';
 
-  // Ticker défilant (règles)
-  h += '<div style="position:relative;z-index:2;overflow:hidden;padding:0;border-bottom:1px solid rgba(91,200,232,.12);background:rgba(0,20,35,.7)">';
-  var tickerText = '&nbsp;&nbsp;⚡ RISK MAX 1% &nbsp;▸&nbsp; ⚡ SL OBLIGATOIRE &nbsp;▸&nbsp; ⚡ RR MIN 2:1 &nbsp;▸&nbsp; ⚡ NO SL = NO TRADE &nbsp;▸&nbsp; ⚡ 2% MAX FORT SETUP &nbsp;▸&nbsp; ⚡ SIZING AVANT ENTRÉE &nbsp;▸&nbsp; ⚡ CAPITAL D\'ABORD &nbsp;▸&nbsp; ⚡ PLAN AVANT TRADE &nbsp;▸&nbsp;';
-  h += '<div id="mm-ticker" style="white-space:nowrap;font-size:9px;color:#5bc8e8;font-family:monospace;padding:7px 0;animation:mmTicker 18s linear infinite;letter-spacing:.04em">';
+  // ── TICKER DÉFILANT ──
+  h += '<div style="position:relative;z-index:4;overflow:hidden;border-bottom:1px solid rgba(160,80,255,.2);background:rgba(20,0,40,.7)">';
+  var tickerText = '&nbsp;&nbsp;⚡ RISK MAX 1% &nbsp;◆&nbsp; 🛡 SL OBLIGATOIRE &nbsp;◆&nbsp; 🎯 RR MIN 2:1 &nbsp;◆&nbsp; 🔥 NO SL = NO TRADE &nbsp;◆&nbsp; 💎 2% MAX FORT SETUP &nbsp;◆&nbsp; ⚡ SIZING AVANT ENTRÉE &nbsp;◆&nbsp; 🏆 CAPITAL D\'ABORD &nbsp;◆&nbsp; ⚔ PLAN AVANT TRADE &nbsp;◆&nbsp;';
+  h += '<div id="mm-ticker" style="white-space:nowrap;font-size:9px;font-family:monospace;font-weight:700;padding:7px 0;animation:mmTicker 14s linear infinite,mmTickerColor 8s linear infinite;letter-spacing:.05em">';
   h += tickerText + tickerText;
   h += '</div></div>';
 
-  // Citation principale (rotative)
-  h += '<div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 22px">';
-  h += '<div id="mm-quote-icon" style="font-size:42px;margin-bottom:18px">⚔</div>';
-  h += '<div id="mm-quote" style="font-size:13px;font-weight:700;color:#d0eeff;text-align:center;line-height:1.7;min-height:90px;transition:opacity .3s;letter-spacing:.01em"></div>';
-  h += '<div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#0090cc,transparent);margin:20px auto"></div>';
-  // Barre de progression citation
-  h += '<div style="width:100%;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:14px">';
-  h += '<div id="mm-progress" style="height:100%;width:0%;background:linear-gradient(90deg,#0070a0,#5bc8e8);border-radius:2px;transition:width .1s linear"></div>';
+  // ── ZONE CITATION (centre) ──
+  h += '<div style="position:relative;z-index:4;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px">';
+  // Icône pulsante
+  h += '<div id="mm-quote-icon" style="font-size:48px;margin-bottom:16px;filter:drop-shadow(0 0 14px rgba(160,80,255,.8))">⚔</div>';
+  // Trait décoratif haut
+  h += '<div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,#c060ff,#5bc8e8,transparent);margin-bottom:18px"></div>';
+  // Citation
+  h += '<div id="mm-quote" style="font-size:13.5px;font-weight:800;color:#e8d8ff;text-align:center;line-height:1.75;min-height:95px;transition:opacity .25s,transform .25s;letter-spacing:.02em;text-shadow:0 0 20px rgba(160,80,255,.4)"></div>';
+  // Barre progress
+  h += '<div style="width:100%;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-top:20px;margin-bottom:6px">';
+  h += '<div id="mm-progress" style="height:100%;width:0%;background:linear-gradient(90deg,#8030e0,#c060ff,#5bc8e8);border-radius:2px"></div>';
   h += '</div>';
-  h += '<div style="font-size:8.5px;color:#1a4055;letter-spacing:.14em;font-weight:700">PROCESS TRADING LIFE</div>';
+  h += '<div id="mm-counter" style="font-size:8px;color:#5030a0;letter-spacing:.06em">1 / 12</div>';
+  // Label PTL
+  h += '<div style="margin-top:14px;font-size:8px;letter-spacing:.18em;font-weight:900;background:linear-gradient(90deg,#8030e0,#5bc8e8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PROCESS TRADING LIFE</div>';
   h += '</div>';
 
-  // Compteur bas
-  h += '<div style="position:relative;z-index:2;padding:14px 18px;border-top:1px solid rgba(91,200,232,.12);background:rgba(0,15,25,.6)">';
-  h += '<div style="font-size:7.5px;color:#1a4055;margin-bottom:8px;letter-spacing:.1em;font-weight:800">RÈGLES FONDAMENTALES PTL</div>';
+  // ── RÈGLES DU BAS ──
+  h += '<div style="position:relative;z-index:4;padding:13px 16px;border-top:1px solid rgba(160,80,255,.2);background:rgba(10,0,25,.7)">';
+  h += '<div style="font-size:7.5px;color:#4020a0;margin-bottom:9px;letter-spacing:.12em;font-weight:900">RÈGLES FONDAMENTALES</div>';
   h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
-  [['1%','Risque max'],['2:1','RR min'],['SL','Obligatoire']].forEach(function(r){
-    h += '<div style="background:rgba(0,144,204,.08);border:1px solid rgba(91,200,232,.2);border-radius:8px;padding:9px 6px;text-align:center">';
-    h += '<div style="font-size:17px;font-weight:900;color:#5bc8e8;font-family:monospace;text-shadow:0 0 10px rgba(91,200,232,.5)">'+r[0]+'</div>';
-    h += '<div style="font-size:7.5px;color:#2a5060;margin-top:2px;letter-spacing:.04em">'+r[1]+'</div>';
+  [['1%','Risque max','rgba(160,80,255,.7)'],['2:1','RR minimum','rgba(91,200,232,.7)'],['SL','Obligatoire','rgba(0,220,120,.7)']].forEach(function(r,i){
+    h += '<div class="mm-rule-card" style="border-radius:8px;padding:9px 5px;text-align:center;border:1px solid '+r[2]+';background:rgba(0,0,0,.3)">';
+    h += '<div style="font-size:18px;font-weight:900;font-family:monospace;color:'+r[2]+';text-shadow:0 0 12px '+r[2]+'">'+r[0]+'</div>';
+    h += '<div style="font-size:7.5px;color:#4040a0;margin-top:3px">'+r[1]+'</div>';
     h += '</div>';
   });
   h += '</div></div>';
@@ -12050,9 +12065,13 @@ function renderCalc(){
     var quoteEl    = document.getElementById('mm-quote');
     var iconEl     = document.getElementById('mm-quote-icon');
     var progressEl = document.getElementById('mm-progress');
-    var icons      = ['⚔','🛡','⚡','🎯','🔒','💎','🏆','⚠️','🔥','👁','📐','💣'];
+    var counterEl  = document.getElementById('mm-counter');
+    var icons      = ['⚔','🛡','⚡','🎯','🔒','💎','🏆','🔥','👁','📐','💣','⚠️'];
+    // Couleurs vives pour chaque citation
+    var colors     = ['#e8d8ff','#c0f8e8','#ffe880','#ff8080','#80d8ff','#ffb040','#c0ff80','#ff80c0','#80ffff','#ffc0e0','#a0ff80','#ffdd60'];
+    var glows      = ['rgba(160,80,255,.5)','rgba(0,220,140,.4)','rgba(255,200,0,.5)','rgba(255,100,100,.5)','rgba(91,200,232,.5)','rgba(255,150,40,.4)','rgba(100,255,80,.4)','rgba(255,80,160,.4)','rgba(80,255,255,.4)','rgba(255,180,200,.4)','rgba(140,255,100,.4)','rgba(255,210,60,.4)'];
     var idx        = 0;
-    var DURATION   = 4000; // ms par citation
+    var DURATION   = 3500; // ms par citation
     var progressStart, progressRAF;
 
     function animateProgress(){
@@ -12064,21 +12083,24 @@ function renderCalc(){
 
     function showQuote(){
       if(!quoteEl) return;
+      var i = idx % quotes.length;
       quoteEl.style.opacity = '0';
-      quoteEl.style.transform = 'translateY(8px)';
+      quoteEl.style.transform = 'translateY(12px) scale(.97)';
       setTimeout(function(){
-        quoteEl.textContent = quotes[idx % quotes.length];
-        if(iconEl) iconEl.textContent = icons[idx % icons.length];
-        quoteEl.style.transition = 'opacity .25s ease, transform .25s ease';
+        quoteEl.textContent = quotes[i];
+        quoteEl.style.color = colors[i % colors.length];
+        quoteEl.style.textShadow = '0 0 24px '+glows[i % glows.length]+', 0 0 40px '+glows[i % glows.length];
+        if(iconEl) iconEl.textContent = icons[i % icons.length];
+        if(counterEl) counterEl.textContent = (i+1)+' / '+quotes.length;
+        quoteEl.style.transition = 'opacity .2s ease, transform .2s ease';
         quoteEl.style.opacity = '1';
-        quoteEl.style.transform = 'translateY(0)';
-        // Barre de progression
+        quoteEl.style.transform = 'translateY(0) scale(1)';
         if(progressEl){ progressEl.style.width = '0%'; }
         progressStart = Date.now();
         cancelAnimationFrame(progressRAF);
         progressRAF = requestAnimationFrame(animateProgress);
         idx++;
-      }, 250);
+      }, 200);
     }
     showQuote();
     setInterval(showQuote, DURATION);
