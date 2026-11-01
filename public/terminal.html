@@ -184,13 +184,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 @keyframes mmScan{0%{top:-4px}100%{top:100%}}
 @keyframes mmBorderPulse{0%,100%{box-shadow:0 0 0 0 rgba(160,80,255,0),inset 0 0 30px rgba(160,80,255,.04)}50%{box-shadow:0 0 30px 4px rgba(160,80,255,.35),inset 0 0 60px rgba(160,80,255,.12)}}
 @keyframes mmRuleFlash{0%,100%{background:rgba(0,144,204,.08);border-color:rgba(91,200,232,.2);transform:scale(1)}33%{background:rgba(160,80,255,.18);border-color:rgba(160,80,255,.6);transform:scale(1.06)}66%{background:rgba(0,200,120,.1);border-color:rgba(0,200,120,.4);transform:scale(1.04)}}
-@keyframes mmTickerColor{0%{color:#5bc8e8}25%{color:#c060ff}50%{color:#00e87c}75%{color:#ffd040}100%{color:#5bc8e8}}
+@keyframes mmTickerColor{0%{color:#ff9030}25%{color:#c060ff}50%{color:#ffd040}75%{color:#ff6090}100%{color:#ff9030}}
+@keyframes mmLogoBorder{0%,100%{box-shadow:0 0 0 2px #ffd040,0 0 18px 4px rgba(255,190,0,.5)}50%{box-shadow:0 0 0 3px #ffee00,0 0 32px 8px rgba(255,220,0,.75),0 0 60px 12px rgba(255,160,0,.3)}}
+@keyframes calcBorderGlow{0%,100%{box-shadow:0 0 0 1px rgba(255,120,30,.3),0 0 20px rgba(160,60,255,.1)}50%{box-shadow:0 0 0 1px rgba(255,120,30,.7),0 0 40px rgba(160,60,255,.3),inset 0 0 20px rgba(160,60,255,.05)}}
+@keyframes calcHeaderShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 #mm-quote-icon{animation:mmPulse 1.8s cubic-bezier(.4,0,.6,1) infinite}
 #mm-quote{animation:mmGlowPurple 2.5s ease-in-out infinite}
-#mm-ticker{display:inline-block;animation:mmTickerColor 8s linear infinite}
+#mm-ticker{display:inline-block;animation:mmTickerColor 6s linear infinite}
 .mm-rule-card{animation:mmRuleFlash 6s ease-in-out infinite}
 .mm-rule-card:nth-child(2){animation-delay:2s}
 .mm-rule-card:nth-child(3){animation-delay:4s}
+#mm-logo-wrap{animation:mmLogoBorder 2s ease-in-out infinite;border-radius:12px}
+#calc-card{animation:calcBorderGlow 3s ease-in-out infinite}
 /* ═══ SAISON CHART ═══ */
 .sz-chart{display:flex;align-items:center;gap:4px;height:120px;padding:0 4px;margin-bottom:12px}
 .sz-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;height:100%;justify-content:center}
@@ -11859,9 +11864,9 @@ function renderCalc(){
     return '<option value="'+c+'"'+(c==='USD'?' selected':'')+'>'+c+'</option>';
   }).join('');
 
-  // ── Styles inline communs ──
-  var inp = 'width:100%;background:#1a1f2e;border:1px solid rgba(255,255,255,.12);color:#e8e8e8;padding:11px 14px;border-radius:8px;font-size:14px;font-family:monospace;box-sizing:border-box;outline:none';
-  var lbl = 'display:block;font-size:11px;font-weight:700;color:#8a95b0;margin-bottom:6px;letter-spacing:.04em';
+  // ── Styles inline communs (thème orange/violet terminal) ──
+  var inp = 'width:100%;background:#0e0614;border:1px solid rgba(160,60,255,.25);color:#f0e0c0;padding:11px 14px;border-radius:8px;font-size:14px;font-family:monospace;box-sizing:border-box;outline:none';
+  var lbl = 'display:block;font-size:11px;font-weight:700;color:#b080ff;margin-bottom:6px;letter-spacing:.05em';
   var field = 'margin-bottom:16px';
 
   var h = '';
@@ -11911,11 +11916,15 @@ function renderCalc(){
   h += '</div></div>';
 
   // ── ZONE CITATION (centre) ──
-  h += '<div style="position:relative;z-index:4;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px">';
+  h += '<div style="position:relative;z-index:4;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 20px 14px">';
+  // Logo PTL avec contour jaune pulsant
+  h += '<div id="mm-logo-wrap" style="margin-bottom:14px;padding:4px;background:linear-gradient(135deg,#ffd040,#ff9030,#ff6090,#ffd040);background-size:300% 300%">';
+  h += '<img src="ptl-bg.png" style="width:100%;max-width:220px;display:block;border-radius:8px;object-fit:cover;height:80px;object-position:center 30%">';
+  h += '</div>';
   // Icône pulsante
-  h += '<div id="mm-quote-icon" style="font-size:48px;margin-bottom:16px;filter:drop-shadow(0 0 14px rgba(160,80,255,.8))">⚔</div>';
-  // Trait décoratif haut
-  h += '<div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,#c060ff,#5bc8e8,transparent);margin-bottom:18px"></div>';
+  h += '<div id="mm-quote-icon" style="font-size:36px;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(160,80,255,.8))">⚔</div>';
+  // Trait décoratif
+  h += '<div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,#ff9030,#c060ff,transparent);margin-bottom:14px"></div>';
   // Citation
   h += '<div id="mm-quote" style="font-size:13.5px;font-weight:800;color:#e8d8ff;text-align:center;line-height:1.75;min-height:95px;transition:opacity .25s,transform .25s;letter-spacing:.02em;text-shadow:0 0 20px rgba(160,80,255,.4)"></div>';
   // Barre progress
@@ -11942,15 +11951,15 @@ function renderCalc(){
   h += '</div>'; // fin panneau droit
 
   // ── CARTE CALCULATEUR (gauche) ──
-  h += '<div style="background:linear-gradient(145deg,#0d2a3a,#0a1f2e);border:1px solid rgba(0,160,200,.25);border-radius:16px;overflow:hidden">';
+  h += '<div id="calc-card" style="background:linear-gradient(145deg,#130a1e,#1a0e08);border:1px solid rgba(255,120,30,.3);border-radius:16px;overflow:hidden">';
 
   // JS animation mantra injecté via setAttribute
   h += '<script id="mm-anim-src" type="text/x-mantras">'+mantrasJS+'<\/script>';
 
-  // Header card
-  h += '<div style="background:linear-gradient(90deg,#0070a0,#005580);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">';
-  h += '<div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:.05em">📐 CALCULATEUR DE POSITION PTL</div>';
-  h += '<div style="font-size:9px;color:rgba(255,255,255,.6);background:rgba(0,0,0,.2);padding:3px 10px;border-radius:20px">Mis à jour en temps réel</div>';
+  // Header card orange/violet
+  h += '<div style="background:linear-gradient(90deg,#3d0080,#8b2200,#c04000);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">';
+  h += '<div style="font-size:14px;font-weight:900;color:#fff;letter-spacing:.06em;text-shadow:0 0 20px rgba(255,120,30,.6)">📐 CALCULATEUR DE POSITION PTL</div>';
+  h += '<div style="font-size:9px;color:rgba(255,180,80,.8);background:rgba(0,0,0,.35);padding:3px 10px;border-radius:20px;border:1px solid rgba(255,120,30,.3)">⚡ Live</div>';
   h += '</div>';
 
   // Corps : grille 2 colonnes
@@ -11965,13 +11974,13 @@ function renderCalc(){
   h += '<div style="'+field+'">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
   h += '<label style="'+lbl.replace('margin-bottom:6px','margin-bottom:0')+'" id="c-sl-label">⚙ Stop loss (pips)</label>';
-  h += '<button onclick="calcToggleSLMode()" style="font-size:9px;padding:2px 9px;background:rgba(0,160,200,.15);border:1px solid rgba(0,160,200,.35);border-radius:20px;color:#5bc8e8;cursor:pointer;font-family:monospace" id="c-sl-toggle-btn">Basculer sur le prix</button>';
+  h += '<button onclick="calcToggleSLMode()" style="font-size:9px;padding:2px 9px;background:rgba(160,60,255,.15);border:1px solid rgba(160,60,255,.4);border-radius:20px;color:#c080ff;cursor:pointer;font-family:monospace" id="c-sl-toggle-btn">Basculer sur le prix</button>';
   h += '</div>';
-  h += '<input id="c-sl" type="number" step="0.1" value="20" min="0.1" oninput="calcPosition()" style="'+inp+';border-color:rgba(224,82,82,.4);color:#ff7c7c">';
+  h += '<input id="c-sl" type="number" step="0.1" value="20" min="0.1" oninput="calcPosition()" style="'+inp+';border-color:rgba(255,80,80,.45);color:#ff8080">';
   h += '</div>';
   // Info pip instrument
-  h += '<div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-bottom:16px">';
-  h += '<div style="display:flex;justify-content:space-between"><span id="c-inst-pip-label" style="font-size:10px;color:#8a95b0">EUR/USD 1 pip</span><span id="c-inst-pip-val" style="font-size:10px;font-weight:700;color:#e8e8e8;font-family:monospace">0,0001</span></div>';
+  h += '<div style="background:rgba(60,0,120,.2);border:1px solid rgba(160,60,255,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px">';
+  h += '<div style="display:flex;justify-content:space-between"><span id="c-inst-pip-label" style="font-size:10px;color:#9060c0">EUR/USD 1 pip</span><span id="c-inst-pip-val" style="font-size:10px;font-weight:700;color:#ffb060;font-family:monospace">0,0001</span></div>';
   h += '</div>';
   // Taille du contrat
   h += '<div style="'+field+'"><label style="'+lbl+'">Taille du contrat (unités par lot)</label>';
@@ -11991,7 +12000,7 @@ function renderCalc(){
   h += '<div style="display:flex;gap:5px;margin-top:7px">';
   h += [5000,10000,25000,50000,100000].map(function(v){
     var lv=v>=1000?(v/1000)+'K':v;
-    return '<button onclick="document.getElementById(\'c-capital\').value='+v+';calcPosition()" style="flex:1;padding:4px 2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:8.5px;color:#8a95b0;cursor:pointer;font-family:monospace">'+lv+'</button>';
+    return '<button onclick="document.getElementById(\'c-capital\').value='+v+';calcPosition()" style="flex:1;padding:4px 2px;background:rgba(255,100,0,.07);border:1px solid rgba(255,100,0,.2);border-radius:5px;font-size:8.5px;color:#ff9040;cursor:pointer;font-family:monospace">'+lv+'</button>';
   }).join('');
   h += '</div></div>';
   // Risque avec toggle % / montant
@@ -11999,16 +12008,16 @@ function renderCalc(){
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
   h += '<label style="'+lbl.replace('margin-bottom:6px','margin-bottom:0')+'">Risque</label>';
   h += '<div style="display:flex;gap:0;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden">';
-  h += '<button id="c-risk-pct-btn" onclick="calcToggleRiskMode(\'pct\')" style="padding:3px 12px;background:rgba(0,160,200,.25);border:none;color:#5bc8e8;font-size:9px;cursor:pointer;font-family:monospace;font-weight:700">%</button>';
-  h += '<button id="c-risk-amt-btn" onclick="calcToggleRiskMode(\'amount\')" style="padding:3px 12px;background:transparent;border:none;color:#5a6580;font-size:9px;cursor:pointer;font-family:monospace">Montant</button>';
+  h += '<button id="c-risk-pct-btn" onclick="calcToggleRiskMode(\'pct\')" style="padding:3px 12px;background:rgba(160,60,255,.3);border:none;color:#c080ff;font-size:9px;cursor:pointer;font-family:monospace;font-weight:700">%</button>';
+  h += '<button id="c-risk-amt-btn" onclick="calcToggleRiskMode(\'amount\')" style="padding:3px 12px;background:transparent;border:none;color:#604080;font-size:9px;cursor:pointer;font-family:monospace">Montant</button>';
   h += '</div></div>';
   h += '<div style="display:flex;gap:5px;margin-bottom:7px">';
   h += ['0.5','1','1.5','2','3'].map(function(r){
-    return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:5px 2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:9px;color:#8a95b0;cursor:pointer;font-family:monospace">'+r+'%</button>';
+    return '<button onclick="document.getElementById(\'c-risk\').value='+r+';calcPosition()" style="flex:1;padding:5px 2px;background:rgba(160,60,255,.07);border:1px solid rgba(160,60,255,.22);border-radius:5px;font-size:9px;color:#a060e0;cursor:pointer;font-family:monospace">'+r+'%</button>';
   }).join('');
   h += '</div>';
-  h += '<input id="c-risk" type="number" value="1" min="0.01" step="0.1" oninput="calcPosition()" style="'+inp+';border-color:rgba(200,160,60,.4);color:#f0c040">';
-  h += '<div id="c-risk-equiv" style="font-size:9px;color:#f0c040;margin-top:5px;text-align:right"></div>';
+  h += '<input id="c-risk" type="number" value="1" min="0.01" step="0.1" oninput="calcPosition()" style="'+inp+';border-color:rgba(255,140,0,.45);color:#ffaa30">';
+  h += '<div id="c-risk-equiv" style="font-size:9px;color:#ff9030;margin-top:5px;text-align:right"></div>';
   h += '</div>';
   h += '</div>'; // fin col 2
 
@@ -12016,26 +12025,26 @@ function renderCalc(){
 
   // ── BOUTON CALCULER ──
   h += '<div style="padding:0 22px 22px">';
-  h += '<button onclick="calcPosition()" style="width:100%;padding:14px;background:linear-gradient(90deg,#0090cc,#0070a0);border:none;border-radius:10px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;letter-spacing:.05em;transition:opacity .15s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">Calculer</button>';
+  h += '<button onclick="calcPosition()" style="width:100%;padding:14px;background:linear-gradient(90deg,#5500bb,#cc4400,#ff7700);border:none;border-radius:10px;font-size:14px;font-weight:900;color:#fff;cursor:pointer;letter-spacing:.08em;transition:all .15s;text-shadow:0 0 20px rgba(255,150,0,.5);box-shadow:0 0 20px rgba(160,60,255,.3)" onmouseover="this.style.boxShadow=\'0 0 35px rgba(255,100,0,.6),0 0 20px rgba(160,60,255,.4)\'" onmouseout="this.style.boxShadow=\'0 0 20px rgba(160,60,255,.3)\'">⚡ CALCULER</button>';
   h += '</div>';
 
   // ── RÉSULTATS 3 GRANDS OUTPUTS (style CashBackForex) ──
-  h += '<div id="c-result-area" style="border-top:1px solid rgba(255,255,255,.08);padding:22px">';
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden">';
+  h += '<div id="c-result-area" style="border-top:1px solid rgba(255,120,30,.15);padding:22px">';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(160,60,255,.12);border-radius:10px;overflow:hidden">';
   // Lots
-  h += '<div style="background:#0d2a3a;padding:20px;text-align:center">';
-  h += '<div style="font-size:10px;color:#5bc8e8;margin-bottom:6px;font-weight:700;letter-spacing:.03em">Lots <span style="font-size:8px;color:#5a6580">(taille de deal)</span></div>';
-  h += '<div id="c-lot" style="font-size:32px;font-weight:900;color:#5bc8e8;font-family:monospace;letter-spacing:-.02em">—</div>';
+  h += '<div style="background:#100818;padding:20px;text-align:center">';
+  h += '<div style="font-size:10px;color:#ff9030;margin-bottom:6px;font-weight:700;letter-spacing:.04em">Lots <span style="font-size:8px;color:#603020">(taille de deal)</span></div>';
+  h += '<div id="c-lot" style="font-size:32px;font-weight:900;color:#ffaa50;font-family:monospace;letter-spacing:-.02em;text-shadow:0 0 16px rgba(255,150,0,.5)">—</div>';
   h += '</div>';
   // Unités
-  h += '<div style="background:#0d2a3a;padding:20px;text-align:center">';
-  h += '<div style="font-size:10px;color:#8a95b0;margin-bottom:6px;font-weight:700;letter-spacing:.03em">Unités <span style="font-size:8px;color:#5a6580">(taille de deal)</span></div>';
-  h += '<div id="c-units" style="font-size:32px;font-weight:900;color:#c8d0e0;font-family:monospace;letter-spacing:-.02em">—</div>';
+  h += '<div style="background:#100818;padding:20px;text-align:center">';
+  h += '<div style="font-size:10px;color:#c080ff;margin-bottom:6px;font-weight:700;letter-spacing:.04em">Unités <span style="font-size:8px;color:#503060">(taille de deal)</span></div>';
+  h += '<div id="c-units" style="font-size:32px;font-weight:900;color:#d090ff;font-family:monospace;letter-spacing:-.02em;text-shadow:0 0 16px rgba(160,80,255,.5)">—</div>';
   h += '</div>';
   // Fonds à risque
-  h += '<div style="background:#0d2a3a;padding:20px;text-align:center">';
-  h += '<div style="font-size:10px;color:#8a95b0;margin-bottom:6px;font-weight:700;letter-spacing:.03em">Fonds à risque</div>';
-  h += '<div id="c-max-loss" style="font-size:32px;font-weight:900;color:#c8d0e0;font-family:monospace;letter-spacing:-.02em">—</div>';
+  h += '<div style="background:#100818;padding:20px;text-align:center">';
+  h += '<div style="font-size:10px;color:#c080ff;margin-bottom:6px;font-weight:700;letter-spacing:.04em">Fonds à risque</div>';
+  h += '<div id="c-max-loss" style="font-size:32px;font-weight:900;color:#ff8050;font-family:monospace;letter-spacing:-.02em;text-shadow:0 0 16px rgba(255,100,0,.4)">—</div>';
   h += '</div>';
   h += '</div>';
 
@@ -12044,8 +12053,8 @@ function renderCalc(){
   h += '</div>'; // fin result area
 
   // ── TABLEAU MULTI-RISQUE ──
-  h += '<div style="border-top:1px solid rgba(255,255,255,.08);padding:18px 22px">';
-  h += '<div style="font-size:10px;font-weight:800;color:#8a95b0;margin-bottom:10px;letter-spacing:.05em">TABLEAU DE RISQUE</div>';
+  h += '<div style="border-top:1px solid rgba(160,60,255,.15);padding:18px 22px">';
+  h += '<div style="font-size:10px;font-weight:800;color:#8040c0;margin-bottom:10px;letter-spacing:.08em">TABLEAU DE RISQUE</div>';
   h += '<div style="overflow-x:auto"><table id="c-risk-table" style="width:100%;border-collapse:collapse;font-size:9px"></table></div>';
   h += '</div>';
 
