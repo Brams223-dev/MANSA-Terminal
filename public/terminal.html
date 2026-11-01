@@ -188,6 +188,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 @keyframes mmLogoBorder{0%,100%{box-shadow:0 0 0 2px #ffd040,0 0 18px 4px rgba(255,190,0,.5)}50%{box-shadow:0 0 0 3px #ffee00,0 0 32px 8px rgba(255,220,0,.75),0 0 60px 12px rgba(255,160,0,.3)}}
 @keyframes calcBorderGlow{0%,100%{box-shadow:0 0 0 1px rgba(255,120,30,.3),0 0 20px rgba(160,60,255,.1)}50%{box-shadow:0 0 0 1px rgba(255,120,30,.7),0 0 40px rgba(160,60,255,.3),inset 0 0 20px rgba(160,60,255,.05)}}
 @keyframes bullBearBreath{0%,100%{opacity:.13;transform:scale(1)}25%{opacity:.22;transform:scale(1.03)}50%{opacity:.16;transform:scale(1.06)}75%{opacity:.24;transform:scale(1.02)}}
+@keyframes bbPanLeft{0%{transform:scale(1.08) translateX(0%)}100%{transform:scale(1.14) translateX(-4%)}}
+@keyframes bbZoom{0%{transform:scale(1) translateX(0)}50%{transform:scale(1.12) translateX(-3%)}100%{transform:scale(1.06) translateX(2%)}}
 @keyframes calcHeaderShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 #mm-quote-icon{animation:mmPulse 1.8s cubic-bezier(.4,0,.6,1) infinite}
 #mm-quote{animation:mmGlowPurple 2.5s ease-in-out infinite}
@@ -11893,10 +11895,13 @@ function renderCalc(){
 
   h += '<div id="mm-panel" style="position:sticky;top:10px;background:#06080f;border:1px solid rgba(160,80,255,.3);border-radius:16px;overflow:hidden;min-height:640px;display:flex;flex-direction:column;animation:mmBorderPulse 3s ease-in-out infinite">';
 
-  // ── IMAGE PTL EN ARRIÈRE-PLAN ──
-  h += '<div style="position:absolute;inset:0;background:url(ptl-bg.png) center 40%/cover no-repeat;opacity:.22;animation:mmBgBreath 4s ease-in-out infinite;pointer-events:none"></div>';
+  // ── IMAGE BULL/BEAR EN ARRIÈRE-PLAN ANIMÉE ──
+  h += '<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">';
+  // Image qui respire et dérive légèrement (bear côté gauche attaque)
+  h += '<div style="position:absolute;inset:-8%;background:url(bull-bear-bg.png) center/cover no-repeat;opacity:.28;animation:bbPanLeft 12s ease-in-out infinite alternate,mmBgBreath 5s ease-in-out infinite"></div>';
+  h += '</div>';
   // Overlay dégradé pour lisibilité (violet→bleu→noir)
-  h += '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,0,60,.75) 0%,rgba(0,10,30,.6) 40%,rgba(6,8,15,.92) 100%);pointer-events:none"></div>';
+  h += '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,0,50,.8) 0%,rgba(0,8,25,.55) 40%,rgba(6,8,15,.94) 100%);pointer-events:none"></div>';
   // Scan line néon violet
   h += '<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(160,80,255,.9),rgba(91,200,232,.7),transparent);animation:mmScan 2s linear infinite;pointer-events:none;z-index:3"></div>';
 
@@ -11918,9 +11923,11 @@ function renderCalc(){
 
   // ── ZONE CITATION (centre) ──
   h += '<div style="position:relative;z-index:4;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 20px 14px">';
-  // Logo PTL avec contour jaune pulsant
-  h += '<div id="mm-logo-wrap" style="margin-bottom:14px;padding:4px;background:linear-gradient(135deg,#ffd040,#ff9030,#ff6090,#ffd040);background-size:300% 300%">';
-  h += '<img src="ptl-bg.png" style="width:100%;max-width:220px;display:block;border-radius:8px;object-fit:cover;height:80px;object-position:center 30%">';
+  // Image bull/bear centrale avec contour jaune pulsant + zoom animé
+  h += '<div id="mm-logo-wrap" style="margin-bottom:14px;padding:3px;background:linear-gradient(135deg,#ffd040,#ff9030,#ff6090,#ffd040);background-size:300% 300%;border-radius:10px;overflow:hidden">';
+  h += '<div style="width:100%;max-width:220px;height:90px;overflow:hidden;border-radius:8px;position:relative">';
+  h += '<img src="bull-bear-bg.png" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;animation:bbZoom 8s ease-in-out infinite alternate;display:block">';
+  h += '</div>';
   h += '</div>';
   // Icône pulsante
   h += '<div id="mm-quote-icon" style="font-size:36px;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(160,80,255,.8))">⚔</div>';
