@@ -876,6 +876,7 @@ body{padding-top:22px;}
   <div class="ntab" onclick="nav('news')" id="nt-news">📰 NEWS</div>
   <div class="ntab" onclick="nav('squawk')" id="nt-squawk">🔊 SQUAWK</div>
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
+  <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 ANALYSE SETUP</div>
   <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALCULATEUR</div>
   <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API LIVE</div>
   <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 NOUS REJOINDRE</div>
@@ -1336,6 +1337,98 @@ body{padding-top:22px;}
     </div>
   </div>
   <div id="backtest-content"></div>
+</div>
+
+<!-- ═══ PANEL ANALYSE SETUP ═══ -->
+<div class="panel" id="p-setup">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">📸</span><div><div class="p-title-text">ANALYSE SETUP — VALIDATION PRÉ-TRADE</div><div class="p-title-sub">Colle ton graphique TradingView · L'IA croise avec COT · DMX · Macro · Force devises · Verdict GO / WAIT / NO</div></div></div>
+    <div class="p-title-right"><span id="setup-ia-status" style="font-size:8px;color:var(--dim)">⚪ En attente</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- COLONNE GAUCHE : upload + contexte -->
+    <div>
+      <!-- Zone drop image -->
+      <div id="setup-drop-zone" onclick="document.getElementById('setup-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='#ff88aa'" ondragleave="this.style.borderColor='rgba(255,80,120,.35)'" ondrop="setupHandleDrop(event)"
+        style="border:2px dashed rgba(255,80,120,.35);border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,80,120,.04);margin-bottom:14px;position:relative;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <input type="file" id="setup-file-input" accept="image/*" style="display:none" onchange="setupHandleFile(this.files[0])">
+        <div id="setup-preview-wrap" style="display:none;width:100%;position:relative">
+          <img id="setup-preview-img" style="width:100%;border-radius:8px;display:block;max-height:280px;object-fit:contain">
+          <button onclick="event.stopPropagation();setupClearImage()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);border:1px solid rgba(255,80,120,.5);border-radius:6px;color:#ff88aa;font-size:10px;cursor:pointer;padding:3px 9px">✕ Supprimer</button>
+        </div>
+        <div id="setup-drop-placeholder">
+          <div style="font-size:36px;margin-bottom:10px;filter:drop-shadow(0 0 10px rgba(255,80,120,.5))">📸</div>
+          <div style="font-size:11px;font-weight:700;color:#ff88aa;margin-bottom:6px">Colle ou dépose ton graphique TradingView</div>
+          <div style="font-size:9px;color:var(--dim);line-height:1.7">Ctrl+V pour coller · Cliquer pour choisir un fichier<br>PNG · JPG · Tous formats acceptés</div>
+        </div>
+      </div>
+
+      <!-- Infos setup complémentaires -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">PAIRE / ACTIF</label>
+          <select id="setup-pair" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
+            <option value="">Détection auto</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">UNITÉ DE TEMPS</label>
+          <select id="setup-tf" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
+            <option value="M1">M1 — 1 minute</option>
+            <option value="M5">M5 — 5 minutes</option>
+            <option value="M15">M15 — 15 minutes</option>
+            <option value="M30">M30 — 30 minutes</option>
+            <option value="H1" selected>H1 — 1 heure</option>
+            <option value="H4">H4 — 4 heures</option>
+            <option value="D1">D1 — Journalier</option>
+            <option value="W1">W1 — Hebdomadaire</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">DIRECTION ENVISAGÉE</label>
+          <select id="setup-dir" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
+            <option value="">Non définie</option>
+            <option value="LONG">📈 LONG (Achat)</option>
+            <option value="SHORT">📉 SHORT (Vente)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">STRATÉGIE PTL</label>
+          <select id="setup-strat" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
+            <option value="">Toutes / Non précisé</option>
+            <option value="ICHIMOKU">Multi-TF Ichimoku</option>
+            <option value="STRUCTURE">Structure Protocol</option>
+            <option value="SWING">Swing Action Market</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Notes optionnelles -->
+      <div style="margin-bottom:14px">
+        <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">TES OBSERVATIONS (optionnel)</label>
+        <textarea id="setup-notes" placeholder="Ce que tu vois sur le graphique, ton plan, tes hésitations..." rows="3" style="width:100%;box-sizing:border-box;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:10px;resize:vertical;line-height:1.6"></textarea>
+      </div>
+
+      <!-- Bouton Analyser -->
+      <button id="setup-analyze-btn" onclick="setupAnalyze()" style="width:100%;padding:14px;background:linear-gradient(90deg,#8800cc,#cc0055,#ff4488);border:none;border-radius:10px;font-size:13px;font-weight:900;color:#fff;cursor:pointer;letter-spacing:.08em;box-shadow:0 0 24px rgba(255,80,120,.3);transition:all .2s"
+        onmouseover="this.style.boxShadow='0 0 40px rgba(255,80,120,.6)'" onmouseout="this.style.boxShadow='0 0 24px rgba(255,80,120,.3)'">
+        🔍 ANALYSER MON SETUP
+      </button>
+      <div style="text-align:center;margin-top:6px;font-size:8px;color:var(--dim)">L'IA va croiser ton graphique avec COT · DMX · Macro · Force devises · Saisonnalité</div>
+    </div>
+
+    <!-- COLONNE DROITE : résultat analyse -->
+    <div id="setup-result-col">
+      <div id="setup-result-placeholder" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;border:1px solid var(--border2);border-radius:14px;background:var(--s1)">
+        <div style="font-size:48px;margin-bottom:16px;opacity:.3">⚖️</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.9">Colle ton graphique<br>et clique <strong style="color:#ff88aa">Analyser</strong><br>pour obtenir le verdict</div>
+      </div>
+      <div id="setup-result-content" style="display:none"></div>
+    </div>
+
+  </div>
 </div>
 
 <div class="panel" id="p-ia">
@@ -4963,6 +5056,7 @@ function nav(id){
   if(id==='heatmap'){renderHeatmap();}
   if(id==='sessions'){renderV20Sessions();startV20SessionClock();}
   if(id==='ia'){renderIAPanel();}
+  if(id==='setup'){renderSetupAnalysis();}
   if(id==='macro'){renderMacroEnriched(); renderCalendar();}
   if(id==='backtest'){renderBacktest();}
   if(id==='cot'){renderCOT();}
@@ -9361,6 +9455,270 @@ var IA_KEY = '';
 var IA_LOADING = false;
 var IA_HISTORY = [];
 var IA_SYSTEM_PROMPT = 'Tu es Mansa IA, l\'analyste institutionnel intégré dans le terminal de trading Mansa. Tu analyses les marchés Forex, indices, actions et crypto avec une approche professionnelle. Tu connais la méthode PTL (Process Trading Life) basée sur Ichimoku multi-timeframe. Tu utilises le français. Tes réponses sont concises, précises et actionnables pour un trader professionnel. Tu cites toujours les niveaux clés, le contexte macro, et le biais directionnel. Tu termines toujours par un résumé : Biais (Bullish/Bearish/Neutre), Niveaux clés, et Catalyseurs à surveiller.';
+
+/* ═══ ANALYSE SETUP — VISION IA ═══ */
+var SETUP_IMAGE_B64 = null;
+var SETUP_IMAGE_TYPE = 'image/png';
+var SETUP_ANALYZING = false;
+
+function setupInitPairList(){
+  var sel = document.getElementById('setup-pair');
+  if(!sel || sel.options.length > 1) return;
+  var pairs = ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','USD/CAD','AUD/USD','NZD/USD',
+    'EUR/GBP','EUR/JPY','EUR/CHF','EUR/CAD','GBP/JPY','AUD/JPY','XAU/USD','XAG/USD','US30','NAS100','SPX500'];
+  pairs.forEach(function(p){
+    var o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    sel.appendChild(o);
+  });
+}
+
+function setupHandleDrop(e){
+  e.preventDefault();
+  document.getElementById('setup-drop-zone').style.borderColor = 'rgba(255,80,120,.35)';
+  var files = e.dataTransfer.files;
+  if(files && files[0]) setupHandleFile(files[0]);
+}
+
+function setupHandleFile(file){
+  if(!file || !file.type.startsWith('image/')) return;
+  SETUP_IMAGE_TYPE = file.type;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    SETUP_IMAGE_B64 = e.target.result.split(',')[1];
+    document.getElementById('setup-preview-img').src = e.target.result;
+    document.getElementById('setup-preview-wrap').style.display = 'block';
+    document.getElementById('setup-drop-placeholder').style.display = 'none';
+    document.getElementById('setup-ia-status').textContent = '🟡 Image chargée';
+  };
+  reader.readAsDataURL(file);
+}
+
+function setupClearImage(){
+  SETUP_IMAGE_B64 = null;
+  document.getElementById('setup-preview-wrap').style.display = 'none';
+  document.getElementById('setup-drop-placeholder').style.display = 'flex';
+  document.getElementById('setup-ia-status').textContent = '⚪ En attente';
+}
+
+// Écouter Ctrl+V sur le panel setup
+document.addEventListener('paste', function(e){
+  if(document.getElementById('p-setup') && document.getElementById('p-setup').classList.contains('on')){
+    var items = e.clipboardData && e.clipboardData.items;
+    if(!items) return;
+    for(var i=0;i<items.length;i++){
+      if(items[i].type.startsWith('image/')){
+        setupHandleFile(items[i].getAsFile());
+        break;
+      }
+    }
+  }
+});
+
+function setupBuildContext(){
+  var ctx = '=== CONTEXTE TERMINAL MANSA ===\n';
+  // FX Data
+  try{
+    ctx += '\n[FOREX — Prix & Signaux]\n';
+    FX_DATA.slice(0,12).forEach(function(d){
+      ctx += d.p+': '+d.b+' ('+( d.ch>=0?'+':'')+d.ch.toFixed(2)+'%) Signal:'+d.sig+' COT:'+d.cot+' DMX:'+d.dmx+'%\n';
+    });
+  }catch(e){}
+  // Devise strength
+  try{
+    ctx += '\n[FORCE DES DEVISES]\n';
+    var devises = ['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD'];
+    devises.forEach(function(d){
+      if(window.FX_STRENGTH && FX_STRENGTH[d] !== undefined) ctx += d+':'+FX_STRENGTH[d].toFixed(1)+'% ';
+    });
+    ctx += '\n';
+  }catch(e){}
+  // COT
+  try{
+    ctx += '\n[COT — Positionnement institutionnel]\n';
+    if(window.COT_DATA && COT_DATA.length){
+      COT_DATA.slice(0,8).forEach(function(c){
+        ctx += c.pair+': Nets commerciaux='+c.net+' ('+c.bias+')\n';
+      });
+    }
+  }catch(e){}
+  // DMX
+  try{
+    ctx += '\n[DMX — Flux retail]\n';
+    FX_DATA.slice(0,8).forEach(function(d){
+      if(d.dmx !== undefined) ctx += d.p+': DMX='+d.dmx+'% (>70% = foule Short, <30% = foule Long)\n';
+    });
+  }catch(e){}
+  // Macro events today
+  try{
+    ctx += '\n[MACRO — Événements du jour]\n';
+    if(window.MACRO_EVENTS && MACRO_EVENTS.length){
+      var today = new Date().toISOString().split('T')[0];
+      MACRO_EVENTS.filter(function(m){ return m.date && m.date.startsWith(today) && m.impact === 'HIGH'; }).slice(0,6).forEach(function(m){
+        ctx += m.time+' '+m.currency+': '+m.event+' (Impact:'+m.impact+')\n';
+      });
+    }
+  }catch(e){}
+  // Saison
+  try{
+    var pair = document.getElementById('setup-pair').value;
+    if(pair && window.SAISON_DATA && SAISON_DATA[pair]){
+      var sd = SAISON_DATA[pair];
+      ctx += '\n[SAISONNALITÉ — '+pair+']\n';
+      ctx += 'Biais saisonnier ce mois: '+(sd.bias||'neutre')+'\n';
+    }
+  }catch(e){}
+  return ctx;
+}
+
+function setupAnalyze(){
+  if(SETUP_ANALYZING) return;
+  if(!SETUP_IMAGE_B64){
+    var dz = document.getElementById('setup-drop-zone');
+    dz.style.borderColor = '#ff4444';
+    setTimeout(function(){ dz.style.borderColor = 'rgba(255,80,120,.35)'; }, 1500);
+    alert('⚠️ Colle ou charge d\'abord ton graphique TradingView !');
+    return;
+  }
+  if(!IA_KEY){
+    nav('ia');
+    alert('⚠️ Active Mansa IA d\'abord (onglet MANSA IA → colle ta clé API)');
+    return;
+  }
+
+  SETUP_ANALYZING = true;
+  var btn = document.getElementById('setup-analyze-btn');
+  if(btn){ btn.textContent = '⏳ Analyse en cours...'; btn.disabled = true; }
+  document.getElementById('setup-ia-status').textContent = '🔵 Analyse...';
+
+  var pair   = document.getElementById('setup-pair').value;
+  var tf     = document.getElementById('setup-tf').value;
+  var dir    = document.getElementById('setup-dir').value;
+  var strat  = document.getElementById('setup-strat').value;
+  var notes  = document.getElementById('setup-notes').value.trim();
+
+  // Afficher placeholder "analyse en cours"
+  document.getElementById('setup-result-placeholder').style.display = 'none';
+  document.getElementById('setup-result-content').style.display = 'block';
+  document.getElementById('setup-result-content').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:32px;animation:mmPulse 1s infinite">🔍</div><div style="margin-top:14px;font-size:10px;color:var(--dim)">Analyse du setup en cours...<br>Croisement avec COT · DMX · Macro · Force devises</div></div>';
+
+  var terminalCtx = setupBuildContext();
+
+  var systemPrompt = 'Tu es Mansa IA, l\'analyste institutionnel du Mansa Terminal — terminal de trading africain de niveau Bloomberg.\n\n'
+    + 'Tu analyses les setups de trading des traders PTL (Process Trading Life) AVANT qu\'ils entrent en position.\n\n'
+    + 'TON RÔLE : Analyser le graphique TradingView fourni ET croiser avec les données institutionnelles du terminal pour donner un verdict clair.\n\n'
+    + 'FORMAT DE RÉPONSE OBLIGATOIRE :\n'
+    + '1. VERDICT (une seule ligne) : ✅ GO / ⚠️ WAIT / ❌ NO — + raison principale en 10 mots max\n'
+    + '2. SCORE DE CONFLUENCE : X/10 (compte les alignements : technique + COT + DMX + macro + saisonnalité)\n'
+    + '3. CE QUE TU VOIS SUR LE GRAPHIQUE : structure de prix, niveaux clés, indicateurs visibles\n'
+    + '4. ALIGNEMENT INSTITUTIONNEL : est-ce que COT / DMX / force devises confirment ou contredisent ?\n'
+    + '5. RISQUES À SURVEILLER : événements macro, résistances, divergences\n'
+    + '6. CONSEIL GESTION DU RISQUE : SL suggéré, RR minimum, taille de position\n\n'
+    + 'Sois direct, professionnel, institutionnel. Pas de blabla. Les traders PTL respectent le money management — rappelle-le si le setup est risqué.\n\n'
+    + terminalCtx;
+
+  var userContent = [
+    { type: 'image', source: { type: 'base64', media_type: SETUP_IMAGE_TYPE, data: SETUP_IMAGE_B64 } },
+    { type: 'text', text:
+      'Graphique TradingView à analyser.'
+      + (pair ? '\nPaire : '+pair : '')
+      + '\nUnité de temps : '+tf
+      + (dir ? '\nDirection envisagée par le trader : '+dir : '')
+      + (strat ? '\nStratégie PTL : '+strat : '')
+      + (notes ? '\nObservations du trader : '+notes : '')
+      + '\n\nDonne ton verdict et ton analyse complète.'
+    }
+  ];
+
+  var messages = [
+    { role: 'user', content: [ { type: 'text', text: systemPrompt } ] },
+    { role: 'assistant', content: 'Compris. Je suis prêt à analyser le setup.' },
+    { role: 'user', content: userContent }
+  ];
+
+  var payload = {
+    model: 'claude-opus-4-5',
+    max_tokens: 1500,
+    messages: messages,
+    key: IA_KEY
+  };
+
+  fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.error) throw new Error(data.error);
+    var text = data.content && data.content[0] && data.content[0].text;
+    if(!text) throw new Error('Réponse vide');
+    setupShowResult(text);
+  })
+  .catch(function(e){
+    setupShowResult(null, e.message);
+  })
+  .finally(function(){
+    SETUP_ANALYZING = false;
+    if(btn){ btn.textContent = '🔍 ANALYSER MON SETUP'; btn.disabled = false; }
+    document.getElementById('setup-ia-status').textContent = '✅ Analyse terminée';
+  });
+}
+
+function setupShowResult(text, err){
+  var el = document.getElementById('setup-result-content');
+  if(err){
+    el.innerHTML = '<div style="padding:20px;border:1px solid rgba(255,80,80,.3);border-radius:10px;background:rgba(255,0,0,.05)">'
+      + '<div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:8px">❌ Erreur d\'analyse</div>'
+      + '<div style="font-size:9px;color:var(--dim)">'+err+'</div>'
+      + '<div style="font-size:8px;color:var(--dim);margin-top:8px">Vérifiez que votre clé API a des crédits sur console.anthropic.com</div>'
+      + '</div>';
+    return;
+  }
+
+  // Détecter le verdict pour coloriser
+  var verdictColor = 'var(--gold)';
+  var verdictBg = 'rgba(200,160,60,.1)';
+  var verdictBorder = 'rgba(200,160,60,.3)';
+  if(text.includes('✅ GO') || text.match(/VERDICT.*GO/i)){
+    verdictColor = 'var(--green)'; verdictBg = 'rgba(0,200,100,.1)'; verdictBorder = 'rgba(0,200,100,.35)';
+  } else if(text.includes('❌ NO') || text.match(/VERDICT.*NO/i)){
+    verdictColor = 'var(--red)'; verdictBg = 'rgba(255,60,60,.1)'; verdictBorder = 'rgba(255,60,60,.35)';
+  } else if(text.includes('⚠️ WAIT') || text.match(/VERDICT.*WAIT/i)){
+    verdictColor = 'var(--gold)'; verdictBg = 'rgba(200,160,60,.1)'; verdictBorder = 'rgba(200,160,60,.3)';
+  }
+
+  var timestamp = new Date().toLocaleTimeString('fr-FR');
+  var pair = document.getElementById('setup-pair').value || 'Détection auto';
+  var tf   = document.getElementById('setup-tf').value;
+
+  // Convertir texte en HTML propre
+  var html = '<div style="border:1px solid '+verdictBorder+';border-radius:12px;overflow:hidden;background:'+verdictBg+';margin-bottom:14px">';
+  html += '<div style="padding:10px 16px;border-bottom:1px solid '+verdictBorder+';display:flex;justify-content:space-between;align-items:center">';
+  html += '<div style="font-size:9px;color:var(--dim)">🤖 Mansa IA · '+pair+' · '+tf+' · '+timestamp+'</div>';
+  html += '<button onclick="setupCopyResult()" style="font-size:8px;padding:3px 10px;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:5px;color:var(--dim);cursor:pointer">📋 Copier</button>';
+  html += '</div>';
+  html += '<div id="setup-result-text" style="padding:16px;font-size:10px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:var(--fm)">'+text+'</div>';
+  html += '</div>';
+
+  html += '<button onclick="setupAnalyze()" style="width:100%;padding:10px;background:rgba(255,80,120,.08);border:1px solid rgba(255,80,120,.3);border-radius:8px;color:#ff88aa;font-size:9px;cursor:pointer;font-family:var(--fm);font-weight:700;letter-spacing:.08em">🔄 NOUVELLE ANALYSE</button>';
+
+  el.innerHTML = html;
+}
+
+function setupCopyResult(){
+  var el = document.getElementById('setup-result-text');
+  if(!el) return;
+  navigator.clipboard.writeText(el.textContent).then(function(){
+    var btn = event.target;
+    btn.textContent = '✅ Copié !';
+    setTimeout(function(){ btn.textContent = '📋 Copier'; }, 2000);
+  });
+}
+
+function renderSetupAnalysis(){
+  setupInitPairList();
+}
 
 function renderIAPanel(){
   var saved = localStorage.getItem('mansa_ia_key');
