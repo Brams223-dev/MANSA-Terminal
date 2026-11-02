@@ -877,6 +877,7 @@ body{padding-top:22px;}
   <div class="ntab" onclick="nav('squawk')" id="nt-squawk">🔊 SQUAWK</div>
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
   <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 ANALYSE SETUP</div>
+  <div class="ntab" onclick="nav('ds')" id="nt-ds" style="background:linear-gradient(135deg,rgba(255,180,0,.18),rgba(255,100,0,.1));border:1px solid rgba(255,180,0,.4);color:#ffcc44;font-weight:900">🎯 DOUBLE STRUCTURE</div>
   <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALCULATEUR</div>
   <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API LIVE</div>
   <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 NOUS REJOINDRE</div>
@@ -1581,6 +1582,113 @@ body{padding-top:22px;}
   </div>
   <div id="scr-table"></div>
   <div id="scr-detail" style="display:none"></div>
+</div>
+
+<!-- ═══ PANEL DOUBLE STRUCTURE ═══ -->
+<div class="panel" id="p-ds">
+  <div class="p-title">
+    <div class="p-title-left"><span class="p-title-icon">🎯</span><div><div class="p-title-text">DOUBLE STRUCTURE — CHECKLIST MÉTHODE PTL</div><div class="p-title-sub">Colle ton graphique · L'IA valide les 18 règles · Verdict ADMISSIBLE / INVALIDE / À SURVEILLER / DONNÉES INSUFFISANTES</div></div></div>
+    <div class="p-title-right"><span id="ds-ia-status" style="font-size:8px;color:var(--dim)">⚪ En attente</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- COLONNE GAUCHE : Upload + paramètres -->
+    <div>
+      <!-- Zone drop/paste -->
+      <div id="ds-drop-zone" onclick="document.getElementById('ds-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='#ffcc44'" ondragleave="this.style.borderColor='rgba(255,180,0,.3)'" ondrop="event.preventDefault();dsHandleFile(event.dataTransfer.files[0])" style="border:2px dashed rgba(255,180,0,.3);border-radius:12px;padding:32px 16px;text-align:center;cursor:pointer;transition:border-color .2s;background:rgba(255,180,0,.03);margin-bottom:12px">
+        <div id="ds-drop-preview" style="display:none;margin-bottom:10px"><img id="ds-preview-img" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid rgba(255,180,0,.3)" /></div>
+        <div id="ds-drop-hint">
+          <div style="font-size:28px;margin-bottom:8px">📊</div>
+          <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em">COLLE OU DÉPOSE TON GRAPHIQUE</div>
+          <div style="font-size:9px;color:var(--dim);margin-top:4px">Ctrl+V · Glisser-déposer · Cliquer pour sélectionner</div>
+          <div style="font-size:8px;color:rgba(255,180,0,.4);margin-top:6px">TradingView screenshot — tracé avec structures et zones</div>
+        </div>
+        <input type="file" id="ds-file-input" accept="image/*" style="display:none" onchange="dsHandleFile(this.files[0])">
+      </div>
+
+      <!-- Paramètres du setup -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:.1em;margin-bottom:10px">⚙️ PARAMÈTRES DU SETUP</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">PAIRE</div>
+            <select id="ds-pair" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
+              <option value="">Sélectionner...</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">UNITÉ DE TEMPS</div>
+            <select id="ds-tf" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
+              <option value="">Sélectionner...</option>
+              <option value="M30">M30</option>
+              <option value="H1">H1</option>
+              <option value="H2">H2</option>
+              <option value="H4">H4</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">SENS ANTICIPÉ</div>
+            <select id="ds-dir" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
+              <option value="">Sélectionner...</option>
+              <option value="BUY">📈 BUY</option>
+              <option value="SELL">📉 SELL</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">VARIANTE</div>
+            <select id="ds-variant" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
+              <option value="">Non identifiée</option>
+              <option value="detachee">Structure Détachée</option>
+              <option value="twoinone">Two in One</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div style="font-size:7px;color:var(--dim);margin-bottom:3px">ENTRÉE / SL / TP (optionnel)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <input id="ds-entry" type="text" placeholder="Entrée" style="background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm);width:100%;box-sizing:border-box">
+            <input id="ds-sl" type="text" placeholder="SL" style="background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm);width:100%;box-sizing:border-box">
+            <input id="ds-tp" type="text" placeholder="TP" style="background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm);width:100%;box-sizing:border-box">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:7px;color:var(--dim);margin-bottom:3px">NOTES / OBSERVATIONS</div>
+          <textarea id="ds-notes" placeholder="Décris ce que tu vois : structure 1, structure 2, zone de cassure, position EMA..." style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:8px;font-family:var(--fm);resize:vertical;min-height:60px;box-sizing:border-box"></textarea>
+        </div>
+      </div>
+
+      <!-- Bouton analyse -->
+      <button id="ds-analyze-btn" onclick="dsAnalyze()" style="width:100%;padding:14px;background:linear-gradient(90deg,#cc8800,#ff6600,#ffaa00);border:none;border-radius:10px;font-size:13px;font-weight:900;color:#000;cursor:pointer;letter-spacing:.08em;box-shadow:0 0 24px rgba(255,180,0,.35);transition:all .2s">
+        🎯 VALIDER DOUBLE STRUCTURE
+      </button>
+      <div style="font-size:8px;color:var(--dim);text-align:center;margin-top:6px">Nécessite une clé API Claude (onglet 🤖 MANSA IA)</div>
+    </div>
+
+    <!-- COLONNE DROITE : Résultat checklist -->
+    <div>
+      <div id="ds-result-area" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;min-height:400px">
+        <div id="ds-result-placeholder" style="text-align:center;padding:60px 20px">
+          <div style="font-size:40px;margin-bottom:12px">📋</div>
+          <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em">CHECKLIST DOUBLE STRUCTURE</div>
+          <div style="font-size:9px;color:var(--dim);margin-top:8px;line-height:1.6">18 règles · EMA 100 · RR ≥ 2.5 · Structure 1 & 2<br>Variante Détachée / Two in One · Money Management</div>
+          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:left">
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Marché admissible</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Unité M30→H4</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Structure 1 lisible</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Structure 2 valide</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Zone cassure</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ EMA 100 alignée</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Clôture franche</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ RR ≥ 2.5</div>
+          </div>
+        </div>
+        <div id="ds-result-content" style="display:none"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="panel" id="p-setups">
@@ -5057,6 +5165,7 @@ function nav(id){
   if(id==='sessions'){renderV20Sessions();startV20SessionClock();}
   if(id==='ia'){renderIAPanel();}
   if(id==='setup'){renderSetupAnalysis();}
+  if(id==='ds'){renderDSPanel();}
   if(id==='macro'){renderMacroEnriched(); renderCalendar();}
   if(id==='backtest'){renderBacktest();}
   if(id==='cot'){renderCOT();}
@@ -9718,6 +9827,277 @@ function setupCopyResult(){
 
 function renderSetupAnalysis(){
   setupInitPairList();
+}
+
+/* ═══════════════════════════════════════════════════
+   DOUBLE STRUCTURE — CHECKLIST MÉTHODE PTL
+   Valide les 18 règles de la méthode Double Structure
+   ═══════════════════════════════════════════════════ */
+
+var DS_IMAGE_B64 = null;
+var DS_IMAGE_TYPE = 'image/png';
+var DS_ANALYZING = false;
+
+var DS_PAIRS_MAJOR = ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','USD/CAD','AUD/USD','NZD/USD',
+  'EUR/GBP','EUR/JPY','EUR/CHF','EUR/CAD','EUR/AUD','GBP/JPY','GBP/CHF','GBP/CAD','GBP/AUD',
+  'AUD/JPY','AUD/CAD','AUD/NZD','CAD/JPY','CHF/JPY','NZD/JPY','NZD/CAD'];
+
+function renderDSPanel(){
+  var sel = document.getElementById('ds-pair');
+  if(sel && sel.options.length < 5){
+    DS_PAIRS_MAJOR.forEach(function(p){
+      var o = document.createElement('option');
+      o.value = p; o.textContent = p;
+      sel.appendChild(o);
+    });
+  }
+}
+
+function dsHandleFile(file){
+  if(!file || !file.type.startsWith('image/')) return;
+  DS_IMAGE_TYPE = file.type;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    DS_IMAGE_B64 = e.target.result.split(',')[1];
+    var hint = document.getElementById('ds-drop-hint');
+    var preview = document.getElementById('ds-drop-preview');
+    var img = document.getElementById('ds-preview-img');
+    if(hint) hint.style.display = 'none';
+    if(preview) preview.style.display = 'block';
+    if(img) img.src = e.target.result;
+    var status = document.getElementById('ds-ia-status');
+    if(status){ status.textContent = '🖼️ Graphique chargé'; status.style.color = 'var(--gold)'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Ctrl+V dans l'onglet Double Structure
+document.addEventListener('paste', function(e){
+  var panel = document.getElementById('p-ds');
+  if(panel && panel.classList.contains('on')){
+    var items = e.clipboardData && e.clipboardData.items;
+    if(!items) return;
+    for(var i=0;i<items.length;i++){
+      if(items[i].type.startsWith('image/')){
+        dsHandleFile(items[i].getAsFile());
+        break;
+      }
+    }
+  }
+});
+
+var DS_SYSTEM_PROMPT = `Tu es l'assistant de validation strict de la méthode Forex "Double Structure" de Process Trading Life (PTL).
+
+MÉTHODE DOUBLE STRUCTURE — RÈGLES ABSOLUES :
+
+MARCHÉS : Forex uniquement — paires majeures et mineures UNIQUEMENT. Exotiques = INVALIDE.
+MOIS : Ne pas trader en mars (résultats négatifs historiques).
+JOURS : Lundi au vendredi uniquement.
+HORAIRES : Entrée uniquement de 8h à 21h (fuseau à préciser si non fourni).
+UNITÉS DE TEMPS AUTORISÉES : M30, H1, H2, H4 UNIQUEMENT. M15 et journalier = INVALIDE. Pas de multi-timeframe.
+
+EMA 100 : SEUL indicateur. Achat UNIQUEMENT au-dessus de l'EMA 100. Vente UNIQUEMENT en-dessous. SL achat = sous l'EMA 100. SL vente = au-dessus de l'EMA 100.
+
+STRUCTURE 1 (tendance) : Tendance claire avec sommets/creux successifs — pas une simple impulsion. Baissière = LH+LL successifs. Haussière = HH+HL successifs. Doit permettre de tracer des zones intermédiaires pour le management.
+
+STRUCTURE 2 (hésitation/consolidation) : Phase d'équilibre après la structure 1. Responsable de 70% de la validité. Doit être suffisamment grande en hauteur ET en durée relativement à la structure 1. Trop petite/verticale ou trop courte = invalide.
+
+VARIANTE A — Structure Détachée : La structure 2 casse la ligne de tendance de la structure 1.
+VARIANTE B — Two in One : La structure 2 reste DANS la ligne de tendance. ORDRE OBLIGATOIRE : cassure ligne de tendance D'ABORD, puis cassure zone psychologique. Si zone cassée avant ligne de tendance = INVALIDE.
+
+ZONE PSYCHOLOGIQUE : Tracer en ZONE (corps ET mèches). Jamais mèches seules. Multiple impacts = zone plus forte. Cassure puis réintégration = INVALIDE.
+
+CASSURE/CLÔTURE : Bougie CLÔTURÉE au-delà de la zone. Corps/momentum clair, non indécis. Pas de doji. Distance suffisante à la zone (qualitatif).
+
+ENTRÉE : Par cassure directe (préféré) OU pullback véritable (mouvement→retournement→contraction→reprise). Zone cassée doit devenir support/résistance.
+
+STOP LOSS : Au-delà du dernier creux (achat) ou sommet (vente) pertinent, avec marge. Ou au-delà du pullback. ET du bon côté de l'EMA 100. Si les deux critères sont incompatibles = INVALIDE.
+
+TAKE PROFIT : Zone du DÉBUT de la structure 1. Pas de clôture partielle.
+
+RATIO RR : Minimum 2,5. Si inférieur = INVALIDE. Ne jamais réduire le SL pour forcer un ratio acceptable.
+
+FILTRES CALENDRIER : Éviter NFP, CPI, PPI, FOMC, chômage, décisions de taux. Rebond déjà confirmé sur zone intermédiaire = INVALIDE.
+
+MONEY MANAGEMENT : 1% par trade (max 2% si occasions très rares). Limites : 2%/jour, 4%/semaine, 12%/mois.
+
+CHECKLIST OBLIGATOIRE (18 règles) :
+1. Marché admissible (Forex majeure/mineure, non exotique) ?
+2. Calendrier admissible (mois ≠ mars, jour lun-ven, plage 8h-21h) ?
+3. Unité admissible (M30 à H4, utilisée seule) ?
+4. Structure 1 lisible (tendance HH/HL ou LH/LL, pas une impulsion) ?
+5. Structure 2 valide (hésitation suffisante en hauteur ET durée) ?
+6. Variante identifiée (Détachée ou Two in One) ?
+7. Two in One : ligne de tendance cassée AVANT la zone ? (si applicable)
+8. Zone psychologique correctement tracée (corps+mèches, multiple impacts) ?
+9. Pas de cassure puis réintégration de la zone ?
+10. Clôture franche dans le sens du trade (pas doji, distance suffisante) ?
+11. EMA 100 alignée (achat au-dessus / vente en-dessous) ?
+12. Type d'entrée (cassure directe ou vrai pullback) ?
+13. Stop loss structurel ET du bon côté de l'EMA 100 ?
+14. Take profit sur zone début structure 1 ?
+15. RR ≥ 2,5 (calculé avec les prix réels si fournis) ?
+16. Calendrier économique vérifié (pas d'annonce majeure imminente) ?
+17. Pas de rebond sur zone intermédiaire avant l'entrée ?
+18. Money management respecté (1%, limites jour/semaine/mois) ?
+
+VERDICT FINAL :
+✅ ADMISSIBLE : TOUTES les règles vérifiables sont Oui, aucune règle bloquante n'est Non.
+❌ INVALIDE : Au moins une règle bloquante est Non (nommer la/les règle(s) précisément).
+⚠️ À SURVEILLER : Règles importantes sont Inconnu mais aucune règle n'est Non.
+🔍 DONNÉES INSUFFISANTES : Données essentielles manquantes pour évaluer (lister ce qui manque).
+
+FORMAT DE RÉPONSE :
+1. Commence par le VERDICT en grande taille avec emoji
+2. Fiche synthèse (paire, unité, variante, sens)
+3. Checklist numérotée : chaque règle avec ✅ OUI / ❌ NON / ❓ INCONNU + justification courte
+4. Points bloquants (si INVALIDE ou À SURVEILLER)
+5. Prochaine condition à attendre (si À SURVEILLER)
+6. Calcul RR si les prix sont fournis
+
+IMPORTANT : Ne jamais inventer de données. Ne jamais forcer un verdict positif. Si tu ne peux pas évaluer une règle visuellement, marque INCONNU. Réponds en français.`;
+
+function dsAnalyze(){
+  if(DS_ANALYZING) return;
+  if(!DS_IMAGE_B64){
+    alert('Colle ou dépose d\'abord un graphique TradingView.');
+    return;
+  }
+  var key = IA_KEY || (localStorage.getItem('mansa_ia_key') || '');
+  if(!key || !key.startsWith('sk-ant')){
+    alert('Clé API Claude requise — configure-la dans l\'onglet 🤖 MANSA IA.');
+    return;
+  }
+
+  var pair = (document.getElementById('ds-pair') || {}).value || '';
+  var tf = (document.getElementById('ds-tf') || {}).value || '';
+  var dir = (document.getElementById('ds-dir') || {}).value || '';
+  var variant = (document.getElementById('ds-variant') || {}).value || '';
+  var entry = (document.getElementById('ds-entry') || {}).value || '';
+  var sl = (document.getElementById('ds-sl') || {}).value || '';
+  var tp = (document.getElementById('ds-tp') || {}).value || '';
+  var notes = (document.getElementById('ds-notes') || {}).value || '';
+
+  var userText = 'Analyse ce graphique TradingView selon la méthode Double Structure PTL.\n\n';
+  if(pair) userText += 'Paire : ' + pair + '\n';
+  if(tf) userText += 'Unité de temps : ' + tf + '\n';
+  if(dir) userText += 'Sens anticipé : ' + dir + '\n';
+  if(variant) userText += 'Variante : ' + (variant==='twoinone'?'Two in One':'Structure Détachée') + '\n';
+  if(entry) userText += 'Entrée : ' + entry + '\n';
+  if(sl) userText += 'Stop Loss : ' + sl + '\n';
+  if(tp) userText += 'Take Profit : ' + tp + '\n';
+  if(entry && sl && tp){
+    try{
+      var e=parseFloat(entry), s=parseFloat(sl), t=parseFloat(tp);
+      if(!isNaN(e)&&!isNaN(s)&&!isNaN(t)&&Math.abs(e-s)>0){
+        var rr = Math.abs(t-e)/Math.abs(e-s);
+        userText += 'RR calculé : ' + rr.toFixed(2) + '\n';
+      }
+    }catch(ex){}
+  }
+  if(notes) userText += '\nObservations du trader : ' + notes + '\n';
+  userText += '\nValide chaque règle de la checklist (18 points) et donne un verdict final ADMISSIBLE / INVALIDE / À SURVEILLER / DONNÉES INSUFFISANTES.';
+
+  DS_ANALYZING = true;
+  var btn = document.getElementById('ds-analyze-btn');
+  if(btn){ btn.textContent = '⏳ Analyse en cours...'; btn.disabled = true; btn.style.opacity = '.6'; }
+  var status = document.getElementById('ds-ia-status');
+  if(status){ status.textContent = '🔄 Validation...'; status.style.color = 'var(--gold)'; }
+
+  var placeholder = document.getElementById('ds-result-placeholder');
+  var content = document.getElementById('ds-result-content');
+  if(placeholder) placeholder.style.display = 'none';
+  if(content){ content.style.display = 'block'; content.innerHTML = '<div style="text-align:center;padding:40px"><div style="font-size:24px;animation:spin 1s linear infinite;display:inline-block">⚙️</div><div style="font-size:9px;color:var(--gold);margin-top:12px;letter-spacing:.08em">VALIDATION DES 18 RÈGLES...</div></div>'; }
+
+  var messages = [
+    {
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: DS_IMAGE_TYPE, data: DS_IMAGE_B64 } },
+        { type: 'text', text: userText }
+      ]
+    }
+  ];
+
+  fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-opus-4-5',
+      max_tokens: 2000,
+      system: DS_SYSTEM_PROMPT,
+      messages: messages,
+      key: key
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    DS_ANALYZING = false;
+    if(btn){ btn.textContent = '🎯 VALIDER DOUBLE STRUCTURE'; btn.disabled = false; btn.style.opacity = '1'; }
+    if(data.error){
+      dsShowResult(null, data.error);
+    } else {
+      var text = (data.content && data.content[0] && data.content[0].text) || '';
+      dsShowResult(text);
+    }
+  })
+  .catch(function(e){
+    DS_ANALYZING = false;
+    if(btn){ btn.textContent = '🎯 VALIDER DOUBLE STRUCTURE'; btn.disabled = false; btn.style.opacity = '1'; }
+    dsShowResult(null, e.message);
+  });
+}
+
+function dsShowResult(text, err){
+  var content = document.getElementById('ds-result-content');
+  var status = document.getElementById('ds-ia-status');
+  if(!content) return;
+
+  if(err){
+    content.innerHTML = '<div style="padding:20px;background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.25);border-radius:10px"><div style="color:#ff6666;font-size:10px;font-weight:700;margin-bottom:6px">❌ ERREUR</div><div style="font-size:9px;color:var(--dim)">' + err + '</div></div>';
+    if(status){ status.textContent = '❌ Erreur'; status.style.color = 'var(--red)'; }
+    return;
+  }
+
+  // Déterminer couleur verdict
+  var verdictColor = 'var(--dim)';
+  var verdictLabel = '—';
+  if(text.includes('✅ ADMISSIBLE') || text.includes('ADMISSIBLE')&&!text.includes('INVALIDE')&&!text.includes('À SURVEILLER')&&!text.includes('INSUFFISANTES')){
+    verdictColor = 'var(--green)'; verdictLabel = '✅ ADMISSIBLE';
+    if(status){ status.textContent = '✅ ADMISSIBLE'; status.style.color = 'var(--green)'; }
+  } else if(text.includes('❌ INVALIDE') || (text.includes('INVALIDE') && text.indexOf('INVALIDE') < 80)){
+    verdictColor = 'var(--red)'; verdictLabel = '❌ INVALIDE';
+    if(status){ status.textContent = '❌ INVALIDE'; status.style.color = 'var(--red)'; }
+  } else if(text.includes('⚠️ À SURVEILLER') || text.includes('À SURVEILLER')){
+    verdictColor = 'var(--gold)'; verdictLabel = '⚠️ À SURVEILLER';
+    if(status){ status.textContent = '⚠️ À SURVEILLER'; status.style.color = 'var(--gold)'; }
+  } else if(text.includes('DONNÉES INSUFFISANTES') || text.includes('🔍')){
+    verdictColor = '#aaa'; verdictLabel = '🔍 DONNÉES INSUFFISANTES';
+    if(status){ status.textContent = '🔍 Données insuffisantes'; status.style.color = '#aaa'; }
+  } else {
+    if(status){ status.textContent = '✔️ Analysé'; status.style.color = 'var(--text)'; }
+  }
+
+  // Formatter le markdown basique
+  var html = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/✅/g,'<span style="color:var(--green)">✅</span>')
+    .replace(/❌/g,'<span style="color:var(--red)">❌</span>')
+    .replace(/⚠️/g,'<span style="color:var(--gold)">⚠️</span>')
+    .replace(/❓/g,'<span style="color:#aaa">❓</span>')
+    .replace(/🔍/g,'<span style="color:#aaa">🔍</span>')
+    .replace(/\n/g,'<br>');
+
+  content.innerHTML =
+    '<div style="border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:12px">' +
+    '<div style="font-size:14px;font-weight:900;color:' + verdictColor + ';letter-spacing:.05em">' + verdictLabel + '</div>' +
+    '</div>' +
+    '<div style="font-size:9.5px;color:var(--text);line-height:1.8">' + html + '</div>' +
+    '<div style="margin-top:14px">' +
+    '<button onclick="dsAnalyze()" style="width:100%;padding:8px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:8px;color:var(--gold);font-size:8px;cursor:pointer;font-family:var(--fm);font-weight:700;letter-spacing:.08em">🔄 NOUVELLE ANALYSE</button>' +
+    '</div>';
 }
 
 function renderIAPanel(){
