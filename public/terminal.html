@@ -1095,43 +1095,13 @@ body{padding-top:22px;}
 
 <div class="panel" id="p-macro">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">📆</span><div><div class="p-title-text">CALENDRIER ÉCONOMIQUE</div><div class="p-title-sub">NFP · CPI · PMI · Banques centrales · Impact sur les paires</div></div></div>
+    <div class="p-title-left"><span class="p-title-icon">📆</span><div><div class="p-title-text">CALENDRIER ÉCONOMIQUE</div><div class="p-title-sub">NFP · CPI · PMI · FOMC · Banques centrales · Investing.com Live</div></div></div>
     <span class="badge badge-live">LIVE</span>
   </div>
-  <!-- Filtres -->
-  <div id="cal-filters" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-    <div style="font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.05em">IMPACT</div>
-    <button class="cal-filter-btn on" data-filter="all" onclick="calSetFilter('all',this)">Tous</button>
-    <button class="cal-filter-btn" data-filter="high" onclick="calSetFilter('high',this)">🔴 Élevé</button>
-    <button class="cal-filter-btn" data-filter="medium" onclick="calSetFilter('medium',this)">🟡 Moyen</button>
-    <button class="cal-filter-btn" data-filter="low" onclick="calSetFilter('low',this)">⚪ Faible</button>
-    <div style="width:1px;height:16px;background:var(--border2)"></div>
-    <div style="font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.05em">PAYS</div>
-    <button class="cal-filter-btn on" data-country="all" onclick="calSetCountry('all',this)">Tous</button>
-    <button class="cal-filter-btn" data-country="US" onclick="calSetCountry('US',this)">🇺🇸 US</button>
-    <button class="cal-filter-btn" data-country="EU" onclick="calSetCountry('EU',this)">🇪🇺 EU</button>
-    <button class="cal-filter-btn" data-country="GB" onclick="calSetCountry('GB',this)">🇬🇧 GB</button>
-    <button class="cal-filter-btn" data-country="JP" onclick="calSetCountry('JP',this)">🇯🇵 JP</button>
-  </div>
-  <!-- Navigation semaine -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <button onclick="calPrevWeek()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:10px">← Semaine préc.</button>
-    <div id="cal-week-label" style="font-size:10px;font-weight:800;color:var(--gold2)"></div>
-    <button onclick="calNextWeek()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:10px">Semaine suiv. →</button>
-  </div>
-  <!-- Calendrier custom -->
-  <div id="cal-content" style="margin-bottom:16px"></div>
-  <!-- Widget TradingView en complément -->
-  <div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div style="font-size:9px;font-weight:700;color:var(--muted);padding:8px 12px;background:var(--surface2);border-bottom:1px solid var(--border2)">📡 FLUX LIVE TRADINGVIEW</div>
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-      {"colorTheme":"dark","isTransparent":true,"width":"100%","height":400,"locale":"fr","importanceFilter":"0,1","countryFilter":"us,eu,gb,jp,cn,ca,au,ch"}</script>
-    </div>
+  <div style="border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.07);height:calc(100vh - 140px);min-height:600px">
+    <iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=5,22,17,25,32,6,37,26,72&calType=week&timeZone=18&lang=5" width="100%" height="100%" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0" style="border:none;display:block"></iframe>
   </div>
   <div id="macro-list"></div>
-  <div style="font-size:8px;color:var(--dim);margin-top:10px;padding:8px 12px;background:var(--s1);border-radius:4px;border:1px solid var(--border);line-height:1.7">🟢 Résultat &gt; Prévision = <strong style="color:var(--green)">Bullish</strong> monnaie &nbsp;·&nbsp; 🔴 Résultat &lt; Prévision = <strong style="color:var(--red)">Bearish</strong> monnaie &nbsp;·&nbsp; ⚡ Impact PTL = volatilité accrue sur les paires concernées</div>
 </div>
 
 <div class="panel" id="p-heatmap">
