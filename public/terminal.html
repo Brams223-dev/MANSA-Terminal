@@ -754,6 +754,48 @@ body{padding-top:22px;}
 .kb-key{background:#1a1a2e;border:1px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.1);border-radius:3px;padding:2px 8px;font-family:var(--fm);font-size:9px;color:var(--text);}
 .kb-desc{font-size:9px;color:var(--dim);}
 
+/* ── MACRO VISION AI ── */
+.mva-snav{font-size:9px;font-weight:700;padding:5px 12px;border-radius:6px;border:none;background:transparent;color:var(--dim);cursor:pointer;font-family:var(--fm);letter-spacing:.05em;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.mva-snav:hover{color:var(--text);background:rgba(0,200,120,.07)}
+.mva-snav.on{background:rgba(0,200,120,.14);color:#00c878;border:1px solid rgba(0,200,120,.3)}
+.mva-card{background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:14px;transition:border-color .15s,box-shadow .15s;cursor:default}
+.mva-card:hover{border-color:var(--border3);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.mva-bc-rate{font-family:var(--fd);font-size:28px;font-weight:900;line-height:1}
+.mva-orient-hawk{color:#e05252;background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.3)}
+.mva-orient-dove{color:#6a8fff;background:rgba(106,143,255,.12);border:1px solid rgba(106,143,255,.3)}
+.mva-orient-neut{color:#f0a020;background:rgba(240,160,32,.1);border:1px solid rgba(240,160,32,.25)}
+.mva-fact{background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.2);color:#00c878;font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.mva-interp{background:rgba(240,160,32,.08);border:1px solid rgba(240,160,32,.2);color:#f0a020;font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.mva-hypo{background:rgba(106,143,255,.08);border:1px solid rgba(106,143,255,.2);color:#6a8fff;font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.mva-nd{background:rgba(122,122,142,.08);border:1px solid rgba(122,122,142,.2);color:var(--dim);font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.mva-news-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.mva-news-card:hover{border-color:var(--border3);background:var(--s2)}
+.mva-imp-high{border-left:3px solid #e05252!important}
+.mva-imp-medium{border-left:3px solid #f0a020!important}
+.mva-imp-low{border-left:3px solid rgba(106,143,255,.5)!important}
+.mva-imp-critical{border-left:3px solid #ff4444!important;background:rgba(255,68,68,.04)!important}
+.mva-scenario-bull{background:rgba(0,200,120,.06);border:1px solid rgba(0,200,120,.2);border-radius:8px;padding:14px;margin-bottom:12px}
+.mva-scenario-bear{background:rgba(224,82,82,.06);border:1px solid rgba(224,82,82,.2);border-radius:8px;padding:14px;margin-bottom:12px}
+.mva-scenario-neut{background:rgba(240,160,32,.05);border:1px solid rgba(240,160,32,.18);border-radius:8px;padding:14px;margin-bottom:12px}
+.mva-timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+.mva-tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.mva-alert-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:6px}
+.mva-btn{font-size:9px;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:var(--fm);font-weight:700;letter-spacing:.05em;border:1px solid;transition:all .15s}
+.mva-btn-green{background:rgba(0,200,120,.12);border-color:rgba(0,200,120,.4);color:#00c878}
+.mva-btn-green:hover{background:rgba(0,200,120,.22)}
+.mva-btn-blue{background:rgba(68,136,255,.12);border-color:rgba(68,136,255,.4);color:#8af}
+.mva-btn-blue:hover{background:rgba(68,136,255,.22)}
+.mva-btn-gold{background:rgba(200,160,60,.12);border-color:rgba(200,160,60,.4);color:var(--gold)}
+.mva-btn-gold:hover{background:rgba(200,160,60,.22)}
+.mva-loading{text-align:center;padding:40px 20px;color:rgba(255,255,255,.3);font-size:12px}
+.mva-sep{height:1px;background:linear-gradient(90deg,transparent,rgba(0,200,120,.2),transparent);margin:16px 0}
+.mva-rate-bar{height:3px;border-radius:2px;background:var(--border2);margin-top:6px;position:relative;overflow:hidden}
+.mva-rate-fill{height:100%;border-radius:2px;transition:width .6s}
+.mva-compare-col{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:14px}
+.mva-compare-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:9px}
+.mva-compare-label{color:var(--dim);letter-spacing:.04em}
+.mva-compare-val{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+
 </style>
 </head>
 <body>
@@ -869,6 +911,7 @@ body{padding-top:22px;}
   <div class="ntab" onclick="nav('crypto')" id="nt-crypto">🪙 CRYPTO</div>
   <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
   <div class="ntab" onclick="nav('macro')" id="nt-macro">📆 MACRO</div>
+  <div class="ntab" onclick="nav('mva')" id="nt-mva" style="background:linear-gradient(135deg,rgba(0,200,120,.14),rgba(68,136,255,.08));border:1px solid rgba(0,200,120,.35);color:#00c878;font-weight:900">🧠 MACRO VISION AI</div>
   <div class="ntab" onclick="nav('heatmap')" id="nt-heatmap">🌡️ HEATMAP</div>
   <div class="ntab" onclick="nav('sessions')" id="nt-sessions">🕐 SESSIONS</div>
   <div class="ntab" onclick="nav('backtest')" id="nt-backtest">🔬 BACKTEST</div>
@@ -1134,6 +1177,44 @@ body{padding-top:22px;}
   </div>
 
   <div id="macro-list"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     🧠 MACRO VISION AI — Centre d'intelligence macroéconomique
+     ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="p-mva">
+  <div class="p-title">
+    <div class="p-title-left">
+      <span class="p-title-icon">🧠</span>
+      <div>
+        <div class="p-title-text" style="color:#00c878">MACRO VISION AI</div>
+        <div class="p-title-sub">Intelligence macroéconomique · Banques centrales · News · Scénarios Forex</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="mva-status-badge" class="badge badge-live">LIVE</span>
+      <span id="mva-updated" style="font-size:9px;color:var(--dim)"></span>
+    </div>
+  </div>
+
+  <!-- Sub-navigation MVA -->
+  <div style="display:flex;gap:2px;margin-bottom:16px;background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:4px;overflow-x:auto;scrollbar-width:none" id="mva-subnav">
+    <button class="mva-snav on" onclick="mvaNav('overview',this)">🌍 OVERVIEW</button>
+    <button class="mva-snav" onclick="mvaNav('banks',this)">🏦 CENTRAL BANKS</button>
+    <button class="mva-snav" onclick="mvaNav('news',this)">📡 NEWS INTEL</button>
+    <button class="mva-snav" onclick="mvaNav('currency',this)">💱 CURRENCY</button>
+    <button class="mva-snav" onclick="mvaNav('timeline',this)">📅 TIMELINE</button>
+    <button class="mva-snav" onclick="mvaNav('scenario',this)">🎲 SCÉNARIOS</button>
+    <button class="mva-snav" onclick="mvaNav('alerts',this)">🔔 ALERTES</button>
+  </div>
+
+  <!-- Sub-panels -->
+  <div id="mva-content" style="overflow-y:auto;max-height:calc(100vh - 220px)">
+    <div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,.3)">
+      <div style="font-size:32px;margin-bottom:12px">🧠</div>
+      Chargement de Macro Vision AI…
+    </div>
+  </div>
 </div>
 
 <div class="panel" id="p-heatmap">
@@ -5311,6 +5392,948 @@ function renderMacro() {
   macroLoad();
 }
 
+/* ═══════════════════════════════════════════════════════════
+   🧠 MACRO VISION AI — Module complet
+   ═══════════════════════════════════════════════════════════ */
+
+var MVA_VIEW = 'overview';
+var MVA_BANKS_DATA = null;
+var MVA_NEWS_DATA = [];
+var MVA_NEWS_OPEN = null;
+var MVA_ALERTS = JSON.parse(localStorage.getItem('mva_alerts') || '[]');
+var MVA_COMPARE_A = 'FED';
+var MVA_COMPARE_B = 'ECB';
+var MVA_SCENARIO_PAIR = 'EUR/USD';
+var MVA_TIMELINE_PAIR = 'EUR/USD';
+var MVA_TIMELINE_PERIOD = '30';
+var MVA_NEWS_CAT = 'default';
+var MVA_NEWS_CUR = '';
+var MVA_SCENARIO_LOADING = false;
+
+var MVA_PAIRS = ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/CHF'];
+
+var MVA_FLAG = {
+  USD:'🇺🇸',EUR:'🇪🇺',GBP:'🇬🇧',JPY:'🇯🇵',CAD:'🇨🇦',AUD:'🇦🇺',CHF:'🇨🇭',NZD:'🇳🇿',
+  FED:'🇺🇸',ECB:'🇪🇺',BOE:'🇬🇧',BOJ:'🇯🇵',SNB:'🇨🇭',RBA:'🇦🇺'
+};
+
+var MVA_CAT_LABELS = {
+  'central-banks':'🏦 Banques centrales','inflation':'📊 Inflation','employment':'👥 Emploi',
+  'growth':'📈 Croissance','geopolitics':'🌍 Géopolitique','rates':'💹 Taux',
+  'debt':'💸 Dette','trade':'🚢 Commerce','general':'📰 Général','default':'📡 Tout'
+};
+
+var MVA_IMP_CFG = {
+  critical:{label:'CRITIQUE',color:'#ff4444',bg:'rgba(255,68,68,.15)'},
+  high:{label:'ÉLEVÉE',color:'#e05252',bg:'rgba(224,82,82,.12)'},
+  medium:{label:'MODÉRÉE',color:'#f0a020',bg:'rgba(240,160,32,.1)'},
+  low:{label:'FAIBLE',color:'#6a8fff',bg:'rgba(106,143,255,.08)'}
+};
+
+function renderMVA() {
+  // Chargement initial des données
+  if(!MVA_BANKS_DATA) {
+    mvaLoadBanks(function() { mvaRenderView(); });
+  } else {
+    mvaRenderView();
+  }
+}
+
+function mvaNav(view, btn) {
+  MVA_VIEW = view;
+  document.querySelectorAll('.mva-snav').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  mvaRenderView();
+}
+
+function mvaRenderView() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  c.innerHTML = '<div class="mva-loading"><div style="font-size:24px;margin-bottom:8px">⌛</div>Chargement…</div>';
+  if(MVA_VIEW === 'overview') mvaRenderOverview();
+  else if(MVA_VIEW === 'banks') mvaRenderBanks();
+  else if(MVA_VIEW === 'news') mvaRenderNews();
+  else if(MVA_VIEW === 'currency') mvaRenderCurrency();
+  else if(MVA_VIEW === 'timeline') mvaRenderTimeline();
+  else if(MVA_VIEW === 'scenario') mvaRenderScenario();
+  else if(MVA_VIEW === 'alerts') mvaRenderAlerts();
+}
+
+function mvaLoadBanks(cb) {
+  fetch('/api/central-banks?action=rates')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      MVA_BANKS_DATA = d.banks || [];
+      var el = document.getElementById('mva-updated');
+      if(el) el.textContent = 'Màj: ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      if(cb) cb();
+    })
+    .catch(function(e){
+      console.warn('MVA banks error:', e);
+      MVA_BANKS_DATA = [];
+      if(cb) cb();
+    });
+}
+
+/* ── OVERVIEW ── */
+function mvaRenderOverview() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var banks = MVA_BANKS_DATA || [];
+  var h = '';
+
+  // Header synthèse
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px">';
+  var hawk = banks.filter(function(b){ return b.orientation==='hawkish'; }).length;
+  var dove = banks.filter(function(b){ return b.orientation==='dovish'; }).length;
+  var neut = banks.filter(function(b){ return b.orientation==='neutral'; }).length;
+  h += mvaStatCard('🦅 Hawkish', hawk, '#e05252', 'BC en mode restrictif');
+  h += mvaStatCard('🕊️ Dovish', dove, '#6a8fff', 'BC en mode accommodant');
+  h += mvaStatCard('⚖️ Neutres', neut, '#f0a020', 'BC en mode d\'attente');
+  h += mvaStatCard('🏦 Total BC', banks.length, '#00c878', 'banques centrales surveillées');
+  h += '</div>';
+
+  // Cartes banques centrales
+  h += '<div style="margin-bottom:8px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">TABLEAU DE BORD DES BANQUES CENTRALES</div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:20px">';
+  banks.forEach(function(b) {
+    var oClass = b.orientation==='hawkish'?'mva-orient-hawk':b.orientation==='dovish'?'mva-orient-dove':'mva-orient-neut';
+    var oLabel = b.orientation==='hawkish'?'HAWKISH':b.orientation==='dovish'?'DOVISH':'NEUTRAL';
+    var nextDate = b.nextMeeting ? new Date(b.nextMeeting) : null;
+    var daysNext = nextDate ? Math.ceil((nextDate - Date.now())/(86400000)) : null;
+    var rateChange = b.rateChange || 0;
+    var changeStr = rateChange===0 ? '—' : (rateChange>0?'+':'')+rateChange+' bps';
+    var changeColor = rateChange>0?'var(--red)':rateChange<0?'var(--green)':'var(--dim)';
+
+    h += '<div class="mva-card" onclick="mvaQuickBank(\''+b.id+'\')" style="cursor:pointer">';
+    h += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">';
+    h += '<div style="display:flex;align-items:center;gap:8px">';
+    h += '<span style="font-size:22px">'+b.flag+'</span>';
+    h += '<div><div style="font-size:11px;font-weight:800;color:var(--text)">'+b.shortName+'</div>';
+    h += '<div style="font-size:8px;color:var(--dim)">'+b.currency+'</div></div></div>';
+    h += '<span class="'+oClass+'" style="font-size:8px;font-weight:700;padding:3px 8px;border-radius:4px">'+oLabel+'</span>';
+    h += '</div>';
+
+    // Taux
+    h += '<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:10px">';
+    h += '<div><div style="font-size:8px;color:var(--dim);margin-bottom:2px">TAUX DIRECTEUR</div>';
+    h += '<div class="mva-bc-rate" style="color:#00c878">'+b.rate.toFixed(2)+'%</div></div>';
+    h += '<div style="margin-bottom:4px"><div style="font-size:8px;color:var(--dim);margin-bottom:2px">DERNIÈRE DÉC.</div>';
+    h += '<div style="font-size:11px;font-weight:700;color:'+changeColor+'">'+changeStr+'</div></div>';
+    if(b.inflation) {
+      h += '<div style="margin-bottom:4px;margin-left:auto"><div style="font-size:8px;color:var(--dim);margin-bottom:2px">INFLATION</div>';
+      h += '<div style="font-size:11px;font-weight:700;color:'+(b.inflation.current > b.inflation.target?'var(--red)':'var(--green)')+'">'+b.inflation.current+'%</div></div>';
+    }
+    h += '</div>';
+
+    // Barre de taux
+    var rateMax = b.id==='BOJ'?2:8; var ratePct = Math.min((b.rate/rateMax)*100,100);
+    h += '<div class="mva-rate-bar" title="Taux: '+b.rate+'% / Max ref: '+rateMax+'%">';
+    h += '<div class="mva-rate-fill" style="width:'+ratePct+'%;background:linear-gradient(90deg,#4488ff,#00c878)"></div></div>';
+
+    // Prochaine réunion
+    if(nextDate) {
+      h += '<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">';
+      h += '<div style="font-size:8px;color:var(--dim)">Prochaine réunion</div>';
+      h += '<div style="font-size:8px;font-weight:700;color:'+(daysNext<=7?'#e05252':daysNext<=14?'#f0a020':'rgba(255,255,255,.5)')+'">'+b.nextMeeting+(daysNext!==null?' (J-'+daysNext+')':'')+'</div>';
+      h += '</div>';
+    }
+
+    // Orientation label
+    h += '<div style="font-size:8px;color:var(--dim);margin-top:6px;font-style:italic">'+b.orientationLabel+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Divergences importantes
+  h += '<div class="mva-sep"></div>';
+  h += '<div style="margin-bottom:8px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">DIVERGENCES MONÉTAIRES CLÉS</div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">';
+  var divPairs = [
+    {a:'FED',b:'ECB',pair:'EUR/USD'},
+    {a:'FED',b:'BOE',pair:'GBP/USD'},
+    {a:'FED',b:'BOJ',pair:'USD/JPY'},
+    {a:'FED',b:'SNB',pair:'USD/CHF'},
+    {a:'ECB',b:'BOE',pair:'EUR/GBP'},
+    {a:'FED',b:'RBA',pair:'AUD/USD'}
+  ];
+  divPairs.forEach(function(dp) {
+    var bA = banks.find(function(b){ return b.id===dp.a; });
+    var bB = banks.find(function(b){ return b.id===dp.b; });
+    if(!bA||!bB) return;
+    var diff = (bA.rate - bB.rate).toFixed(2);
+    var aHawkier = bA.orientation==='hawkish'||(bA.orientation==='neutral'&&bB.orientation==='dovish');
+    var biasColor = aHawkier ? 'var(--red)' : '#6a8fff';
+    var biasLabel = aHawkier ? bA.currency+' favorisé' : bB.currency+' favorisé';
+
+    h += '<div class="mva-card" onclick="mvaSetCurrencyPair(\''+dp.pair+'\')" style="cursor:pointer" title="Cliquer pour analyser">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    h += '<div style="font-size:11px;font-weight:800;color:var(--gold)">'+dp.pair+'</div>';
+    h += '<div style="font-size:9px;font-weight:700;color:'+biasColor+'">'+biasLabel+'</div></div>';
+    h += '<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-bottom:4px">';
+    h += '<span>'+bA.shortName+' '+bA.rate+'%</span><span>→</span><span>'+bB.shortName+' '+bB.rate+'%</span></div>';
+    h += '<div style="font-size:8px;color:rgba(255,255,255,.4)">Différentiel: <strong style="color:var(--text)">'+diff+' pp</strong></div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  c.innerHTML = h;
+}
+
+function mvaStatCard(label, val, color, sub) {
+  return '<div class="mva-card" style="text-align:center">'
+    +'<div style="font-size:9px;color:var(--dim);margin-bottom:4px">'+label+'</div>'
+    +'<div style="font-size:28px;font-weight:900;color:'+color+'">'+val+'</div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,.3);margin-top:2px">'+sub+'</div>'
+    +'</div>';
+}
+
+/* ── CENTRAL BANKS ── */
+function mvaRenderBanks() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var banks = MVA_BANKS_DATA || [];
+  var h = '';
+
+  // Sélecteur de banque + comparateur
+  h += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">';
+  h += '<div style="font-size:9px;color:var(--dim);font-weight:700">SÉLECTIONNER :</div>';
+  banks.forEach(function(b) {
+    h += '<button onclick="mvaShowBank(\''+b.id+'\')" class="mva-btn '+(MVA_COMPARE_A===b.id?'mva-btn-green':'mva-btn-blue')+'" id="mva-bsel-'+b.id+'">'+b.flag+' '+b.shortName+'</button>';
+  });
+  h += '<div style="margin-left:auto"><button onclick="mvaRenderComparator()" class="mva-btn mva-btn-gold">⚖️ Comparateur</button></div>';
+  h += '</div>';
+
+  // Panel détail banque sélectionnée
+  h += '<div id="mva-bank-detail"></div>';
+
+  // Comparateur par défaut
+  h += '<div id="mva-comparator" style="display:none"></div>';
+
+  c.innerHTML = h;
+  mvaShowBank(MVA_COMPARE_A || (banks[0] && banks[0].id));
+}
+
+function mvaShowBank(bankId) {
+  MVA_COMPARE_A = bankId;
+  document.querySelectorAll('[id^="mva-bsel-"]').forEach(function(b){
+    b.className = 'mva-btn mva-btn-blue';
+  });
+  var selBtn = document.getElementById('mva-bsel-'+bankId);
+  if(selBtn) selBtn.className = 'mva-btn mva-btn-green';
+
+  var banks = MVA_BANKS_DATA || [];
+  var bank = banks.find(function(b){ return b.id===bankId; });
+  var el = document.getElementById('mva-bank-detail');
+  var comp = document.getElementById('mva-comparator');
+  if(comp) comp.style.display='none';
+  if(!el || !bank) return;
+
+  var oClass = bank.orientation==='hawkish'?'mva-orient-hawk':bank.orientation==='dovish'?'mva-orient-dove':'mva-orient-neut';
+  var h = '';
+
+  // Header
+  h += '<div class="mva-card" style="margin-bottom:12px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<span style="font-size:36px">'+bank.flag+'</span>';
+  h += '<div><div style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--text)">'+bank.name+'</div>';
+  h += '<div style="font-size:9px;color:var(--dim)">'+bank.currency+' · Gouverneur: '+bank.governorName+'</div></div>';
+  h += '<div style="margin-left:auto;text-align:right">';
+  h += '<div class="mva-bc-rate" style="color:#00c878">'+bank.rate.toFixed(2)+'%</div>';
+  h += '<div style="font-size:8px;color:var(--dim)">taux directeur</div></div></div>';
+
+  // Stats ligne
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px">';
+  if(bank.inflation) h += '<div style="text-align:center"><div style="font-size:8px;color:var(--dim);margin-bottom:3px">INFLATION ACTUELLE</div><div style="font-size:18px;font-weight:800;color:'+(bank.inflation.current>bank.inflation.target?'var(--red)':'var(--green)')+'">'+bank.inflation.current+'%</div><div style="font-size:7px;color:var(--dim)">Cible: '+bank.inflation.target+'%</div></div>';
+  if(bank.growth) h += '<div style="text-align:center"><div style="font-size:8px;color:var(--dim);margin-bottom:3px">CROISSANCE PIB</div><div style="font-size:18px;font-weight:800;color:'+(bank.growth.gdp>=1?'var(--green)':bank.growth.gdp>=0?'var(--gold)':'var(--red)')+'">'+bank.growth.gdp+'%</div><div style="font-size:7px;color:var(--dim)">annualisé</div></div>';
+  if(bank.unemployment!=null) h += '<div style="text-align:center"><div style="font-size:8px;color:var(--dim);margin-bottom:3px">CHÔMAGE</div><div style="font-size:18px;font-weight:800;color:var(--text)">'+bank.unemployment+'%</div></div>';
+  h += '<div style="text-align:center"><div style="font-size:8px;color:var(--dim);margin-bottom:3px">ORIENTATION</div><div style="font-size:11px;font-weight:800;padding:4px 8px;border-radius:5px" class="'+oClass+'">'+bank.orientation.toUpperCase()+'</div></div>';
+  h += '</div>';
+
+  // Citation clé
+  if(bank.keyQuote) {
+    h += '<div style="background:rgba(255,255,255,.03);border-left:3px solid rgba(0,200,120,.5);padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:12px">';
+    h += '<div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:4px">💬 '+bank.governorName+' — '+bank.keyQuote+'</div>';
+    h += '<div style="font-size:8px;color:var(--dim)">'+bank.keyQuoteDate+'</div></div>';
+  }
+
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><a href="'+bank.source+'" target="_blank" class="mva-btn mva-btn-blue" style="text-decoration:none">🔗 Source officielle</a>';
+  h += '<button onclick="mvaRenderComparatorWith(\''+bank.id+'\')" class="mva-btn mva-btn-gold">⚖️ Comparer</button></div>';
+  h += '</div>';
+
+  // Historique décisions
+  h += '<div style="margin-bottom:8px;margin-top:16px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">HISTORIQUE DES DÉCISIONS</div>';
+  h += '<div style="overflow-x:auto">';
+  h += '<table style="width:100%;border-collapse:collapse;font-size:9px">';
+  h += '<thead><tr style="border-bottom:1px solid var(--border2)">';
+  ['Date','Taux','Variation (bps)','Décision'].forEach(function(col){
+    h += '<th style="padding:6px 10px;text-align:left;color:var(--dim);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:8px">'+col+'</th>';
+  });
+  h += '</tr></thead><tbody>';
+  (bank.rateHistory||[]).slice(0,10).forEach(function(d,i){
+    var bpColor = d.bp>0?'var(--red)':d.bp<0?'var(--green)':'var(--dim)';
+    var bpStr = d.bp===0?'—':(d.bp>0?'+':'')+d.bp+' bps';
+    h += '<tr style="border-bottom:1px solid rgba(255,255,255,.03);'+(i===0?'background:rgba(0,200,120,.04)':'')+'">';
+    h += '<td style="padding:7px 10px;color:var(--text)">'+d.date+'</td>';
+    h += '<td style="padding:7px 10px;font-weight:700;color:#00c878;font-family:var(--fd)">'+d.rate.toFixed(2)+'%</td>';
+    h += '<td style="padding:7px 10px;font-weight:700;color:'+bpColor+'">'+bpStr+'</td>';
+    h += '<td style="padding:7px 10px;color:var(--dim)">'+d.decision+'</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+
+  // Prochaines réunions
+  if(bank.meetings2025 && bank.meetings2025.length) {
+    h += '<div style="margin-top:16px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">AGENDA 2025</div>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    bank.meetings2025.forEach(function(d) {
+      var dt = new Date(d);
+      var past = dt < new Date();
+      var days = Math.ceil((dt - Date.now())/86400000);
+      h += '<div style="background:'+(past?'var(--s1)':'rgba(0,200,120,.07)')+';border:1px solid '+(past?'var(--border)':'rgba(0,200,120,.2)')+';border-radius:6px;padding:5px 10px;font-size:8px">';
+      h += '<div style="color:'+(past?'var(--dim)':'var(--text)');font-weight:'+(past?'400':'700')+'">'+d+'</div>';
+      if(!past) h += '<div style="color:rgba(0,200,120,.7);font-size:7px">J-'+days+'</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+
+  h += '<div style="font-size:7px;color:var(--dim);margin-top:12px;padding:6px;background:var(--s1);border-radius:4px"><span class="mva-fact">FAIT</span> Source: '+bank.source+' · <span class="mva-interp">INTERPRÉTATION</span> Orientation estimée par l\'IA à partir des communications publiques disponibles.</div>';
+
+  el.innerHTML = h;
+}
+
+function mvaRenderComparatorWith(bankId) {
+  MVA_COMPARE_A = bankId;
+  var banks = MVA_BANKS_DATA || [];
+  var other = banks.find(function(b){ return b.id!==bankId; });
+  if(other) MVA_COMPARE_B = other.id;
+  mvaRenderComparator();
+}
+
+function mvaRenderComparator() {
+  var el = document.getElementById('mva-bank-detail');
+  var comp = document.getElementById('mva-comparator');
+  if(el) el.innerHTML='';
+  if(!comp) return;
+  comp.style.display='block';
+
+  var banks = MVA_BANKS_DATA || [];
+  var bA = banks.find(function(b){ return b.id===MVA_COMPARE_A; }) || banks[0];
+  var bB = banks.find(function(b){ return b.id===MVA_COMPARE_B; }) || banks[1];
+  if(!bA||!bB) return;
+
+  var h = '';
+  // Sélecteurs
+  h += '<div style="display:flex;gap:12px;margin-bottom:14px;align-items:center;flex-wrap:wrap">';
+  h += '<div style="font-size:9px;color:var(--dim);font-weight:700">COMPARER :</div>';
+  h += '<select onchange="MVA_COMPARE_A=this.value;mvaRenderComparator()" style="background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:6px;font-family:var(--fm);font-size:9px">';
+  banks.forEach(function(b){ h += '<option value="'+b.id+'" '+(b.id===MVA_COMPARE_A?'selected':'')+'>'+b.flag+' '+b.shortName+' ('+b.currency+')</option>'; });
+  h += '</select>';
+  h += '<span style="color:var(--dim);font-weight:700">VS</span>';
+  h += '<select onchange="MVA_COMPARE_B=this.value;mvaRenderComparator()" style="background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:6px;font-family:var(--fm);font-size:9px">';
+  banks.forEach(function(b){ h += '<option value="'+b.id+'" '+(b.id===MVA_COMPARE_B?'selected':'')+'>'+b.flag+' '+b.shortName+' ('+b.currency+')</option>'; });
+  h += '</select>';
+  h += '</div>';
+
+  // Tableau comparatif
+  h += '<div style="display:flex;gap:12px;margin-bottom:12px">';
+  [bA, bB].forEach(function(b) {
+    var oClass = b.orientation==='hawkish'?'mva-orient-hawk':b.orientation==='dovish'?'mva-orient-dove':'mva-orient-neut';
+    h += '<div class="mva-compare-col">';
+    h += '<div style="text-align:center;margin-bottom:12px"><span style="font-size:28px">'+b.flag+'</span>';
+    h += '<div style="font-size:13px;font-weight:800;color:var(--text);margin:4px 0">'+b.shortName+'</div>';
+    h += '<div class="mva-bc-rate" style="color:#00c878">'+b.rate.toFixed(2)+'%</div></div>';
+    var rows = [
+      {l:'Orientation',v:'<span class="'+oClass+'" style="font-size:8px;padding:2px 7px;border-radius:4px">'+b.orientation.toUpperCase()+'</span>'},
+      {l:'Inflation',v:b.inflation?b.inflation.current+'% <span style="color:var(--dim);font-size:8px">(cible '+b.inflation.target+'%)</span>':'—'},
+      {l:'Croissance PIB',v:b.growth?b.growth.gdp+'%':'—'},
+      {l:'Chômage',v:b.unemployment!=null?b.unemployment+'%':'—'},
+      {l:'Dernière déc.',v:b.lastDecision||'—'},
+      {l:'Prochaine réunion',v:b.nextMeeting||'—'},
+      {l:'Gouverneur',v:b.governorName||'—'}
+    ];
+    rows.forEach(function(r){
+      h += '<div class="mva-compare-row"><span class="mva-compare-label">'+r.l+'</span><span class="mva-compare-val">'+r.v+'</span></div>';
+    });
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Synthèse divergence
+  var diff = (bA.rate - bB.rate).toFixed(2);
+  var aHawkier = (bA.orientation==='hawkish') || (bA.orientation==='neutral' && bB.orientation==='dovish');
+  var synColor = aHawkier ? '#e05252' : '#6a8fff';
+  var synLabel = aHawkier
+    ? '📊 Différentiel favorable à '+bA.currency+' — politique '+bA.shortName+' plus restrictive'
+    : '📊 Différentiel favorable à '+bB.currency+' — politique '+bB.shortName+' plus restrictive';
+  h += '<div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:14px">';
+  h += '<div style="font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.08em;margin-bottom:8px">SYNTHÈSE DIVERGENCE <span class="mva-interp">INTERPRÉTATION</span></div>';
+  h += '<div style="font-size:11px;font-weight:700;color:'+synColor+';margin-bottom:6px">'+synLabel+'</div>';
+  h += '<div style="font-size:9px;color:var(--dim)">Différentiel de taux: <strong style="color:var(--text)">'+diff+' pp</strong> · ';
+  h += bA.shortName+' orientation: <strong style="color:var(--text)">'+bA.orientation+'</strong> · ';
+  h += bB.shortName+' orientation: <strong style="color:var(--text)">'+bB.orientation+'</strong></div>';
+  h += '<div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,.3)">⚠ Ne pas baser une décision de trading uniquement sur les taux. Les anticipations déjà intégrées dans les prix, les données récentes et le contexte géopolitique doivent également être considérés.</div>';
+  h += '</div>';
+
+  comp.innerHTML = h;
+}
+
+/* ── NEWS INTELLIGENCE ── */
+function mvaRenderNews() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var h = '';
+
+  // Filtres catégorie + devise
+  h += '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">';
+  var cats = ['default','central-banks','inflation','employment','growth','geopolitics','rates'];
+  cats.forEach(function(cat){
+    h += '<button onclick="MVA_NEWS_CAT=\''+cat+'\';MVA_NEWS_CUR=\'\';mvaLoadNews()" class="mva-btn '+(MVA_NEWS_CAT===cat?'mva-btn-green':'mva-btn-blue')+'">'+MVA_CAT_LABELS[cat]+'</button>';
+  });
+  h += '</div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">';
+  ['','USD','EUR','GBP','JPY','CHF','AUD'].forEach(function(cur){
+    var label = cur || '🌐 Toutes';
+    var flag = cur ? (MVA_FLAG[cur]||'') : '';
+    h += '<button onclick="MVA_NEWS_CUR=\''+cur+'\';MVA_NEWS_CAT=\'default\';mvaLoadNews()" class="mva-btn '+(MVA_NEWS_CUR===cur?'mva-btn-gold':'mva-btn-blue')+'">'+flag+' '+label+'</button>';
+  });
+  h += '</div>';
+
+  h += '<div id="mva-news-list"><div class="mva-loading"><div style="font-size:24px;margin-bottom:8px">📡</div>Chargement des actualités…</div></div>';
+  h += '<div id="mva-news-analysis" style="margin-top:16px"></div>';
+
+  c.innerHTML = h;
+  mvaLoadNews();
+}
+
+function mvaLoadNews() {
+  var el = document.getElementById('mva-news-list');
+  if(!el) return;
+  el.innerHTML = '<div class="mva-loading"><div style="font-size:24px;margin-bottom:8px">📡</div>Chargement…</div>';
+
+  var url = '/api/macro-news?pageSize=20';
+  if(MVA_NEWS_CUR) url += '&currency='+MVA_NEWS_CUR;
+  else url += '&category='+MVA_NEWS_CAT;
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      MVA_NEWS_DATA = d.articles || [];
+      mvaRenderNewsList();
+    })
+    .catch(function(e){
+      if(el) el.innerHTML = '<div class="mva-loading">❌ Erreur: '+e.message+'</div>';
+    });
+}
+
+function mvaRenderNewsList() {
+  var el = document.getElementById('mva-news-list');
+  if(!el) return;
+  if(!MVA_NEWS_DATA.length) {
+    el.innerHTML = '<div class="mva-loading">📭 Aucun article trouvé</div>';
+    return;
+  }
+  var h = '';
+  MVA_NEWS_DATA.forEach(function(a, i) {
+    var imp = MVA_IMP_CFG[a.importance] || MVA_IMP_CFG.low;
+    var curs = (a.currencies||[]).map(function(c){ return (MVA_FLAG[c]||'')+' '+c; }).join(' · ');
+    var dt = a.publishedAt ? new Date(a.publishedAt) : null;
+    var timeStr = dt ? dt.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    var catLabel = MVA_CAT_LABELS[a.category] || a.category;
+
+    h += '<div class="mva-news-card mva-imp-'+a.importance+'" onclick="mvaOpenNews('+i+')">';
+    h += '<div style="display:flex;align-items:flex-start;gap:10px">';
+    h += '<div style="flex:1">';
+    h += '<div style="display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap">';
+    h += '<span style="font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;background:'+imp.bg+';color:'+imp.color+'">'+imp.label+'</span>';
+    h += '<span style="font-size:8px;color:var(--dim)">'+catLabel+'</span>';
+    if(curs) h += '<span style="font-size:8px;color:var(--gold);margin-left:auto">'+curs+'</span>';
+    h += '</div>';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px">'+a.title+'</div>';
+    if(a.summary) h += '<div style="font-size:9px;color:var(--dim);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+a.summary+'</div>';
+    h += '<div style="display:flex;gap:8px;margin-top:5px;align-items:center">';
+    h += '<span style="font-size:8px;color:rgba(255,255,255,.3)">'+a.source.name+'</span>';
+    if(timeStr) h += '<span style="font-size:8px;color:rgba(255,255,255,.2)">'+timeStr+'</span>';
+    h += '<span style="font-size:8px;color:#6a8fff;margin-left:auto">🤖 Analyser avec IA →</span>';
+    h += '</div></div></div></div>';
+  });
+  el.innerHTML = h;
+}
+
+function mvaOpenNews(idx) {
+  var a = MVA_NEWS_DATA[idx];
+  if(!a) return;
+  MVA_NEWS_OPEN = a;
+  var el = document.getElementById('mva-news-analysis');
+  if(!el) return;
+
+  var imp = MVA_IMP_CFG[a.importance] || MVA_IMP_CFG.low;
+  var curs = (a.currencies||[]).map(function(c){ return (MVA_FLAG[c]||'')+c; }).join(' ');
+  var h = '';
+  h += '<div class="mva-sep"></div>';
+  h += '<div style="background:var(--s2);border:1px solid rgba(0,200,120,.2);border-radius:10px;padding:16px">';
+  h += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">';
+  h += '<div style="flex:1"><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3">'+a.title+'</div>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:8px;padding:2px 7px;border-radius:4px;background:'+imp.bg+';color:'+imp.color+'">'+imp.label+'</span>';
+  h += '<span style="font-size:8px;color:var(--gold)">'+curs+'</span>';
+  h += '<a href="'+a.url+'" target="_blank" class="mva-btn mva-btn-blue" style="font-size:7px;padding:2px 7px;text-decoration:none">🔗 Source</a></div></div>';
+  h += '<button onclick="document.getElementById(\'mva-news-analysis\').innerHTML=\'\'" style="color:var(--dim);background:none;border:none;cursor:pointer;font-size:16px;padding:4px">✕</button>';
+  h += '</div>';
+
+  h += '<div id="mva-ai-analysis">';
+  h += '<div style="text-align:center;padding:20px"><button onclick="mvaAnalyzeNews()" class="mva-btn mva-btn-green" style="padding:10px 24px;font-size:10px">🤖 Générer l\'analyse IA (Claude)</button>';
+  h += '<div style="font-size:8px;color:var(--dim);margin-top:8px">Requiert une clé API Claude active</div></div>';
+  h += '</div>';
+  h += '</div>';
+
+  el.innerHTML = h;
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function mvaAnalyzeNews() {
+  var a = MVA_NEWS_OPEN;
+  if(!a) return;
+  var el = document.getElementById('mva-ai-analysis');
+  if(!el) return;
+  var key = document.getElementById('ia-api-key') ? document.getElementById('ia-api-key').value : '';
+
+  el.innerHTML = '<div class="mva-loading"><div style="font-size:20px;margin-bottom:8px;animation:pulse 1s infinite">🤖</div>Analyse en cours…</div>';
+
+  var prompt = 'Analyse macroéconomique de cette actualité pour un trader swing Forex:\n\n'
+    + 'Titre: '+a.title+'\n'
+    + 'Résumé: '+(a.summary||'Non disponible')+'\n'
+    + 'Devises concernées: '+(a.currencies||[]).join(', ')+'\n'
+    + 'Catégorie: '+a.category+'\n\n'
+    + 'Structure ton analyse en 9 sections numérotées:\n'
+    + '1. Que vient-il de se passer ?\n'
+    + '2. Pourquoi cet événement est-il important ?\n'
+    + '3. Quelles devises sont concernées ?\n'
+    + '4. Quelles anticipations ont changé ?\n'
+    + '5. Quels éléments pourraient soutenir ou fragiliser chaque devise ?\n'
+    + '6. Conséquences potentielles sur le Forex ?\n'
+    + '7. Scénarios haussiers, baissiers, neutres ?\n'
+    + '8. Qu\'est-ce qui pourrait invalider ces scénarios ?\n'
+    + '9. Conclusion macroéconomique pour le swing trading\n\n'
+    + 'Important: distingue clairement FAIT / INTERPRÉTATION / HYPOTHÈSE. '
+    + 'Ne transforme pas automatiquement une bonne nouvelle économique en signal d\'achat.';
+
+  var payload = {
+    messages: [{role:'user', content: prompt}],
+    model: 'claude-haiku-4-5',
+    max_tokens: 1500,
+    system: 'Tu es un analyste macroéconomique spécialisé en marchés Forex pour traders institutionnels. Tes analyses sont rigoureuses, sourcées et ne font pas de recommandations d\'achat/vente directes. Tu distingues toujours FAIT (information confirmée), INTERPRÉTATION (lecture économique), et HYPOTHÈSE (scénario non confirmé).'
+  };
+  if(key) payload.key = key;
+
+  fetch('/api/ai', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(30000)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d.error) throw new Error(d.error);
+    var text = d.content?.[0]?.text || '';
+    // Formatter le texte avec les badges
+    var formatted = text
+      .replace(/FAIT/g,'<span class="mva-fact">FAIT</span>')
+      .replace(/INTERPRÉTATION/g,'<span class="mva-interp">INTERPRÉTATION</span>')
+      .replace(/HYPOTHÈSE/g,'<span class="mva-hypo">HYPOTHÈSE</span>')
+      .replace(/DONNÉE INDISPONIBLE/g,'<span class="mva-nd">DONNÉE INDISPONIBLE</span>')
+      .replace(/\n/g,'<br>');
+    el.innerHTML = '<div style="font-size:9px;line-height:1.6;color:var(--text)">'+formatted+'</div>'
+      +'<div style="font-size:8px;color:var(--dim);margin-top:10px;padding:6px;background:var(--s1);border-radius:4px">🤖 Analyse générée par Claude · <span class="mva-interp">INTERPRÉTATION</span> — Outil d\'aide à la décision uniquement</div>';
+  })
+  .catch(function(e){
+    el.innerHTML = '<div style="color:var(--red);font-size:9px;padding:12px">❌ '+e.message+'<br><small style="color:var(--dim)">Configure ta clé API dans l\'onglet 🤖 MANSA IA</small></div>';
+  });
+}
+
+/* ── CURRENCY ANALYSIS ── */
+function mvaSetCurrencyPair(pair) {
+  MVA_SCENARIO_PAIR = pair;
+  mvaNav('currency', document.querySelector('[onclick="mvaNav(\'currency\',this)"]'));
+}
+
+function mvaRenderCurrency() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var h = '';
+
+  // Sélecteur de paire
+  h += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">';
+  h += '<div style="font-size:9px;color:var(--dim);font-weight:700">PAIRE :</div>';
+  MVA_PAIRS.forEach(function(p){
+    h += '<button onclick="MVA_SCENARIO_PAIR=\''+p+'\';mvaRenderCurrencyDetail()" class="mva-btn '+(MVA_SCENARIO_PAIR===p?'mva-btn-green':'mva-btn-blue')+'">'+p+'</button>';
+  });
+  h += '</div>';
+  h += '<div id="mva-cur-detail"></div>';
+  c.innerHTML = h;
+  mvaRenderCurrencyDetail();
+}
+
+function mvaRenderCurrencyDetail() {
+  // Mettre à jour les boutons
+  document.querySelectorAll('#mva-content .mva-btn').forEach(function(b){
+    b.className = 'mva-btn '+(b.textContent.trim()===MVA_SCENARIO_PAIR?'mva-btn-green':'mva-btn-blue');
+  });
+
+  var el = document.getElementById('mva-cur-detail');
+  if(!el) return;
+  var pair = MVA_SCENARIO_PAIR;
+  var parts = pair.split('/');
+  var curA = parts[0], curB = parts[1];
+  var banks = MVA_BANKS_DATA || [];
+  var bcA = banks.find(function(b){ return b.currency===curA; });
+  var bcB = banks.find(function(b){ return b.currency===curB; });
+
+  var h = '<div style="display:flex;gap:12px;margin-bottom:16px">';
+
+  // Colonne A
+  [bcA, bcB].forEach(function(bc, i) {
+    var cur = i===0?curA:curB;
+    var oClass = bc?(bc.orientation==='hawkish'?'mva-orient-hawk':bc.orientation==='dovish'?'mva-orient-dove':'mva-orient-neut'):'';
+    h += '<div class="mva-compare-col">';
+    h += '<div style="text-align:center;margin-bottom:12px">';
+    h += '<span style="font-size:28px">'+(bc?bc.flag:(MVA_FLAG[cur]||'🌐'))+'</span>';
+    h += '<div style="font-size:14px;font-weight:800;color:var(--gold);margin:4px 0">'+cur+'</div>';
+    if(bc) {
+      h += '<div class="mva-bc-rate" style="color:#00c878;font-size:22px">'+bc.rate.toFixed(2)+'%</div>';
+      h += '<div style="font-size:8px;color:var(--dim)">taux directeur</div>';
+    }
+    h += '</div>';
+    if(bc) {
+      var rows = [
+        {l:'Banque centrale',v:bc.shortName},
+        {l:'Orientation',v:'<span class="'+oClass+'" style="font-size:8px;padding:2px 6px;border-radius:4px">'+bc.orientation.toUpperCase()+'</span>'},
+        {l:'Inflation',v:bc.inflation?(bc.inflation.current+'% <span style="color:var(--dim)">(cible '+bc.inflation.target+'%)</span>'):'—'},
+        {l:'Croissance PIB',v:bc.growth?bc.growth.gdp+'%':'—'},
+        {l:'Chômage',v:bc.unemployment!=null?bc.unemployment+'%':'—'},
+        {l:'Dernière décision',v:bc.lastDecision||'—'},
+        {l:'Prochaine réunion',v:bc.nextMeeting||'—'},
+      ];
+      rows.forEach(function(r){
+        h += '<div class="mva-compare-row"><span class="mva-compare-label">'+r.l+'</span><span class="mva-compare-val">'+r.v+'</span></div>';
+      });
+      if(bc.keyQuote) {
+        h += '<div style="margin-top:10px;padding:8px;background:rgba(255,255,255,.03);border-left:2px solid rgba(0,200,120,.4);border-radius:0 6px 6px 0">';
+        h += '<div style="font-size:8px;color:rgba(255,255,255,.5);font-style:italic">« '+bc.keyQuote+' »</div>';
+        h += '<div style="font-size:7px;color:var(--dim);margin-top:3px">'+bc.governorName+' · '+bc.keyQuoteDate+'</div></div>';
+      }
+    } else {
+      h += '<div style="font-size:9px;color:var(--dim);text-align:center;padding:20px">Données banque centrale non disponibles pour '+cur+'</div>';
+    }
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Synthèse + bouton scenario
+  if(bcA && bcB) {
+    var diff = (bcA.rate - bcB.rate).toFixed(2);
+    var aFav = bcA.orientation==='hawkish'||(bcA.orientation==='neutral'&&bcB.orientation==='dovish');
+    var synColor = aFav ? '#e05252' : '#6a8fff';
+    var synLabel = aFav
+      ? '📊 '+curA+' structurellement favorisé · '+bcA.shortName+' plus restrictive'
+      : '📊 '+curB+' structurellement favorisé · '+bcB.shortName+' plus restrictive';
+
+    h += '<div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:12px">';
+    h += '<div style="font-size:9px;font-weight:700;color:var(--dim);margin-bottom:6px">DIVERGENCE MACROÉCONOMIQUE <span class="mva-interp">INTERPRÉTATION</span></div>';
+    h += '<div style="font-size:11px;font-weight:700;color:'+synColor+';margin-bottom:4px">'+synLabel+'</div>';
+    h += '<div style="font-size:9px;color:var(--dim)">Différentiel de taux: <strong style="color:var(--text)">'+diff+' pp</strong></div>';
+    h += '</div>';
+  }
+
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h += '<button onclick="MVA_SCENARIO_PAIR=\''+pair+'\';mvaNav(\'scenario\',document.querySelector(\'[onclick=\\\"mvaNav(\\\'scenario\\\',this)\\\"]\'))" class="mva-btn mva-btn-gold">🎲 Générer scénarios '+pair+'</button>';
+  h += '<button onclick="MVA_TIMELINE_PAIR=\''+pair+'\';mvaNav(\'timeline\',document.querySelector(\'[onclick=\\\"mvaNav(\\\'timeline\\\',this)\\\"]\'))" class="mva-btn mva-btn-blue">📅 Timeline '+pair+'</button>';
+  h += '</div>';
+  h += '<div style="font-size:7px;color:var(--dim);margin-top:12px;padding:6px;background:var(--s1);border-radius:4px"><span class="mva-fact">FAIT</span> Données banques centrales issues des communications officielles · <span class="mva-interp">INTERPRÉTATION</span> Analyse divergence estimée par IA</div>';
+
+  el.innerHTML = h;
+}
+
+/* ── TIMELINE ── */
+function mvaRenderTimeline() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var h = '';
+
+  h += '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">';
+  h += '<div style="font-size:9px;color:var(--dim);font-weight:700">PAIRE :</div>';
+  MVA_PAIRS.slice(0,6).forEach(function(p){
+    h += '<button onclick="MVA_TIMELINE_PAIR=\''+p+'\';mvaRenderTimelineData()" class="mva-btn '+(MVA_TIMELINE_PAIR===p?'mva-btn-green':'mva-btn-blue')+'">'+p+'</button>';
+  });
+  h += '</div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">';
+  ['7','30','90','180','365'].forEach(function(d){
+    var label = d==='7'?'7 jours':d==='30'?'30 jours':d==='90'?'3 mois':d==='180'?'6 mois':'1 an';
+    h += '<button onclick="MVA_TIMELINE_PERIOD=\''+d+'\';mvaRenderTimelineData()" class="mva-btn '+(MVA_TIMELINE_PERIOD===d?'mva-btn-gold':'mva-btn-blue')+'">'+label+'</button>';
+  });
+  h += '</div>';
+  h += '<div id="mva-tl-data"></div>';
+  c.innerHTML = h;
+  mvaRenderTimelineData();
+}
+
+function mvaRenderTimelineData() {
+  // Mettre à jour les boutons
+  document.querySelectorAll('#mva-content .mva-btn').forEach(function(b){
+    var t = b.textContent.trim();
+    if(MVA_PAIRS.indexOf(t)>=0) b.className = 'mva-btn '+(t===MVA_TIMELINE_PAIR?'mva-btn-green':'mva-btn-blue');
+    var pmap = {'7 jours':'7','30 jours':'30','3 mois':'90','6 mois':'180','1 an':'365'};
+    if(pmap[t]) b.className = 'mva-btn '+(pmap[t]===MVA_TIMELINE_PERIOD?'mva-btn-gold':'mva-btn-blue');
+  });
+
+  var el = document.getElementById('mva-tl-data');
+  if(!el) return;
+  var pair = MVA_TIMELINE_PAIR;
+  var parts = pair.split('/');
+  var curA = parts[0], curB = parts[1];
+  var days = parseInt(MVA_TIMELINE_PERIOD);
+  var banks = MVA_BANKS_DATA || [];
+  var bcA = banks.find(function(b){ return b.currency===curA; });
+  var bcB = banks.find(function(b){ return b.currency===curB; });
+  var now = Date.now();
+  var from = now - days * 86400000;
+
+  // Agréger events des 2 banques centrales dans la période
+  var events = [];
+  [bcA, bcB].forEach(function(bc){
+    if(!bc) return;
+    (bc.rateHistory||[]).forEach(function(h){
+      var dt = new Date(h.date).getTime();
+      if(dt >= from && dt <= now) {
+        events.push({
+          type: 'rate',
+          date: h.date,
+          ts: dt,
+          bc: bc.shortName,
+          currency: bc.currency,
+          flag: bc.flag,
+          rate: h.rate,
+          bp: h.bp,
+          decision: h.decision,
+          color: h.bp>0?'#e05252':h.bp<0?'#6a8fff':'#f0a020'
+        });
+      }
+    });
+  });
+
+  // Trier par date desc
+  events.sort(function(a,b){ return b.ts-a.ts; });
+
+  var h = '';
+  h += '<div style="margin-bottom:12px;font-size:9px;font-weight:700;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">CHRONOLOGIE '+pair+' — '+MVA_TIMELINE_PERIOD+' DERNIERS JOURS</div>';
+
+  if(!events.length) {
+    h += '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.3)">📭 Aucun événement dans cette période<br><small>Essaie une période plus longue</small></div>';
+  } else {
+    events.forEach(function(e){
+      var bpStr = e.bp===0?'Maintien':(e.bp>0?'+':'')+e.bp+' bps';
+      h += '<div class="mva-timeline-item">';
+      h += '<div class="mva-tl-dot" style="background:'+e.color+'"></div>';
+      h += '<div style="flex:1">';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">';
+      h += '<span style="font-size:9px;color:var(--dim);font-variant-numeric:tabular-nums">'+e.date+'</span>';
+      h += '<span style="font-size:16px">'+e.flag+'</span>';
+      h += '<span style="font-size:10px;font-weight:700;color:var(--text)">'+e.bc+' ('+e.currency+')</span>';
+      h += '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:'+e.color+'22;color:'+e.color+'">'+bpStr+'</span>';
+      h += '</div>';
+      h += '<div style="font-size:9px;color:var(--dim)">Taux après décision: <strong style="color:var(--text)">'+e.rate.toFixed(2)+'%</strong></div>';
+      h += '</div></div>';
+    });
+  }
+
+  h += '<div style="margin-top:16px;padding:10px;background:var(--s1);border-radius:6px;font-size:8px;color:var(--dim)">';
+  h += '⚠ <span class="mva-interp">INTERPRÉTATION</span> La chronologie montre des événements de politique monétaire. Elle ne démontre pas de causalité entre une décision et un mouvement de prix — une corrélation temporelle n\'est pas une preuve de causalité.';
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+/* ── SCENARIO BUILDER ── */
+function mvaRenderScenario() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var h = '';
+
+  h += '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">';
+  h += '<div style="font-size:9px;color:var(--dim);font-weight:700">PAIRE :</div>';
+  MVA_PAIRS.forEach(function(p){
+    h += '<button onclick="MVA_SCENARIO_PAIR=\''+p+'\';document.getElementById(\'mva-scen-result\').innerHTML=\'\'" class="mva-btn '+(MVA_SCENARIO_PAIR===p?'mva-btn-green':'mva-btn-blue')+'">'+p+'</button>';
+  });
+  h += '</div>';
+
+  h += '<div class="mva-card" style="margin-bottom:12px">';
+  h += '<div style="font-size:9px;font-weight:700;color:var(--dim);margin-bottom:8px;letter-spacing:.06em">CONSTRUIRE UN SCÉNARIO MACROÉCONOMIQUE</div>';
+  h += '<textarea id="mva-scen-input" placeholder="Ex: Qu\'est-ce qui pourrait soutenir le dollar face à l\'euro ?\n\nOu: Analyse macroéconomique complète de USD/JPY pour swing trading..."';
+  h += ' style="width:100%;background:var(--s1);border:1px solid var(--border2);color:var(--text);font-family:var(--fm);font-size:9px;padding:10px;border-radius:6px;min-height:80px;resize:vertical;line-height:1.5;box-sizing:border-box"></textarea>';
+  h += '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">';
+  h += '<button onclick="mvaBuildScenario()" class="mva-btn mva-btn-green" id="mva-scen-btn">🎲 Générer scénarios (Claude)</button>';
+  h += '<button onclick="document.getElementById(\'mva-scen-input\').value=\'Analyse macroéconomique complète de '+MVA_SCENARIO_PAIR+' pour swing trading. Inclus: situation Fed vs BCE, inflation, emploi, anticipations de taux, biais directionnel.\'" class="mva-btn mva-btn-blue">📋 Template '+MVA_SCENARIO_PAIR+'</button>';
+  h += '</div></div>';
+
+  h += '<div id="mva-scen-result"></div>';
+  c.innerHTML = h;
+}
+
+function mvaBuildScenario() {
+  if(MVA_SCENARIO_LOADING) return;
+  var input = document.getElementById('mva-scen-input');
+  if(!input || !input.value.trim()) return;
+  var el = document.getElementById('mva-scen-result');
+  if(!el) return;
+
+  MVA_SCENARIO_LOADING = true;
+  var btn = document.getElementById('mva-scen-btn');
+  if(btn) btn.textContent = '⌛ Génération en cours…';
+  el.innerHTML = '<div class="mva-loading"><div style="font-size:24px;margin-bottom:8px;animation:pulse 1s infinite">🎲</div>Construction des scénarios…</div>';
+
+  var banks = MVA_BANKS_DATA || [];
+  var parts = MVA_SCENARIO_PAIR.split('/');
+  var curA = parts[0], curB = parts[1];
+  var bcA = banks.find(function(b){ return b.currency===curA; });
+  var bcB = banks.find(function(b){ return b.currency===curB; });
+
+  var context = 'Données macroéconomiques actuelles:\n';
+  if(bcA) context += curA+': '+bcA.shortName+' taux '+bcA.rate+'%, orientation '+bcA.orientation+', inflation '+bcA.inflation?.current+'%\n';
+  if(bcB) context += curB+': '+bcB.shortName+' taux '+bcB.rate+'%, orientation '+bcB.orientation+', inflation '+bcB.inflation?.current+'%\n';
+  if(bcA && bcB) context += 'Différentiel de taux: '+(bcA.rate - bcB.rate).toFixed(2)+' pp\n';
+
+  var prompt = context + '\nDemande de l\'analyste:\n' + input.value.trim() + '\n\n'
+    + 'Construis une analyse en 3 scénarios structurés:\n\n'
+    + 'SCÉNARIO HAUSSIER '+curA+'\n'
+    + '- Éléments macroéconomiques favorables\n- Évolution anticipations\n- Conditions de validation\n- Événements à surveiller\n\n'
+    + 'SCÉNARIO BAISSIER '+curA+'\n'
+    + '- Éléments susceptibles de fragiliser\n- Évolution anticipations\n- Conditions de validation\n- Événements à surveiller\n\n'
+    + 'SCÉNARIO NEUTRE\n'
+    + '- Absence de divergence claire\n- Facteurs contradictoires\n- Conditions d\'émergence d\'une tendance\n\n'
+    + 'Pour chaque scénario: indique FAIT / INTERPRÉTATION / HYPOTHÈSE. '
+    + 'Ne donne pas de probabilités non justifiées. '
+    + 'Termine par les 3 prochaines dates importantes à surveiller.';
+
+  var key = document.getElementById('ia-api-key') ? document.getElementById('ia-api-key').value : '';
+  var payload = {
+    messages: [{role:'user', content: prompt}],
+    model: 'claude-haiku-4-5',
+    max_tokens: 2000,
+    system: 'Tu es un analyste macroéconomique Forex institutionnel. Tes scénarios sont conditionnels, sourcés et ne constituent pas des conseils financiers. Tu distingues FAIT / INTERPRÉTATION / HYPOTHÈSE. Pas de garanties de performance.'
+  };
+  if(key) payload.key = key;
+
+  fetch('/api/ai', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(40000)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    MVA_SCENARIO_LOADING = false;
+    if(btn) btn.textContent = '🎲 Générer scénarios (Claude)';
+    if(d.error) throw new Error(d.error);
+    var text = d.content?.[0]?.text || '';
+    var formatted = text
+      .replace(/SCÉNARIO HAUSSIER[^\n]*/g, function(m){ return '<div class="mva-scenario-bull"><div style="font-size:11px;font-weight:800;color:#00c878">▲ '+m+'</div>'; })
+      .replace(/SCÉNARIO BAISSIER[^\n]*/g, function(m){ return '</div><div class="mva-scenario-bear"><div style="font-size:11px;font-weight:800;color:#e05252">▼ '+m+'</div>'; })
+      .replace(/SCÉNARIO NEUTRE[^\n]*/g, function(m){ return '</div><div class="mva-scenario-neut"><div style="font-size:11px;font-weight:800;color:#f0a020">◆ '+m+'</div>'; })
+      .replace(/FAIT/g,'<span class="mva-fact">FAIT</span>')
+      .replace(/INTERPRÉTATION/g,'<span class="mva-interp">INTERPRÉTATION</span>')
+      .replace(/HYPOTHÈSE/g,'<span class="mva-hypo">HYPOTHÈSE</span>')
+      .replace(/\n/g,'<br>') + '</div>';
+    el.innerHTML = '<div style="font-size:9px;line-height:1.6">'+formatted+'</div>'
+      +'<div style="font-size:8px;color:var(--dim);margin-top:10px;padding:8px;background:var(--s1);border-radius:6px">🤖 Scénarios générés par Claude · <span class="mva-interp">INTERPRÉTATION</span> · Outil d\'aide à la décision uniquement · Pas de conseil financier</div>';
+  })
+  .catch(function(e){
+    MVA_SCENARIO_LOADING = false;
+    if(btn) btn.textContent = '🎲 Générer scénarios (Claude)';
+    el.innerHTML = '<div style="color:var(--red);font-size:9px;padding:12px">❌ '+e.message+'<br><small style="color:var(--dim)">Configure ta clé API dans l\'onglet 🤖 MANSA IA</small></div>';
+  });
+}
+
+/* ── ALERTS ── */
+function mvaRenderAlerts() {
+  var c = document.getElementById('mva-content');
+  if(!c) return;
+  var h = '';
+
+  h += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">';
+  h += '<div style="font-size:9px;color:var(--dim);font-weight:700">CRÉER UNE ALERTE :</div>';
+  h += '</div>';
+
+  // Form création alerte
+  h += '<div class="mva-card" style="margin-bottom:16px">';
+  h += '<div style="font-size:9px;font-weight:700;color:var(--dim);margin-bottom:10px;letter-spacing:.06em">NOUVELLE ALERTE MACROÉCONOMIQUE</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+  h += '<div><div style="font-size:8px;color:var(--dim);margin-bottom:4px">TYPE D\'ÉVÉNEMENT</div>';
+  h += '<select id="mva-alert-type" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px;border-radius:6px;font-family:var(--fm);font-size:9px">';
+  ['Décision de taux','Publication inflation','NFP / Emploi','Publication PMI','Discours gouverneur','Réunion banque centrale','Alerte personnalisée'].forEach(function(t){
+    h += '<option>'+t+'</option>';
+  });
+  h += '</select></div>';
+  h += '<div><div style="font-size:8px;color:var(--dim);margin-bottom:4px">DEVISE / BANQUE CENTRALE</div>';
+  h += '<select id="mva-alert-cur" style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px;border-radius:6px;font-family:var(--fm);font-size:9px">';
+  ['Toutes','USD (Fed)','EUR (BCE)','GBP (BoE)','JPY (BoJ)','CHF (SNB)','AUD (RBA)'].forEach(function(c2){
+    h += '<option>'+c2+'</option>';
+  });
+  h += '</select></div>';
+  h += '</div>';
+  h += '<textarea id="mva-alert-note" placeholder="Note personnalisée (optionnel)..." style="width:100%;background:var(--s1);border:1px solid var(--border2);color:var(--text);font-family:var(--fm);font-size:9px;padding:8px;border-radius:6px;height:50px;resize:none;box-sizing:border-box"></textarea>';
+  h += '<div style="margin-top:8px"><button onclick="mvaAddAlert()" class="mva-btn mva-btn-green">+ Créer l\'alerte</button></div>';
+  h += '</div>';
+
+  // Liste alertes existantes
+  h += '<div style="font-size:9px;font-weight:700;color:var(--dim);margin-bottom:8px;letter-spacing:.1em;text-transform:uppercase">ALERTES ACTIVES ('+MVA_ALERTS.length+')</div>';
+
+  if(!MVA_ALERTS.length) {
+    h += '<div style="text-align:center;padding:30px;color:rgba(255,255,255,.3);font-size:11px">🔔 Aucune alerte configurée<br><small>Crée une alerte pour être notifié</small></div>';
+  } else {
+    MVA_ALERTS.forEach(function(a, i) {
+      h += '<div class="mva-alert-row">';
+      h += '<span style="font-size:16px">🔔</span>';
+      h += '<div style="flex:1"><div style="font-size:10px;font-weight:700;color:var(--text)">'+a.type+'</div>';
+      h += '<div style="font-size:8px;color:var(--dim)">'+a.currency+(a.note?' · '+a.note:'')+'</div>';
+      h += '<div style="font-size:7px;color:rgba(255,255,255,.2)">Créée le '+a.created+'</div></div>';
+      h += '<button onclick="mvaDeleteAlert('+i+')" style="background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.3);color:#e05252;padding:4px 10px;border-radius:5px;font-size:9px;cursor:pointer">✕</button>';
+      h += '</div>';
+    });
+  }
+
+  h += '<div style="margin-top:16px;padding:10px;background:var(--s1);border-radius:6px;font-size:8px;color:var(--dim)">';
+  h += '💡 Les alertes sont sauvegardées localement dans ton navigateur. Pour des alertes en temps réel (push notifications), la fonctionnalité Discord/Telegram sera disponible dans une prochaine mise à jour.';
+  h += '</div>';
+
+  c.innerHTML = h;
+}
+
+function mvaAddAlert() {
+  var type = document.getElementById('mva-alert-type')?.value;
+  var cur = document.getElementById('mva-alert-cur')?.value;
+  var note = document.getElementById('mva-alert-note')?.value;
+  if(!type) return;
+  MVA_ALERTS.push({
+    id: Date.now(),
+    type, currency: cur||'Toutes',
+    note: note||'',
+    created: new Date().toLocaleDateString('fr-FR')
+  });
+  localStorage.setItem('mva_alerts', JSON.stringify(MVA_ALERTS));
+  mvaRenderAlerts();
+}
+
+function mvaDeleteAlert(idx) {
+  MVA_ALERTS.splice(idx, 1);
+  localStorage.setItem('mva_alerts', JSON.stringify(MVA_ALERTS));
+  mvaRenderAlerts();
+}
+
+function mvaQuickBank(id) {
+  MVA_COMPARE_A = id;
+  mvaNav('banks', document.querySelector('[onclick="mvaNav(\'banks\',this)"]'));
+}
+
 /* NEWS */
 function renderNews(){
   var h='';
@@ -5432,6 +6455,7 @@ function nav(id){
   if(id==='setup'){renderSetupAnalysis();}
   if(id==='ds'){renderDSPanel();}
   if(id==='macro'){renderMacro();}
+  if(id==='mva'){renderMVA();}
   if(id==='backtest'){renderBacktest();}
   if(id==='cot'){renderCOT();}
   if(id==='dmx'){renderDMX();}
