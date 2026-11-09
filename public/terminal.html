@@ -5759,7 +5759,7 @@ function mvaShowBank(bankId) {
       var past = dt < new Date();
       var days = Math.ceil((dt - Date.now())/86400000);
       h += '<div style="background:'+(past?'var(--s1)':'rgba(0,200,120,.07)')+';border:1px solid '+(past?'var(--border)':'rgba(0,200,120,.2)')+';border-radius:6px;padding:5px 10px;font-size:8px">';
-      h += '<div style="color:'+(past?'var(--dim)':'var(--text)');font-weight:'+(past?'400':'700')+'">'+d+'</div>';
+      h += '<div style="color:'+(past?'var(--dim)':'var(--text)')+'">'+d+'</div>';
       if(!past) h += '<div style="color:rgba(0,200,120,.7);font-size:7px">J-'+days+'</div>';
       h += '</div>';
     });
