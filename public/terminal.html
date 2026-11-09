@@ -1512,8 +1512,12 @@ body{padding-top:22px;}
         </div>
         <div id="setup-drop-placeholder">
           <div style="font-size:36px;margin-bottom:10px;filter:drop-shadow(0 0 10px rgba(255,80,120,.5))">📸</div>
-          <div style="font-size:11px;font-weight:700;color:#ff88aa;margin-bottom:6px">Colle ou dépose ton graphique TradingView</div>
-          <div style="font-size:9px;color:var(--dim);line-height:1.7">Ctrl+V pour coller · Cliquer pour choisir un fichier<br>PNG · JPG · Tous formats acceptés</div>
+          <div style="font-size:11px;font-weight:700;color:#ff88aa;margin-bottom:8px">Colle ou dépose ton graphique TradingView</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+            <button onclick="event.stopPropagation();setupPasteFromClipboard()" style="background:rgba(255,80,120,.15);border:1px solid rgba(255,80,120,.4);border-radius:7px;color:#ff88aa;font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,80,120,.3)'" onmouseout="this.style.background='rgba(255,80,120,.15)'">📋 Coller</button>
+            <button onclick="event.stopPropagation();document.getElementById('setup-file-input').click()" style="background:rgba(255,80,120,.08);border:1px solid rgba(255,80,120,.2);border-radius:7px;color:var(--dim);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,80,120,.15)'" onmouseout="this.style.background='rgba(255,80,120,.08)'">📁 Parcourir</button>
+          </div>
+          <div style="font-size:9px;color:var(--dim);line-height:1.7">ou glisse ton image ici · Ctrl+V aussi supporté</div>
         </div>
       </div>
 
@@ -1751,9 +1755,12 @@ body{padding-top:22px;}
         <div id="ds-drop-preview" style="display:none;margin-bottom:10px"><img id="ds-preview-img" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid rgba(255,180,0,.3)" /></div>
         <div id="ds-drop-hint">
           <div style="font-size:28px;margin-bottom:8px">📊</div>
-          <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em">COLLE OU DÉPOSE TON GRAPHIQUE</div>
-          <div style="font-size:9px;color:var(--dim);margin-top:4px">Ctrl+V · Glisser-déposer · Cliquer pour sélectionner</div>
-          <div style="font-size:8px;color:rgba(255,180,0,.4);margin-top:6px">TradingView screenshot — tracé avec structures et zones</div>
+          <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em;margin-bottom:10px">COLLE OU DÉPOSE TON GRAPHIQUE</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+            <button onclick="event.stopPropagation();dsPasteFromClipboard()" style="background:rgba(255,180,0,.15);border:1px solid rgba(255,180,0,.4);border-radius:7px;color:var(--gold);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,180,0,.3)'" onmouseout="this.style.background='rgba(255,180,0,.15)'">📋 Coller</button>
+            <button onclick="event.stopPropagation();document.getElementById('ds-file-input').click()" style="background:rgba(255,180,0,.05);border:1px solid rgba(255,180,0,.2);border-radius:7px;color:var(--dim);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,180,0,.15)'" onmouseout="this.style.background='rgba(255,180,0,.05)'">📁 Parcourir</button>
+          </div>
+          <div style="font-size:8px;color:rgba(255,180,0,.4);margin-top:4px">ou glisse ici · Ctrl+V aussi supporté</div>
         </div>
         <input type="file" id="ds-file-input" accept="image/*" style="display:none" onchange="dsHandleFile(this.files[0])">
       </div>
@@ -10946,6 +10953,18 @@ function setupHandleDrop(e){
   if(files && files[0]) setupHandleFile(files[0]);
 }
 
+async function setupPasteFromClipboard(){
+  try {
+    var items = await navigator.clipboard.read();
+    for(var item of items){
+      var imgType = item.types.find(function(t){ return t.startsWith('image/'); });
+      if(imgType){ var blob = await item.getType(imgType); setupHandleFile(blob); return; }
+    }
+    showToast('📋 Pas d\'image dans le presse-papier — fais Ctrl+V ou copie un screenshot TradingView', 'var(--gold)');
+  } catch(e) {
+    showToast('📋 Colle avec Ctrl+V directement dans la zone image', 'var(--gold)');
+  }
+}
 function setupHandleFile(file){
   if(!file || !file.type.startsWith('image/')) return;
   SETUP_IMAGE_TYPE = file.type;
@@ -11210,6 +11229,18 @@ function renderDSPanel(){
   }
 }
 
+async function dsPasteFromClipboard(){
+  try {
+    var items = await navigator.clipboard.read();
+    for(var item of items){
+      var imgType = item.types.find(function(t){ return t.startsWith('image/'); });
+      if(imgType){ var blob = await item.getType(imgType); dsHandleFile(blob); return; }
+    }
+    showToast('📋 Pas d\'image dans le presse-papier — fais Ctrl+V ou copie un screenshot TradingView', 'var(--gold)');
+  } catch(e) {
+    showToast('📋 Colle avec Ctrl+V directement dans la zone image', 'var(--gold)');
+  }
+}
 function dsHandleFile(file){
   if(!file || !file.type.startsWith('image/')) return;
   DS_IMAGE_TYPE = file.type;
