@@ -68,8 +68,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 #mansa-tagline-inner{white-space:nowrap;font-size:8.5px;font-weight:700;letter-spacing:.12em;color:rgba(200,160,60,.7);animation:taglineScroll 22s linear infinite}
 @keyframes taglineScroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
 @keyframes signupGlow{0%,100%{box-shadow:0 0 8px rgba(0,200,120,.2)}50%{box-shadow:0 0 18px rgba(0,200,120,.5),0 0 30px rgba(0,200,120,.15)}}
-/* Right zone */
-.tb-right{display:flex;align-items:center;gap:5px;padding:0 10px;margin-left:auto;flex-shrink:0;height:100%;border-left:1px solid rgba(255,255,255,.06);background:linear-gradient(90deg,transparent,rgba(0,0,0,.3))}
+/* Right zone (kept for JS compat) */
+.tb-right{display:none}
 .tb-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;box-shadow:0 0 6px rgba(0,200,120,.6)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -929,44 +929,40 @@ body{padding-top:22px;}
   <div class="tb-brand">
     <span class="tb-brand-crown">👑</span>
     <div>
-      <span class="tb-brand-name">MANSA</span><span class="tb-brand-ver">PTL v4</span>
-      <div style="font-size:7px;color:var(--dim);letter-spacing:.06em;margin-top:1px">TERMINAL DE TRADING &nbsp;<span id="live-price-indicator" style="color:var(--dim);font-weight:700">● STATIC</span></div>
+      <span class="tb-brand-name">MANSA</span>
+      <div style="font-size:7px;color:var(--dim);letter-spacing:.05em;margin-top:1px">TERMINAL · <span id="live-price-indicator" style="color:var(--dim);font-weight:700">STATIC</span></div>
     </div>
   </div>
-  <!-- SESSIONS (compact inline) -->
+  <!-- SESSIONS -->
   <div id="tb-sessions"></div>
-  <!-- HORLOGE MONDIALE (hidden, still rendered for compat) -->
-  <div id="tb-worldclock" style="display:none"></div>
-  <!-- TICKERS (hidden, still rendered for compat) -->
-  <div class="tb-tickers" id="tb-tickers" style="display:none"></div>
-  <!-- PHRASE ACCROCHEUSE (hidden) -->
-  <div id="mansa-tagline" style="display:none"><div id="mansa-tagline-inner"></div></div>
-  <!-- INDICES (hidden) -->
-  <div id="tb-indices" style="display:none"></div>
   <!-- SPACER -->
-  <div style="flex:1"></div>
-  <!-- DROITE -->
-  <div class="tb-right">
-    <div style="display:flex;align-items:center;gap:5px;padding-right:8px;border-right:1px solid rgba(255,255,255,.06)">
-      <div class="tb-dot" id="tb-live-dot"></div>
-      <span style="font-size:7.5px;color:var(--green);letter-spacing:.08em;font-weight:700">LIVE</span>
-    </div>
-    <div id="tb-main-clock">
-      <span id="tb-time">--:--:--</span>
-      <span id="tb-date">--- · Paris</span>
-    </div>
-    <button class="hdr-btn" onclick="nav('api')">🔌 API</button>
-    <button class="hdr-btn" id="btn-ia" onclick="toggleAI()">🤖 IA</button>
-    <button class="hdr-btn" onclick="openFAQ('guide')">❓</button>
-    <div id="tb-auth-btn" onclick="mansaOpenAuth()" title="Connexion / Mon compte" style="display:none"></div>
-    <div id="tb-signup-btn" style="display:none"></div>
-    <button id="wl-toggle-btn" onclick="toggleWatchlist()" title="Ma Watchlist">⭐ <span id="wl-count-top">0</span></button>
-    <div id="tb-user-btn" onclick="openProfileMenu()" title="Mon profil">
-      <div class="tb-user-dot"></div>
-      <span class="tb-user-name">USER</span>
-      <span style="font-size:9px;color:var(--dim)">▾</span>
-    </div>
+  <div style="flex:1;min-width:0"></div>
+  <!-- HORLOGE PARIS -->
+  <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding:0 14px;border-left:1px solid rgba(255,255,255,.06);flex-shrink:0">
+    <span id="tb-time" style="font-size:14px;color:var(--gold2);font-weight:700;font-family:var(--fd);letter-spacing:.04em;font-variant-numeric:tabular-nums">--:--</span>
+    <span id="tb-date" style="font-size:7px;color:var(--dim);letter-spacing:.04em">--- · Paris</span>
   </div>
+  <!-- LIVE DOT -->
+  <div style="display:flex;align-items:center;gap:4px;padding:0 10px;border-left:1px solid rgba(255,255,255,.06);flex-shrink:0">
+    <div class="tb-dot" id="tb-live-dot"></div>
+    <span style="font-size:7px;color:var(--green);letter-spacing:.08em;font-weight:700">LIVE</span>
+  </div>
+  <!-- PROFIL -->
+  <div id="tb-auth-btn" onclick="mansaOpenAuth()" title="Connexion" style="display:none"></div>
+  <div id="tb-signup-btn" style="display:none"></div>
+  <div id="tb-user-btn" onclick="openProfileMenu()" title="Mon profil" style="display:flex;align-items:center;gap:5px;padding:0 12px;height:100%;border-left:1px solid rgba(255,255,255,.06);cursor:pointer;flex-shrink:0">
+    <div class="tb-user-dot"></div>
+    <span class="tb-user-name" style="font-size:9px">USER</span>
+    <span style="font-size:9px;color:var(--dim)">▾</span>
+  </div>
+  <!-- HIDDEN COMPAT -->
+  <div id="tb-worldclock" style="display:none"></div>
+  <div class="tb-tickers" id="tb-tickers" style="display:none"></div>
+  <div id="mansa-tagline" style="display:none"><div id="mansa-tagline-inner"></div></div>
+  <div id="tb-indices" style="display:none"></div>
+  <div id="tb-main-clock" style="display:none"></div>
+  <button class="hdr-btn" id="btn-ia" style="display:none" onclick="toggleAI()"></button>
+  <button id="wl-toggle-btn" style="display:none" onclick="toggleWatchlist()">⭐ <span id="wl-count-top">0</span></button>
 </div>
 
 <!-- NAV TABS -->
