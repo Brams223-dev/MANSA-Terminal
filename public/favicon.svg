@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d0d1f"/>
+      <stop offset="100%" stop-color="#06060f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d060"/>
+      <stop offset="50%" stop-color="#c8a03c"/>
+      <stop offset="100%" stop-color="#e8c060"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+      <stop offset="50%" stop-color="rgba(255,255,255,0.35)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+      <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="2 0" dur="2.5s" repeatCount="indefinite"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <rect width="32" height="32" rx="7"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fond arrondi -->
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+
+  <!-- Bordure dorée subtile -->
+  <rect width="32" height="32" rx="7" fill="none" stroke="url(#gold)" stroke-width="1" opacity="0.4"/>
+
+  <!-- Lettre M en or -->
+  <path d="M5 24 L5 8 L10 8 L16 17 L22 8 L27 8 L27 24 L23 24 L23 13.5 L17.5 22 L14.5 22 L9 13.5 L9 24 Z"
+        fill="url(#gold)"/>
+
+  <!-- Effet brillance animée -->
+  <rect width="32" height="32" rx="7" fill="url(#shine)" clip-path="url(#clip)" opacity="0.6"/>
+
+  <!-- Point vert "live" en bas à droite -->
+  <circle cx="26.5" cy="25.5" r="3" fill="#06060f"/>
+  <circle cx="26.5" cy="25.5" r="2" fill="#00c878">
+    <animate attributeName="opacity" values="1;0.4;1" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>
