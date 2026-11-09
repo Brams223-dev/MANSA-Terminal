@@ -800,6 +800,60 @@ body{padding-top:22px;}
 </head>
 <body>
 
+<!-- ══ GATE OVERLAY — affiché tant que non connecté ══ -->
+<div id="gate-overlay" style="
+  position:fixed;inset:0;z-index:9999;
+  background:#06060f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;
+">
+  <div style="
+    background:#0b0b18;border:1px solid rgba(200,160,60,.3);
+    border-radius:16px;padding:40px;max-width:400px;width:90%;
+    box-shadow:0 0 60px rgba(200,160,60,.07),0 20px 60px rgba(0,0,0,.6);
+    text-align:center;
+  ">
+    <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:900;background:linear-gradient(135deg,#c8a03c,#e8c060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.15em;margin-bottom:4px">MANSA</div>
+    <div style="font-size:9px;color:rgba(200,160,60,.5);letter-spacing:.2em;margin-bottom:28px">TERMINAL · PROCESS TRADING LIFE</div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.08)">
+      <div id="gate-tab-login" onclick="gateTab('login')" style="flex:1;padding:9px;font-size:10px;font-weight:700;cursor:pointer;color:#c8a03c;border-bottom:2px solid #c8a03c;letter-spacing:.08em;transition:all .2s">CONNEXION</div>
+      <div id="gate-tab-signup" onclick="gateTab('signup')" style="flex:1;padding:9px;font-size:10px;font-weight:700;cursor:pointer;color:rgba(255,255,255,.35);border-bottom:2px solid transparent;letter-spacing:.08em;transition:all .2s">CRÉER UN COMPTE</div>
+    </div>
+
+    <div id="gate-error" style="display:none;background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);border-radius:7px;padding:9px 12px;color:#e05252;font-size:10px;margin-bottom:14px"></div>
+    <div id="gate-success" style="display:none;background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.25);border-radius:7px;padding:9px 12px;color:#00c878;font-size:10px;margin-bottom:14px"></div>
+
+    <div style="text-align:left;margin-bottom:10px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Adresse email</div>
+      <input id="gate-email" type="email" placeholder="ton@email.com" autocomplete="email"
+        style="width:100%;background:#0f0f1e;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:11px 13px;color:#fff;font-size:11px;font-family:'Space Mono',monospace;outline:none;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')gateSubmit()"
+      />
+    </div>
+    <div style="text-align:left;margin-bottom:20px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Mot de passe</div>
+      <input id="gate-pwd" type="password" placeholder="6 caractères minimum" autocomplete="current-password"
+        style="width:100%;background:#0f0f1e;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:11px 13px;color:#fff;font-size:11px;font-family:'Space Mono',monospace;outline:none;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')gateSubmit()"
+      />
+    </div>
+
+    <button id="gate-btn" onclick="gateSubmit()" style="
+      width:100%;background:linear-gradient(135deg,#c8a03c,#e8c060);
+      border:none;border-radius:8px;padding:13px;
+      color:#06060f;font-size:11px;font-weight:900;
+      font-family:'Space Mono',monospace;cursor:pointer;letter-spacing:.08em;
+      margin-bottom:6px;
+    ">SE CONNECTER</button>
+
+    <div style="font-size:8px;color:rgba(255,255,255,.18);margin-top:14px">
+      🔐 Connexion chiffrée SSL · Mansa Terminal par PTL
+    </div>
+  </div>
+</div>
+
 <!-- TICKER BAND V22 -->
 <div id="ticker-band">
   <div id="ticker-label">▶ LIVE</div>
@@ -15124,12 +15178,6 @@ function saveJournal(tradeObj) {
 
 (function(){
   try { JOURNAL_TRADES = JSON.parse(localStorage.getItem('ptl_journal_ghost') || '[]'); } catch(e) { JOURNAL_TRADES = []; }
-  var btn = document.getElementById('tb-user-btn');
-  if(btn) {
-    btn.style.display = 'flex';
-    var nameEl = btn.querySelector('.tb-user-name');
-    if(nameEl) nameEl.textContent = 'GHOST';
-  }
   setTimeout(function(){ renderJournal(); }, 100);
 })();
 
@@ -15141,9 +15189,82 @@ function closeProfileMenu(){
   document.getElementById('profile-menu').classList.remove('open');
   document.getElementById('pm-backdrop').classList.remove('open');
 }
-function doLogout(){ closeProfileMenu(); }
+function doLogout(){
+  closeProfileMenu();
+  if(_mansaSupabase){ _mansaSupabase.auth.signOut(); }
+  _mansaUser=null; _mansaJWT=null;
+  mansaShowGate();
+}
 function togglePassVis(){}
 function toggleRegister(){}
+
+/* ══ GATE AUTH ══ */
+var _gateTab = 'login';
+function gateTab(t){
+  _gateTab = t;
+  var tl=document.getElementById('gate-tab-login'), ts=document.getElementById('gate-tab-signup');
+  var btn=document.getElementById('gate-btn');
+  if(t==='login'){
+    tl.style.color='#c8a03c'; tl.style.borderBottom='2px solid #c8a03c';
+    ts.style.color='rgba(255,255,255,.35)'; ts.style.borderBottom='2px solid transparent';
+    btn.textContent='SE CONNECTER';
+    document.getElementById('gate-pwd').setAttribute('autocomplete','current-password');
+  } else {
+    ts.style.color='#c8a03c'; ts.style.borderBottom='2px solid #c8a03c';
+    tl.style.color='rgba(255,255,255,.35)'; tl.style.borderBottom='2px solid transparent';
+    btn.textContent='CRÉER MON COMPTE';
+    document.getElementById('gate-pwd').setAttribute('autocomplete','new-password');
+  }
+  document.getElementById('gate-error').style.display='none';
+  document.getElementById('gate-success').style.display='none';
+}
+function mansaShowGate(){
+  var g=document.getElementById('gate-overlay');
+  if(g) g.style.display='flex';
+}
+function mansaHideGate(){
+  var g=document.getElementById('gate-overlay');
+  if(g){ g.style.opacity='0'; g.style.transition='opacity .4s'; setTimeout(function(){ g.style.display='none'; }, 400); }
+}
+async function gateSubmit(){
+  if(!_mansaSupabase){ mansaInitSupabase(); await new Promise(function(r){setTimeout(r,300);}); }
+  var email=document.getElementById('gate-email').value.trim();
+  var pwd=document.getElementById('gate-pwd').value;
+  var errEl=document.getElementById('gate-error'), okEl=document.getElementById('gate-success');
+  var btn=document.getElementById('gate-btn');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!email||!pwd){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; return; }
+  btn.textContent='...'; btn.disabled=true;
+  try{
+    var result = _gateTab==='login'
+      ? await _mansaSupabase.auth.signInWithPassword({email:email,password:pwd})
+      : await _mansaSupabase.auth.signUp({email:email,password:pwd});
+    if(result.error){
+      var msg=result.error.message||'Erreur';
+      if(msg.includes('Invalid login')||msg.includes('invalid_credentials'))msg='Email ou mot de passe incorrect.';
+      if(msg.includes('already registered'))msg='Email déjà utilisé — connectez-vous.';
+      if(msg.includes('Password should'))msg='Mot de passe trop court (6+ caractères).';
+      errEl.textContent=msg; errEl.style.display='block';
+    } else if(_gateTab==='signup'&&result.data&&!result.data.session){
+      okEl.textContent='✅ Compte créé ! Connecte-toi maintenant.'; okEl.style.display='block';
+      gateTab('login');
+    } else {
+      _mansaUser=result.data.user||result.data.session&&result.data.session.user;
+      _mansaJWT=result.data.session&&result.data.session.access_token;
+      mansaHideGate();
+      mansaUpdateAuthUI();
+      if(_mansaJWT) mansaLoadFromAPI();
+    }
+  }catch(e){ errEl.textContent='Erreur réseau.'; errEl.style.display='block'; }
+  btn.disabled=false; btn.textContent=_gateTab==='login'?'SE CONNECTER':'CRÉER MON COMPTE';
+}
+
+/* Boot — init Supabase et vérifie si déjà connecté */
+(function mansaBootGate(){
+  mansaInitSupabase();
+  /* mansaInitSupabase déclenche onAuthStateChange : si session active → hide gate */
+  /* Fallback : si pas de réponse en 2s → toujours afficher le gate */
+})();
 
 
 renderScreener();
@@ -15393,10 +15514,15 @@ function mansaInitSupabase(){
   try{
     _mansaSupabase=supabase.createClient(MANSA_SUPABASE_URL,MANSA_SUPABASE_ANON);
     _mansaSupabase.auth.getSession().then(function(r){
-      if(r.data&&r.data.session){_mansaUser=r.data.session.user;_mansaJWT=r.data.session.access_token;mansaUpdateAuthUI();mansaLoadFromAPI();}
+      if(r.data&&r.data.session){
+        _mansaUser=r.data.session.user;_mansaJWT=r.data.session.access_token;
+        mansaUpdateAuthUI();mansaLoadFromAPI();
+        mansaHideGate();
+      }
+      /* pas de session → le gate reste affiché */
     });
     _mansaSupabase.auth.onAuthStateChange(function(ev,session){
-      if(session){_mansaUser=session.user;_mansaJWT=session.access_token;mansaUpdateAuthUI();if(ev==='SIGNED_IN')mansaLoadFromAPI();}
+      if(session){_mansaUser=session.user;_mansaJWT=session.access_token;mansaUpdateAuthUI();if(ev==='SIGNED_IN'){mansaLoadFromAPI();mansaHideGate();}}
       else{_mansaUser=null;_mansaJWT=null;mansaUpdateAuthUI();}
     });
   }catch(e){console.warn('Supabase',e);}
@@ -15466,14 +15592,29 @@ async function mansaLogout(){
 function mansaUpdateAuthUI(){
   var icon=document.getElementById('tb-auth-icon'),label=document.getElementById('tb-auth-label'),btn=document.getElementById('tb-auth-btn');
   var signupBtn=document.getElementById('tb-signup-btn');
+  var userBtn=document.getElementById('tb-user-btn');
   if(_mansaUser){
-    icon.textContent='✅';label.textContent=(_mansaUser.email.split('@')[0]).toUpperCase().slice(0,10);
-    btn.style.borderColor='rgba(0,200,120,.4)';btn.style.background='rgba(0,200,120,.08)';label.style.color='#00c878';
+    if(icon)icon.textContent='✅';
+    if(label)label.textContent=(_mansaUser.email.split('@')[0]).toUpperCase().slice(0,10);
+    if(btn){btn.style.borderColor='rgba(0,200,120,.4)';btn.style.background='rgba(0,200,120,.08)';}
+    if(label)label.style.color='#00c878';
     if(signupBtn)signupBtn.style.display='none';
+    /* bouton profil topbar */
+    if(userBtn){
+      userBtn.style.display='flex';
+      var nameEl=userBtn.querySelector('.tb-user-name');
+      if(nameEl)nameEl.textContent=(_mansaUser.email.split('@')[0]).toUpperCase().slice(0,8);
+    }
+    /* nom dans le menu profil */
+    var pmName=document.getElementById('pm-name');
+    if(pmName)pmName.textContent=_mansaUser.user_metadata&&_mansaUser.user_metadata.username?_mansaUser.user_metadata.username:_mansaUser.email.split('@')[0];
   } else {
-    icon.textContent='🔑';label.textContent='CONNEXION';
-    btn.style.borderColor='rgba(200,160,60,.3)';btn.style.background='rgba(200,160,60,.1)';label.style.color='#c8a03c';
+    if(icon)icon.textContent='🔑';
+    if(label)label.textContent='CONNEXION';
+    if(btn){btn.style.borderColor='rgba(200,160,60,.3)';btn.style.background='rgba(200,160,60,.1)';}
+    if(label)label.style.color='#c8a03c';
     if(signupBtn)signupBtn.style.display='flex';
+    if(userBtn)userBtn.style.display='none';
   }
 }
 function mansaApiHdr(){var h={'Content-Type':'application/json'};if(_mansaJWT)h['Authorization']='Bearer '+_mansaJWT;return h;}
