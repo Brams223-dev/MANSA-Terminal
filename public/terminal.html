@@ -83,15 +83,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .hdr-btn.active-btn{background:rgba(200,160,60,.18);border-color:var(--gold);box-shadow:var(--glow-gold)}
 
 /* ═══ NAV TABS ═══ */
-#navtabs{position:fixed;top:44px;left:0;right:0;height:32px;background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;overflow-x:auto;z-index:190;scrollbar-width:none}
+#navwrap{position:fixed;top:44px;left:0;right:0;height:30px;z-index:190;display:flex;align-items:center}
+#nav-arrow-l,#nav-arrow-r{flex-shrink:0;width:22px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(90deg,var(--s1),transparent);color:var(--dim);font-size:10px;z-index:2;user-select:none;transition:color .15s}
+#nav-arrow-r{background:linear-gradient(270deg,var(--s1),transparent)}
+#nav-arrow-l:hover,#nav-arrow-r:hover{color:var(--gold)}
+#navtabs{flex:1;height:30px;background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth}
 #navtabs::-webkit-scrollbar{display:none}
-.ntab{display:flex;align-items:center;gap:5px;padding:0 14px;height:100%;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-right:1px solid rgba(255,255,255,.04);flex-shrink:0;transition:all .15s;white-space:nowrap;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:rgba(200,160,60,.2)}
+.ntab{display:flex;align-items:center;gap:4px;padding:0 10px;height:100%;font-size:7.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-right:1px solid rgba(255,255,255,.04);flex-shrink:0;transition:all .15s;white-space:nowrap;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:rgba(200,160,60,.2)}
 .ntab:hover{color:var(--text);background:rgba(200,160,60,.05)}
 .ntab.on{color:var(--gold2);background:rgba(200,160,60,.06)}
 .ntab.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.9}
+.nav-sep{width:1px;background:rgba(200,160,60,.25);margin:7px 3px;flex-shrink:0}
 
 /* ═══ MAIN ═══ */
-#main{position:fixed;top:76px;left:0;right:0;bottom:0;overflow:hidden}
+#main{position:fixed;top:74px;left:0;right:0;bottom:0;overflow:hidden}
 .panel{display:none;height:100%;overflow-y:auto;overflow-x:hidden;padding:14px 18px 20px}
 .panel.on{display:block;animation:fadeIn .18s ease}
 /* iOS Safari fix — dvh units pour exclure la barre d'adresse */
@@ -433,7 +438,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .wl-btn{font-size:13px;background:none;border:none;cursor:pointer;padding:2px 4px;transition:transform .15s;line-height:1;opacity:.4}
 .wl-btn.active{opacity:1;filter:drop-shadow(0 0 4px rgba(245,158,11,.7))}
 .wl-btn:hover{transform:scale(1.25);opacity:.8}
-#watchlist-panel{position:fixed;right:0;top:76px;bottom:0;width:280px;background:var(--s1);border-left:1px solid var(--border2);z-index:150;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.5)}
+#watchlist-panel{position:fixed;right:0;top:74px;bottom:0;width:280px;background:var(--s1);border-left:1px solid var(--border2);z-index:150;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.5)}
 #watchlist-panel.open{transform:translateX(0)}
 #watchlist-panel::-webkit-scrollbar{width:3px}
 #watchlist-panel::-webkit-scrollbar-thumb{background:var(--border2)}
@@ -963,38 +968,42 @@ body{padding-top:22px;}
 </div>
 
 <!-- NAV TABS -->
-<div id="navtabs">
-  <div class="ntab" onclick="nav('screener')" id="nt-screener">🔍 SCREENER</div>
-  <div class="ntab" onclick="nav('charts')" id="nt-charts">📉 CHARTS</div>
-  <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
-  <div class="ntab" onclick="nav('setups')" id="nt-setups" style="color:var(--gold)">🎯 SETUPS PTL</div>
-  <div class="ntab" onclick="nav('ptl')" id="nt-ptl">⚡ PTL STRATS</div>
-  <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
-  <div class="ntab" onclick="nav('cot')" id="nt-cot">📊 COT</div>
-  <div class="ntab" onclick="nav('dmx')" id="nt-dmx">👥 DMX</div>
-  <div class="ntab" onclick="nav('smart')" id="nt-smart">🏦 SMART MONEY</div>
-  <div class="ntab" onclick="nav('saison')" id="nt-saison">📅 SAISON</div>
-  <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
-  <div class="ntab" onclick="nav('fx')" id="nt-fx">💱 FOREX</div>
-  <div class="ntab" onclick="nav('indices')" id="nt-indices">💪 FORCE DEVISES</div>
-  <div class="ntab" onclick="nav('actions')" id="nt-actions">📈 ACTIONS US/EU</div>
-  <div class="ntab" onclick="nav('rendement')" id="nt-rendement" style="color:var(--green)">💰 RENDEMENT</div>
-  <div class="ntab" onclick="nav('crypto')" id="nt-crypto">🪙 CRYPTO</div>
-  <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
-  <div class="ntab" onclick="nav('macro')" id="nt-macro">📆 MACRO</div>
-  <div class="ntab" onclick="nav('mva')" id="nt-mva" style="background:linear-gradient(135deg,rgba(0,200,120,.14),rgba(68,136,255,.08));border:1px solid rgba(0,200,120,.35);color:#00c878;font-weight:900">🧠 MACRO VISION AI</div>
-  <div class="ntab" onclick="nav('heatmap')" id="nt-heatmap">🌡️ HEATMAP</div>
-  <div class="ntab" onclick="nav('sessions')" id="nt-sessions">🕐 SESSIONS</div>
-  <div class="ntab" onclick="nav('backtest')" id="nt-backtest">🔬 BACKTEST</div>
-  <div class="ntab" onclick="nav('ia')" id="nt-ia" style="background:linear-gradient(135deg,rgba(68,136,255,.18),rgba(68,136,255,.08));border:1px solid rgba(68,136,255,.35);color:#8af">🤖 MANSA IA</div>
-  <div class="ntab" onclick="nav('news')" id="nt-news">📰 NEWS</div>
-  <div class="ntab" onclick="nav('squawk')" id="nt-squawk">🔊 SQUAWK</div>
-  <div style="width:1px;background:rgba(200,160,60,.3);margin:6px 2px;flex-shrink:0"></div>
-  <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 ANALYSE SETUP</div>
-  <div class="ntab" onclick="nav('ds')" id="nt-ds" style="background:linear-gradient(135deg,rgba(255,180,0,.18),rgba(255,100,0,.1));border:1px solid rgba(255,180,0,.4);color:#ffcc44;font-weight:900">🎯 STRUCTURE PROTOCOL</div>
-  <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALCULATEUR</div>
-  <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API LIVE</div>
-  <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 NOUS REJOINDRE</div>
+<div id="navwrap">
+  <div id="nav-arrow-l" onclick="document.getElementById('navtabs').scrollBy({left:-160,behavior:'smooth'})">◀</div>
+  <div id="navtabs">
+    <div class="ntab" onclick="nav('screener')" id="nt-screener">🔍 SCREENER</div>
+    <div class="ntab" onclick="nav('charts')" id="nt-charts">📉 CHARTS</div>
+    <div class="ntab" onclick="nav('setups')" id="nt-setups" style="color:var(--gold)">🎯 SETUPS PTL</div>
+    <div class="ntab" onclick="nav('ptl')" id="nt-ptl">⚡ STRATS</div>
+    <div class="nav-sep"></div>
+    <div class="ntab" onclick="nav('cot')" id="nt-cot">📊 COT</div>
+    <div class="ntab" onclick="nav('dmx')" id="nt-dmx">👥 DMX</div>
+    <div class="ntab" onclick="nav('smart')" id="nt-smart">🏦 SMART $</div>
+    <div class="ntab" onclick="nav('saison')" id="nt-saison">📅 SAISON</div>
+    <div class="nav-sep"></div>
+    <div class="ntab" onclick="nav('fx')" id="nt-fx">💱 FOREX</div>
+    <div class="ntab" onclick="nav('indices')" id="nt-indices">💪 DEVISES</div>
+    <div class="ntab" onclick="nav('actions')" id="nt-actions">📈 ACTIONS</div>
+    <div class="ntab" onclick="nav('rendement')" id="nt-rendement" style="color:var(--green)">💰 REND.</div>
+    <div class="ntab" onclick="nav('crypto')" id="nt-crypto">🪙 CRYPTO</div>
+    <div class="nav-sep"></div>
+    <div class="ntab" onclick="nav('macro')" id="nt-macro">📆 MACRO</div>
+    <div class="ntab" onclick="nav('mva')" id="nt-mva" style="background:linear-gradient(135deg,rgba(0,200,120,.14),rgba(68,136,255,.08));border:1px solid rgba(0,200,120,.35);color:#00c878;font-weight:900">🧠 MVA</div>
+    <div class="ntab" onclick="nav('heatmap')" id="nt-heatmap">🌡️ HEAT</div>
+    <div class="ntab" onclick="nav('sessions')" id="nt-sessions">🕐 SESSIONS</div>
+    <div class="ntab" onclick="nav('backtest')" id="nt-backtest">🔬 BACKTEST</div>
+    <div class="ntab" onclick="nav('ia')" id="nt-ia" style="background:linear-gradient(135deg,rgba(68,136,255,.18),rgba(68,136,255,.08));border:1px solid rgba(68,136,255,.35);color:#8af">🤖 IA</div>
+    <div class="ntab" onclick="nav('news')" id="nt-news">📰 NEWS</div>
+    <div class="ntab" onclick="nav('squawk')" id="nt-squawk">🔊 SQUAWK</div>
+    <div class="nav-sep"></div>
+    <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 SETUP</div>
+    <div class="ntab" onclick="nav('ds')" id="nt-ds" style="background:linear-gradient(135deg,rgba(255,180,0,.18),rgba(255,100,0,.1));border:1px solid rgba(255,180,0,.4);color:#ffcc44;font-weight:900">🎯 PROTOCOL</div>
+    <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALC</div>
+    <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API</div>
+    <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 JOIN</div>
+  </div>
+  <div id="nav-arrow-r" onclick="document.getElementById('navtabs').scrollBy({left:160,behavior:'smooth'})">▶</div>
+</div>
 
 <!-- WATCHLIST PANEL -->
 <div id="watchlist-panel">
