@@ -11015,33 +11015,49 @@ function setupBuildContext(){
   // FX Data
   try{
     ctx += '\n[FOREX — Prix & Signaux]\n';
-    FX_DATA.slice(0,12).forEach(function(d){
-      ctx += d.p+': '+d.b+' ('+( d.ch>=0?'+':'')+d.ch.toFixed(2)+'%) Signal:'+d.sig+' COT:'+d.cot+' DMX:'+d.dmx+'%\n';
+    var fxArr = window.FX || [];
+    fxArr.slice(0,12).forEach(function(d){
+      ctx += d.p+': '+d.b+' ('+(d.ch>=0?'+':'')+d.ch.toFixed(2)+'%) Signal:'+d.sig+' COT:'+d.cot+'('+d.cotP+'%) DMX:'+d.dmx+'%\n';
     });
   }catch(e){}
   // Devise strength
   try{
     ctx += '\n[FORCE DES DEVISES]\n';
-    var devises = ['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD'];
-    devises.forEach(function(d){
-      if(window.FX_STRENGTH && FX_STRENGTH[d] !== undefined) ctx += d+':'+FX_STRENGTH[d].toFixed(1)+'% ';
-    });
+    var strArr = window.SETUPS_FX_STRENGTH || [];
+    if(strArr.length){
+      strArr.forEach(function(s){ ctx += s.currency+':'+s.score.toFixed(0)+'% '; });
+    } else {
+      ctx += 'Non chargé (ouvre l\'onglet SETUPS PTL pour rafraîchir)\n';
+    }
     ctx += '\n';
   }catch(e){}
   // COT
   try{
     ctx += '\n[COT — Positionnement institutionnel]\n';
-    if(window.COT_DATA && COT_DATA.length){
+    // Priorité : données live SETUPS_COT_DATA
+    var cotSrc = window.SETUPS_COT_DATA;
+    if(cotSrc && Object.keys(cotSrc).length){
+      Object.keys(cotSrc).slice(0,8).forEach(function(k){
+        var c=cotSrc[k];
+        ctx += k+': '+(c.cotD||'?')+' (Long='+c.bullPct+'%)\n';
+      });
+    } else if(window.COT_DATA && COT_DATA.length){
+      // Fallback données statiques
       COT_DATA.slice(0,8).forEach(function(c){
-        ctx += c.pair+': Nets commerciaux='+c.net+' ('+c.bias+')\n';
+        var bias = c.l >= 55 ? 'Long' : c.sh >= 55 ? 'Short' : 'Neutre';
+        ctx += c.s+': '+bias+' (Long='+c.l+'% / Short='+c.sh+'% / Net='+c.net+')\n';
       });
     }
   }catch(e){}
   // DMX
   try{
     ctx += '\n[DMX — Flux retail]\n';
-    FX_DATA.slice(0,8).forEach(function(d){
-      if(d.dmx !== undefined) ctx += d.p+': DMX='+d.dmx+'% (>70% = foule Short, <30% = foule Long)\n';
+    var fxArr2 = window.FX || [];
+    fxArr2.slice(0,8).forEach(function(d){
+      if(d.dmx !== undefined){
+        var interp = d.dmx>=75?'Retail suracheté → institutionnels probablement SHORT':d.dmx<=30?'Retail survendu → institutionnels probablement LONG':'Neutre';
+        ctx += d.p+': '+d.dmx+'% Long — '+interp+'\n';
+      }
     });
   }catch(e){}
   // Macro events today
@@ -11394,6 +11410,8 @@ function dsAnalyze(){
     }catch(ex){}
   }
   if(notes) userText += '\nObservations du trader : ' + notes + '\n';
+  // Ajouter le contexte institutionnel du terminal
+  try { userText += '\n\n' + setupBuildContext(); } catch(ex){}
   userText += '\nValide chaque règle de la checklist (18 points) et donne un verdict final ADMISSIBLE / INVALIDE / À SURVEILLER / DONNÉES INSUFFISANTES.';
 
   DS_ANALYZING = true;
