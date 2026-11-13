@@ -1578,12 +1578,12 @@ body{padding-top:22px;}
           </select>
         </div>
         <div>
-          <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">STRATÉGIE</label>
-          <select id="setup-strat" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:7px 10px">
-            <option value="">PTL · Non précisé</option>
-            <option value="ICHIMOKU">Ichimoku Multi-TF</option>
-            <option value="STRUCTURE">Structure Protocol</option>
-            <option value="SWING">Swing Action Market</option>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">STRATÉGIE PTL</label>
+          <select id="setup-strat" onchange="setupUpdateChecklist()" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:7px 10px">
+            <option value="">— Choisir —</option>
+            <option value="STRUCTURE">🔴 Structure Protocol</option>
+            <option value="MULTI">🔵 Multi-Timeframes</option>
+            <option value="SWING">🟡 Swing Action Trading</option>
           </select>
         </div>
       </div>
@@ -1594,15 +1594,19 @@ body{padding-top:22px;}
         <textarea id="setup-notes" placeholder="Ce que tu vois : structure, tendance, zones clés, hésitations..." rows="3" style="width:100%;box-sizing:border-box;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:9px 10px;resize:vertical;line-height:1.6"></textarea>
       </div>
 
-      <!-- Checklist PTL (pré-analyse) -->
-      <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;margin-bottom:14px">
-        <div style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:.1em;margin-bottom:10px">📋 5 CRITÈRES PTL À CROISER</div>
+      <!-- Checklist PTL dynamique -->
+      <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;margin-bottom:14px" id="setup-checklist-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:.1em">📋 CHECKLIST PTL</div>
+          <div id="setup-strat-badge" style="font-size:7.5px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--dim)">— Sélectionner une stratégie —</div>
+        </div>
         <div style="display:flex;flex-direction:column;gap:5px" id="setup-checklist-preview">
-          <div class="setup-crit" id="crit-cot"><span class="crit-icon">◯</span> <span class="crit-name">COT</span> <span class="crit-val">—</span></div>
-          <div class="setup-crit" id="crit-dmx"><span class="crit-icon">◯</span> <span class="crit-name">DMX / Force devises</span> <span class="crit-val">—</span></div>
-          <div class="setup-crit" id="crit-struct"><span class="crit-icon">◯</span> <span class="crit-name">Structure graphique</span> <span class="crit-val">—</span></div>
-          <div class="setup-crit" id="crit-macro"><span class="crit-icon">◯</span> <span class="crit-name">Macro / Calendrier</span> <span class="crit-val">—</span></div>
-          <div class="setup-crit" id="crit-saison"><span class="crit-icon">◯</span> <span class="crit-name">Saisonnalité</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-1"><span class="crit-icon">◯</span> <span class="crit-name">Structure identifiée</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-2"><span class="crit-icon">◯</span> <span class="crit-name">Zone de cassure</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-3"><span class="crit-icon">◯</span> <span class="crit-name">MA100 alignée</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-4"><span class="crit-icon">◯</span> <span class="crit-name">COT / Institutionnels</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-5"><span class="crit-icon">◯</span> <span class="crit-name">Macro / Annonces</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-6"><span class="crit-icon">◯</span> <span class="crit-name">RR ≥ 2.5</span> <span class="crit-val">—</span></div>
         </div>
       </div>
 
@@ -11098,6 +11102,119 @@ function setupBuildContext(){
   return ctx;
 }
 
+// === CHECKLISTS PAR STRATÉGIE PTL ===
+var PTL_CHECKLISTS = {
+  STRUCTURE: {
+    label: '🔴 Structure Protocol',
+    color: '#ff4466',
+    items: [
+      { id:'crit-1', name:'2 structures identifiées (H8+M30)' },
+      { id:'crit-2', name:'Zone de cassure claire' },
+      { id:'crit-3', name:'MA100 plate ou dans le sens' },
+      { id:'crit-4', name:'Pas d\'annonce macro dans 24h' },
+      { id:'crit-5', name:'Zone de danger évitée' },
+      { id:'crit-6', name:'RR ≥ 2.5 possible' }
+    ],
+    rules: 'STRATÉGIE : Structure Protocol (Forex/Matières premières)\n'
+      + 'RÈGLES OBLIGATOIRES :\n'
+      + '1. 2 structures graphiques identifiées (H8 macro + M30 micro)\n'
+      + '2. Zone de cassure avec confirmation de bougie\n'
+      + '3. MA100 plate ou alignée dans le sens du trade\n'
+      + '4. Aucune annonce macroéconomique majeure dans les 24h\n'
+      + '5. Zone de danger évitée (zone d\'approvisionnement/demande forte)\n'
+      + '6. RR minimum 2.5:1\n'
+      + 'VÉRIFIER ces 6 critères dans ton analyse checklist.',
+    rrMin: '2.5:1'
+  },
+  MULTI: {
+    label: '🔵 Multi-Timeframes',
+    color: '#4488ff',
+    items: [
+      { id:'crit-1', name:'Trendline long terme (≥2 touches Daily)' },
+      { id:'crit-2', name:'Rejet clair H4/H1' },
+      { id:'crit-3', name:'Cassure neckline confirmée' },
+      { id:'crit-4', name:'Clôture bougie franche (pas doji)' },
+      { id:'crit-5', name:'MA100 alignée' },
+      { id:'crit-6', name:'RR ≥ 2.5 possible' }
+    ],
+    rules: 'STRATÉGIE : Multi-Timeframes (Forex/Matières premières)\n'
+      + 'RÈGLES OBLIGATOIRES :\n'
+      + '1. Trendline long terme sur Daily/Weekly avec minimum 2 touches\n'
+      + '2. Rejet clair visible sur H4 ou H1\n'
+      + '3. Cassure de neckline confirmée\n'
+      + '4. Clôture de bougie franche (exclure doji et bougies d\'hésitation)\n'
+      + '5. MA100 alignée dans le sens du trade\n'
+      + '6. RR minimum 2.5:1\n'
+      + 'VÉRIFIER ces 6 critères dans ton analyse checklist.',
+    rrMin: '2.5:1'
+  },
+  SWING: {
+    label: '🟡 Swing Action Trading',
+    color: '#ffcc00',
+    items: [
+      { id:'crit-1', name:'Figure haussière (triangle/drapeau/DB)' },
+      { id:'crit-2', name:'Cassure de la zone clé' },
+      { id:'crit-3', name:'Clôture H4/Daily (pas doji)' },
+      { id:'crit-4', name:'MA100 pas sur-étendue' },
+      { id:'crit-5', name:'Volume ou momentum confirmateur' },
+      { id:'crit-6', name:'RR ≥ 2:1 possible' }
+    ],
+    rules: 'STRATÉGIE : Swing Action Trading (Actions US/EU croissance)\n'
+      + 'RÈGLES OBLIGATOIRES :\n'
+      + '1. Figure chartiste haussière identifiée (triangle, drapeau, double bottom, etc.)\n'
+      + '2. Cassure de la zone clé de résistance\n'
+      + '3. Clôture de bougie H4 ou Daily franche (pas doji)\n'
+      + '4. MA100 pas sur-étendue (prix proche de la MA100)\n'
+      + '5. Volume ou momentum confirme le mouvement\n'
+      + '6. RR minimum 2:1\n'
+      + 'VÉRIFIER ces 6 critères dans ton analyse checklist.',
+    rrMin: '2:1'
+  }
+};
+
+function setupUpdateChecklist(){
+  var stratEl = document.getElementById('setup-strat');
+  var strat = stratEl ? stratEl.value : '';
+  var badge = document.getElementById('setup-strat-badge');
+  var preview = document.getElementById('setup-checklist-preview');
+  if(!preview) return;
+
+  var cfg = PTL_CHECKLISTS[strat];
+  if(!cfg){
+    if(badge) badge.textContent = '— Sélectionner une stratégie —';
+    // Reset générique
+    var defaults = [
+      'Structure identifiée','Zone de cassure','MA100 alignée',
+      'COT / Institutionnels','Macro / Annonces','RR ≥ 2.5'
+    ];
+    for(var i=1;i<=6;i++){
+      var el = document.getElementById('crit-'+i);
+      if(el){
+        el.className = 'setup-crit';
+        el.querySelector('.crit-icon').textContent = '◯';
+        el.querySelector('.crit-name').textContent = defaults[i-1];
+        el.querySelector('.crit-val').textContent = '—';
+      }
+    }
+    return;
+  }
+  if(badge){
+    badge.textContent = cfg.label;
+    badge.style.color = cfg.color;
+    badge.style.border = '1px solid '+cfg.color+'55';
+    badge.style.background = cfg.color+'11';
+  }
+  cfg.items.forEach(function(item, idx){
+    var el = document.getElementById('crit-'+(idx+1));
+    if(el){
+      el.className = 'setup-crit';
+      el.querySelector('.crit-icon').textContent = '◯';
+      el.querySelector('.crit-name').textContent = item.name;
+      el.querySelector('.crit-val').textContent = '—';
+    }
+  });
+}
+
 function setupAnalyze(){
   if(SETUP_ANALYZING) return;
   if(!SETUP_IMAGE_B64){
@@ -11135,24 +11252,30 @@ function setupAnalyze(){
   document.getElementById('setup-result-content').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:32px;animation:mmPulse 1s infinite">🔍</div><div style="margin-top:14px;font-size:10px;color:var(--dim)">Analyse du setup en cours...<br>Croisement avec COT · DMX · Macro · Force devises</div></div>';
 
   var terminalCtx = setupBuildContext();
+  var stratCfg = PTL_CHECKLISTS[strat];
+  var stratRules = stratCfg ? '\n\n--- RÈGLES DE LA STRATÉGIE ---\n' + stratCfg.rules + '\n---\n' : '';
+  var rrMin = stratCfg ? stratCfg.rrMin : '2:1';
 
-  var systemPrompt = 'Tu es Mansa IA, analyste institutionnel du Mansa Terminal. Tu valides les setups PRÉ-TRADE des traders PTL.\n\n'
+  var systemPrompt = 'Tu es Mansa IA, analyste institutionnel du Mansa Terminal. Tu valides les setups PRÉ-TRADE des traders PTL.'
+    + stratRules + '\n\n'
     + 'RÉPONDS EXACTEMENT dans ce format, avec ces titres exacts :\n\n'
     + '1. VERDICT : ✅ GO / ⚠️ WAIT / ❌ NO — [raison principale en 8 mots max]\n'
     + '2. SCORE DE CONFLUENCE : X/10\n'
     + '3. CE QUE TU VOIS SUR LE GRAPHIQUE :\n'
     + '- [point 1]\n- [point 2]\n- [point 3]\n\n'
-    + '4. ALIGNEMENT INSTITUTIONNEL :\n'
+    + '4. CHECKLIST STRATÉGIE :\n'
+    + (stratCfg ? stratCfg.items.map(function(it){ return '- '+it.name+' : [✅ OUI / ⚠️ PARTIEL / ❌ NON]'; }).join('\n') : '- Structure : [✅/⚠️/❌]\n- Zone : [✅/⚠️/❌]\n- MA100 : [✅/⚠️/❌]\n- COT : [✅/⚠️/❌]\n- Macro : [✅/⚠️/❌]\n- RR : [✅/⚠️/❌]') + '\n\n'
+    + '5. ALIGNEMENT INSTITUTIONNEL :\n'
     + '- COT : [aligné/contredit/neutre — 1 phrase]\n'
     + '- DMX / Force devises : [aligné/faible — 1 phrase]\n'
     + '- Macro : [favorable/risque événement — 1 phrase]\n\n'
-    + '5. RISQUES À SURVEILLER :\n'
+    + '6. RISQUES À SURVEILLER :\n'
     + '- [risque 1]\n- [risque 2]\n\n'
-    + '6. GESTION DU RISQUE :\n'
+    + '7. GESTION DU RISQUE :\n'
     + '- SL suggéré : [niveau ou description]\n'
-    + '- RR minimum : [ratio]\n'
-    + '- Taille position : [conseil]\n\n'
-    + 'Sois direct, sans blabla. Max 400 mots total.\n\n'
+    + '- RR minimum : '+rrMin+'\n'
+    + '- Taille position : 1% max du capital\n\n'
+    + 'Sois direct, sans blabla. Max 450 mots total.\n\n'
     + terminalCtx;
 
   var userContent = [
@@ -11246,8 +11369,9 @@ function setupShowResult(text, err){
 
   // Sections clés
   var sectionGraphique    = parseSection('CE QUE TU VOIS|GRAPHIQUE|ANALYSE TECHNIQUE', text);
+  var sectionChecklist    = parseSection('CHECKLIST|CRIT[EÈ]RE', text);
   var sectionInstitution  = parseSection('ALIGNEMENT|INSTITUTIONNEL|COT|DMX', text);
-  var sectionRisques      = parseSection('RISQUE|SURVEILLER|RISQUES', text);
+  var sectionRisques      = parseSection('RISQUE[S]? [ÀA] SURVEILLER|RISQUES', text);
   var sectionGestion      = parseSection('GESTION|CONSEIL|MONEY MANAGEMENT|SL', text);
 
   // Mettre à jour la checklist gauche
@@ -11260,18 +11384,34 @@ function setupShowResult(text, err){
     if(iconEl) iconEl.innerHTML = state==='ok'?'✅':state==='ko'?'❌':'⚠️';
     if(valEl)  valEl.textContent = valText;
   }
-  // Lire les alignements dans le texte
-  var cotOk   = /COT.*confirm|COT.*align|confirm.*COT/i.test(text);
-  var cotKo   = /COT.*contred|contred.*COT|COT.*oppos/i.test(text);
-  var dmxOk   = /DMX.*confirm|force.*align|DMX.*align/i.test(text);
-  var dmxKo   = /DMX.*faible|force.*faible|DMX.*contred/i.test(text);
-  var macOk   = /macro.*fav|calendrier.*clair|pas.*event/i.test(text);
-  var macKo   = /risque.*macro|event.*important|NFP|CPI.*risque/i.test(text);
-  updateCrit('crit-cot',    cotKo?'ko':cotOk?'ok':'warn', cotKo?'Contredit':'Confirmé');
-  updateCrit('crit-dmx',    dmxKo?'ko':dmxOk?'ok':'warn', dmxKo?'Faible':'Aligné');
-  updateCrit('crit-struct', isGo?'ok':isNo?'ko':'warn',   isGo?'Validée':isNo?'Invalide':'À vérifier');
-  updateCrit('crit-macro',  macKo?'warn':'ok',             macKo?'Événement':'Clear');
-  updateCrit('crit-saison', 'warn', 'Vérifié');
+
+  // Parser la checklist stratégie dans la réponse IA (section 4 : CHECKLIST STRATÉGIE)
+  var checklistSection = parseSection('CHECKLIST|CRIT[EÈ]RE', text);
+  var stratCfgNow = PTL_CHECKLISTS[strat];
+  if(checklistSection && stratCfgNow){
+    var checkLines = checklistSection.split('\n').filter(function(l){ return l && l.trim(); });
+    checkLines.forEach(function(line, idx){
+      if(idx >= 6) return;
+      var isOk = /✅|OUI|confirm|align|valide/i.test(line);
+      var isKo = /❌|NON\b|invalide|absent|manqu|contred/i.test(line);
+      var state = isOk ? 'ok' : isKo ? 'ko' : 'warn';
+      var val   = isOk ? '✅ OK' : isKo ? '❌ NON' : '⚠️ Partiel';
+      updateCrit('crit-'+(idx+1), state, val);
+    });
+  } else {
+    // Fallback: heuristiques génériques sur les anciens critères
+    var cotOk = /COT.*confirm|COT.*align|confirm.*COT/i.test(text);
+    var cotKo = /COT.*contred|contred.*COT|COT.*oppos/i.test(text);
+    var dmxOk = /DMX.*confirm|force.*align|DMX.*align/i.test(text);
+    var dmxKo = /DMX.*faible|force.*faible|DMX.*contred/i.test(text);
+    var macKo = /risque.*macro|event.*important|NFP|CPI.*risque/i.test(text);
+    updateCrit('crit-1', cotKo?'ko':cotOk?'ok':'warn', cotKo?'Contredit':'Confirmé');
+    updateCrit('crit-2', dmxKo?'ko':dmxOk?'ok':'warn', dmxKo?'Faible':'Aligné');
+    updateCrit('crit-3', isGo?'ok':isNo?'ko':'warn',   isGo?'Validée':'À vérifier');
+    updateCrit('crit-4', macKo?'warn':'ok',             macKo?'Événement':'Clear');
+    updateCrit('crit-5', 'warn', 'Vérifié');
+    updateCrit('crit-6', isGo?'ok':isNo?'ko':'warn',   isGo?'Atteint':'À vérifier');
+  }
 
   // Construire HTML résultat
   function renderSection(icon, title, content){
@@ -11305,7 +11445,22 @@ function setupShowResult(text, err){
   html += '</div>';
 
   // ─── SECTIONS ───
-  html += renderSection('📊','CE QUI SE PASSE SUR LE GRAPHIQUE', sectionGraphique);
+  html += renderSection('📊','GRAPHIQUE', sectionGraphique);
+  if(sectionChecklist){
+    // Checklist : rendu spécial avec couleurs
+    var chkLines = sectionChecklist.split('\n').filter(function(l){ return l && l.trim(); });
+    var chkHtml = chkLines.map(function(l){
+      l = (l||'').replace(/^[-•·*]\s*/,'').trim();
+      if(!l) return '';
+      var color = /✅|OUI|confirm/i.test(l) ? '#00c878' : /❌|NON\b/i.test(l) ? '#ff5555' : '#ffcc44';
+      var icon  = /✅|OUI/i.test(l) ? '✅' : /❌|NON\b/i.test(l) ? '❌' : '⚠️';
+      return '<div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:5px;color:'+color+'"><span style="flex-shrink:0">'+icon+'</span><span style="color:var(--text)">'+l+'</span></div>';
+    }).join('');
+    html += '<div style="margin-bottom:14px">'
+      + '<div style="font-size:9px;color:var(--gold2);font-weight:700;letter-spacing:.08em;margin-bottom:7px">📋 CHECKLIST STRATÉGIE</div>'
+      + '<div style="font-size:9.5px;line-height:1.75;padding:10px 12px;background:rgba(255,255,255,.025);border-radius:8px;border-left:2px solid rgba(200,160,60,.3)">'+chkHtml+'</div>'
+      + '</div>';
+  }
   html += renderSection('🏦','ALIGNEMENT INSTITUTIONNEL', sectionInstitution);
   html += renderSection('⚠️','RISQUES À SURVEILLER', sectionRisques);
   html += renderSection('🛡️','GESTION DU RISQUE', sectionGestion);
