@@ -11118,11 +11118,16 @@ function setupAnalyze(){
   if(btn){ btn.textContent = '⏳ Analyse en cours...'; btn.disabled = true; }
   document.getElementById('setup-ia-status').textContent = '🔵 Analyse...';
 
-  var pair   = document.getElementById('setup-pair').value;
-  var tf     = document.getElementById('setup-tf').value;
-  var dir    = document.getElementById('setup-dir').value;
-  var strat  = document.getElementById('setup-strat').value;
-  var notes  = document.getElementById('setup-notes').value.trim();
+  var pairEl  = document.getElementById('setup-pair');
+  var tfEl    = document.getElementById('setup-tf');
+  var dirEl   = document.getElementById('setup-dir');
+  var stratEl = document.getElementById('setup-strat');
+  var notesEl = document.getElementById('setup-notes');
+  var pair  = pairEl  ? pairEl.value  : '';
+  var tf    = tfEl    ? tfEl.value    : 'H1';
+  var dir   = dirEl   ? dirEl.value   : '';
+  var strat = stratEl ? stratEl.value : '';
+  var notes = notesEl ? (notesEl.value || '').trim() : '';
 
   // Afficher placeholder "analyse en cours"
   document.getElementById('setup-result-placeholder').style.display = 'none';
@@ -11231,10 +11236,12 @@ function setupShowResult(text, err){
   var tf   = document.getElementById('setup-tf').value || '—';
 
   // Parser le texte en sections
-  function parseSection(label, text){
-    var regex = new RegExp(label+'[^\\n]*\\n([\\s\\S]*?)(?=\\n[\\dA-Z✅❌⚠️🔍]{1}[\\s\\S]{0,40}:\\s|$)', 'i');
-    var m = text.match(regex);
-    return m ? m[1].trim() : null;
+  function parseSection(label, txt){
+    try {
+      var regex = new RegExp(label+'[^\\n]*\\n([\\s\\S]*?)(?=\\n[\\dA-Z✅❌⚠️🔍]{1}[\\s\\S]{0,40}:\\s|$)', 'i');
+      var m = txt.match(regex);
+      return (m && m[1]) ? m[1].trim() : null;
+    } catch(e){ return null; }
   }
 
   // Sections clés
@@ -11268,11 +11275,12 @@ function setupShowResult(text, err){
 
   // Construire HTML résultat
   function renderSection(icon, title, content){
-    if(!content) return '';
+    if(!content || typeof content !== 'string') return '';
     // Convertir lignes en bullets propres
-    var lines = content.split('\n').filter(function(l){ return l.trim(); });
+    var lines = content.split('\n').filter(function(l){ return l && l.trim && l.trim(); });
     var inner = lines.map(function(l){
-      l = l.replace(/^[-•·*]\s*/, '').trim();
+      l = (l || '').replace(/^[-•·*]\s*/, '').trim();
+      if(!l) return '';
       return '<div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:5px"><span style="color:var(--gold);flex-shrink:0;margin-top:2px">›</span><span>'+l+'</span></div>';
     }).join('');
     return '<div style="margin-bottom:14px">'
