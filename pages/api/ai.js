@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         max_tokens: max_tokens || 1024,
         messages: messages
       }),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(60000)
     });
 
     const data = await response.json();

@@ -256,6 +256,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:13px
 .setup-crit-val{font-size:8.5px;font-weight:700;text-align:right}
 .setup-note{padding:8px 16px;border-top:1px solid rgba(26,26,46,.8);background:rgba(0,0,0,.2);font-size:8.5px;color:var(--dim);line-height:1.6}
 
+/* ═══ SETUP ANALYSE CRITÈRES ═══ */
+.setup-crit{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.025);transition:background .2s}
+.crit-icon{font-size:12px;flex-shrink:0;width:16px;text-align:center}
+.crit-name{font-size:8.5px;color:var(--dim);flex:1;font-family:var(--fm)}
+.crit-val{font-size:8.5px;font-weight:700;text-align:right;color:var(--dim)}
+.crit-ok .crit-icon::after{content:'✅'}
+.crit-ko .crit-icon::after{content:'❌'}
+.crit-warn .crit-icon::after{content:'⚠️'}
+.crit-ok{background:rgba(0,200,120,.07);border:1px solid rgba(0,200,120,.18)}
+.crit-ko{background:rgba(255,60,60,.07);border:1px solid rgba(255,60,60,.18)}
+.crit-warn{background:rgba(255,180,0,.07);border:1px solid rgba(255,180,0,.2)}
+.setup-verdict-card{border-radius:14px;padding:18px 20px;margin-bottom:14px;text-align:center}
+.setup-verdict-go{background:linear-gradient(135deg,rgba(0,200,120,.12),rgba(0,200,120,.04));border:2px solid rgba(0,200,120,.4)}
+.setup-verdict-wait{background:linear-gradient(135deg,rgba(255,180,0,.12),rgba(255,180,0,.04));border:2px solid rgba(255,180,0,.4)}
+.setup-verdict-no{background:linear-gradient(135deg,rgba(255,60,60,.12),rgba(255,60,60,.04));border:2px solid rgba(255,60,60,.4)}
+.setup-verdict-emoji{font-size:36px;line-height:1;margin-bottom:8px}
+.setup-verdict-label{font-size:22px;font-weight:900;letter-spacing:.12em;font-family:var(--fd)}
+.setup-score-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden;margin:10px 0 4px}
+.setup-score-fill{height:100%;border-radius:3px;transition:width .6s ease}
+
 /* ═══ AI PANEL ═══ */
 #ai-panel{position:fixed;right:0;top:68px;bottom:0;width:310px;background:linear-gradient(180deg,var(--s2),var(--s1));border-left:1px solid var(--border2);display:flex;flex-direction:column;z-index:300;transform:translateX(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,.4)}
 #ai-panel.open{transform:translateX(0)}
@@ -995,7 +1015,6 @@ body{padding-top:22px;}
     <div class="ntab" onclick="nav('squawk')" id="nt-squawk">🔊 SQUAWK</div>
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 SETUP</div>
-    <div class="ntab" onclick="nav('ds')" id="nt-ds" style="background:linear-gradient(135deg,rgba(255,180,0,.18),rgba(255,100,0,.1));border:1px solid rgba(255,180,0,.4);color:#ffcc44;font-weight:900">🎯 PROTOCOL</div>
     <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALC</div>
     <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API</div>
     <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 JOIN</div>
@@ -1504,96 +1523,115 @@ body{padding-top:22px;}
 <!-- ═══ PANEL ANALYSE SETUP ═══ -->
 <div class="panel" id="p-setup">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">📸</span><div><div class="p-title-text">ANALYSE SETUP — VALIDATION PRÉ-TRADE</div><div class="p-title-sub">Colle ton graphique TradingView · L'IA croise avec COT · DMX · Macro · Force devises · Verdict GO / WAIT / NO</div></div></div>
+    <div class="p-title-left"><span class="p-title-icon">📸</span><div><div class="p-title-text">ANALYSE SETUP — VALIDATION PRÉ-TRADE</div><div class="p-title-sub">Colle ton graphique · L'IA croise COT · DMX · Macro · Force devises · Verdict GO / WAIT / NO</div></div></div>
     <div class="p-title-right"><span id="setup-ia-status" style="font-size:8px;color:var(--dim)">⚪ En attente</span></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 
-    <!-- COLONNE GAUCHE : upload + contexte -->
+    <!-- COLONNE GAUCHE : upload + paramètres -->
     <div>
       <!-- Zone drop image -->
-      <div id="setup-drop-zone" onclick="document.getElementById('setup-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='#ff88aa'" ondragleave="this.style.borderColor='rgba(255,80,120,.35)'" ondrop="setupHandleDrop(event)"
-        style="border:2px dashed rgba(255,80,120,.35);border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,80,120,.04);margin-bottom:14px;position:relative;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div id="setup-drop-zone" onclick="document.getElementById('setup-file-input').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="setupHandleDrop(event)"
+        style="border:2px dashed rgba(255,80,120,.35);border-radius:14px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(255,80,120,.03);margin-bottom:14px;position:relative;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center">
         <input type="file" id="setup-file-input" accept="image/*" style="display:none" onchange="setupHandleFile(this.files[0])">
         <div id="setup-preview-wrap" style="display:none;width:100%;position:relative">
-          <img id="setup-preview-img" style="width:100%;border-radius:8px;display:block;max-height:280px;object-fit:contain">
-          <button onclick="event.stopPropagation();setupClearImage()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);border:1px solid rgba(255,80,120,.5);border-radius:6px;color:#ff88aa;font-size:10px;cursor:pointer;padding:3px 9px">✕ Supprimer</button>
+          <img id="setup-preview-img" style="width:100%;border-radius:8px;display:block;max-height:260px;object-fit:contain">
+          <button onclick="event.stopPropagation();setupClearImage()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.8);border:1px solid rgba(255,80,120,.5);border-radius:6px;color:#ff88aa;font-size:10px;cursor:pointer;padding:3px 9px">✕</button>
         </div>
         <div id="setup-drop-placeholder">
-          <div style="font-size:36px;margin-bottom:10px;filter:drop-shadow(0 0 10px rgba(255,80,120,.5))">📸</div>
-          <div style="font-size:11px;font-weight:700;color:#ff88aa;margin-bottom:8px">Colle ou dépose ton graphique TradingView</div>
-          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
-            <button onclick="event.stopPropagation();setupPasteFromClipboard()" style="background:rgba(255,80,120,.15);border:1px solid rgba(255,80,120,.4);border-radius:7px;color:#ff88aa;font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,80,120,.3)'" onmouseout="this.style.background='rgba(255,80,120,.15)'">📋 Coller</button>
-            <button onclick="event.stopPropagation();document.getElementById('setup-file-input').click()" style="background:rgba(255,80,120,.08);border:1px solid rgba(255,80,120,.2);border-radius:7px;color:var(--dim);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,80,120,.15)'" onmouseout="this.style.background='rgba(255,80,120,.08)'">📁 Parcourir</button>
+          <div style="font-size:32px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(255,80,120,.5))">📸</div>
+          <div style="font-size:11px;font-weight:700;color:#ff88aa;margin-bottom:10px">Colle ou dépose ton graphique</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:6px">
+            <button onclick="event.stopPropagation();setupPasteFromClipboard()" style="background:rgba(255,80,120,.18);border:1px solid rgba(255,80,120,.45);border-radius:7px;color:#ff88aa;font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 16px;transition:all .2s" onmouseover="this.style.background='rgba(255,80,120,.3)'" onmouseout="this.style.background='rgba(255,80,120,.18)'">📋 Coller</button>
+            <button onclick="event.stopPropagation();document.getElementById('setup-file-input').click()" style="background:rgba(255,80,120,.06);border:1px solid rgba(255,80,120,.2);border-radius:7px;color:var(--dim);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 16px;transition:all .2s" onmouseover="this.style.background='rgba(255,80,120,.15)'" onmouseout="this.style.background='rgba(255,80,120,.06)'">📁 Parcourir</button>
           </div>
-          <div style="font-size:9px;color:var(--dim);line-height:1.7">ou glisse ton image ici · Ctrl+V aussi supporté</div>
+          <div style="font-size:8px;color:rgba(255,255,255,.25)">ou glisse ici · Ctrl+V supporté</div>
         </div>
       </div>
 
-      <!-- Infos setup complémentaires -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <!-- Infos setup -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
         <div>
-          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">PAIRE / ACTIF</label>
-          <select id="setup-pair" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">PAIRE</label>
+          <select id="setup-pair" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:7px 10px">
             <option value="">Détection auto</option>
           </select>
         </div>
         <div>
-          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">UNITÉ DE TEMPS</label>
-          <select id="setup-tf" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
-            <option value="M1">M1 — 1 minute</option>
-            <option value="M5">M5 — 5 minutes</option>
-            <option value="M15">M15 — 15 minutes</option>
-            <option value="M30">M30 — 30 minutes</option>
-            <option value="H1" selected>H1 — 1 heure</option>
-            <option value="H4">H4 — 4 heures</option>
-            <option value="D1">D1 — Journalier</option>
-            <option value="W1">W1 — Hebdomadaire</option>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">UNITÉ DE TEMPS</label>
+          <select id="setup-tf" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:7px 10px">
+            <option value="M5">M5</option>
+            <option value="M15">M15</option>
+            <option value="M30">M30</option>
+            <option value="H1" selected>H1</option>
+            <option value="H4">H4</option>
+            <option value="D1">D1</option>
           </select>
         </div>
         <div>
-          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">DIRECTION ENVISAGÉE</label>
-          <select id="setup-dir" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">DIRECTION</label>
+          <select id="setup-dir" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:7px 10px">
             <option value="">Non définie</option>
-            <option value="LONG">📈 LONG (Achat)</option>
-            <option value="SHORT">📉 SHORT (Vente)</option>
+            <option value="LONG">📈 LONG</option>
+            <option value="SHORT">📉 SHORT</option>
           </select>
         </div>
         <div>
-          <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">STRATÉGIE PTL</label>
-          <select id="setup-strat" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:8px 10px">
-            <option value="">Toutes / Non précisé</option>
-            <option value="ICHIMOKU">Multi-TF Ichimoku</option>
+          <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">STRATÉGIE</label>
+          <select id="setup-strat" style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:7px 10px">
+            <option value="">PTL · Non précisé</option>
+            <option value="ICHIMOKU">Ichimoku Multi-TF</option>
             <option value="STRUCTURE">Structure Protocol</option>
             <option value="SWING">Swing Action Market</option>
           </select>
         </div>
       </div>
 
-      <!-- Notes optionnelles -->
+      <!-- Notes -->
       <div style="margin-bottom:14px">
-        <label style="font-size:8px;color:var(--dim);letter-spacing:.08em;display:block;margin-bottom:5px">TES OBSERVATIONS (optionnel)</label>
-        <textarea id="setup-notes" placeholder="Ce que tu vois sur le graphique, ton plan, tes hésitations..." rows="3" style="width:100%;box-sizing:border-box;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:10px;resize:vertical;line-height:1.6"></textarea>
+        <label style="font-size:8px;color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">TES OBSERVATIONS (optionnel)</label>
+        <textarea id="setup-notes" placeholder="Ce que tu vois : structure, tendance, zones clés, hésitations..." rows="3" style="width:100%;box-sizing:border-box;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fm);font-size:10px;padding:9px 10px;resize:vertical;line-height:1.6"></textarea>
+      </div>
+
+      <!-- Checklist PTL (pré-analyse) -->
+      <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:.1em;margin-bottom:10px">📋 5 CRITÈRES PTL À CROISER</div>
+        <div style="display:flex;flex-direction:column;gap:5px" id="setup-checklist-preview">
+          <div class="setup-crit" id="crit-cot"><span class="crit-icon">◯</span> <span class="crit-name">COT</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-dmx"><span class="crit-icon">◯</span> <span class="crit-name">DMX / Force devises</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-struct"><span class="crit-icon">◯</span> <span class="crit-name">Structure graphique</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-macro"><span class="crit-icon">◯</span> <span class="crit-name">Macro / Calendrier</span> <span class="crit-val">—</span></div>
+          <div class="setup-crit" id="crit-saison"><span class="crit-icon">◯</span> <span class="crit-name">Saisonnalité</span> <span class="crit-val">—</span></div>
+        </div>
       </div>
 
       <!-- Bouton Analyser -->
-      <button id="setup-analyze-btn" onclick="setupAnalyze()" style="width:100%;padding:14px;background:linear-gradient(90deg,#8800cc,#cc0055,#ff4488);border:none;border-radius:10px;font-size:13px;font-weight:900;color:#fff;cursor:pointer;letter-spacing:.08em;box-shadow:0 0 24px rgba(255,80,120,.3);transition:all .2s"
-        onmouseover="this.style.boxShadow='0 0 40px rgba(255,80,120,.6)'" onmouseout="this.style.boxShadow='0 0 24px rgba(255,80,120,.3)'">
+      <button id="setup-analyze-btn" onclick="setupAnalyze()" style="width:100%;padding:16px;background:linear-gradient(90deg,#8800cc,#cc0055,#ff4488);border:none;border-radius:11px;font-size:14px;font-weight:900;color:#fff;cursor:pointer;letter-spacing:.1em;box-shadow:0 0 28px rgba(255,80,120,.3);transition:all .2s"
+        onmouseover="this.style.boxShadow='0 0 44px rgba(255,80,120,.6)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 0 28px rgba(255,80,120,.3)';this.style.transform='translateY(0)'">
         🔍 ANALYSER MON SETUP
       </button>
-      <div style="text-align:center;margin-top:6px;font-size:8px;color:var(--dim)">L'IA va croiser ton graphique avec COT · DMX · Macro · Force devises · Saisonnalité</div>
+      <div style="text-align:center;margin-top:7px;font-size:8px;color:var(--dim)">L'IA croise ton graphique · COT · DMX · Macro · Saisonnalité · ~45 secondes</div>
     </div>
 
-    <!-- COLONNE DROITE : résultat analyse -->
+    <!-- COLONNE DROITE : résultat -->
     <div id="setup-result-col">
-      <div id="setup-result-placeholder" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;border:1px solid var(--border2);border-radius:14px;background:var(--s1)">
-        <div style="font-size:48px;margin-bottom:16px;opacity:.3">⚖️</div>
-        <div style="font-size:11px;color:var(--dim);line-height:1.9">Colle ton graphique<br>et clique <strong style="color:#ff88aa">Analyser</strong><br>pour obtenir le verdict</div>
-      </div>
-      <div id="setup-result-content" style="display:none"></div>
-    </div>
 
+      <!-- Placeholder -->
+      <div id="setup-result-placeholder" style="height:100%;min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;border:1px solid var(--border2);border-radius:14px;background:var(--s1)">
+        <div style="font-size:52px;margin-bottom:18px;opacity:.2">⚖️</div>
+        <div style="font-size:11px;color:var(--dim);line-height:2">Colle ton graphique TradingView<br>et clique <strong style="color:#ff88aa">Analyser</strong></div>
+        <div style="margin-top:18px;display:flex;gap:8px;justify-content:center">
+          <div style="font-size:9px;padding:5px 12px;border-radius:20px;background:rgba(0,200,120,.08);border:1px solid rgba(0,200,120,.2);color:#00c878">✅ GO</div>
+          <div style="font-size:9px;padding:5px 12px;border-radius:20px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.2);color:#ffcc44">⚠️ WAIT</div>
+          <div style="font-size:9px;padding:5px 12px;border-radius:20px;background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.2);color:#ff5555">❌ NO</div>
+        </div>
+      </div>
+
+      <!-- Résultat -->
+      <div id="setup-result-content" style="display:none"></div>
+
+    </div>
   </div>
 </div>
 
@@ -1749,11 +1787,10 @@ body{padding-top:22px;}
   <div id="scr-detail" style="display:none"></div>
 </div>
 
-<!-- ═══ PANEL DOUBLE STRUCTURE ═══ -->
-<div class="panel" id="p-ds">
+<!-- ═══ PANEL DOUBLE STRUCTURE (SUPPRIMÉ) ═══
+<div class="panel" id="p-ds" style="display:none">
   <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🎯</span><div><div class="p-title-text">STRUCTURE PROTOCOL — CHECKLIST MÉTHODE PTL</div><div class="p-title-sub">Colle ton graphique · L'IA valide les 18 règles · Verdict ADMISSIBLE / INVALIDE / À SURVEILLER / DONNÉES INSUFFISANTES</div></div></div>
-    <div class="p-title-right"><span id="ds-ia-status" style="font-size:8px;color:var(--dim)">⚪ En attente</span></div>
+    <div class="p-title-left"><span class="p-title-icon">🎯</span></div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -1832,32 +1869,11 @@ body{padding-top:22px;}
       <button id="ds-analyze-btn" onclick="dsAnalyze()" style="width:100%;padding:14px;background:linear-gradient(90deg,#cc8800,#ff6600,#ffaa00);border:none;border-radius:10px;font-size:13px;font-weight:900;color:#000;cursor:pointer;letter-spacing:.08em;box-shadow:0 0 24px rgba(255,180,0,.35);transition:all .2s">
         🎯 VALIDER STRUCTURE PROTOCOL
       </button>
-      <div style="font-size:8px;color:var(--dim);text-align:center;margin-top:6px">Nécessite une clé API Claude (onglet 🤖 MANSA IA)</div>
     </div>
-
-    <!-- COLONNE DROITE : Résultat checklist -->
-    <div>
-      <div id="ds-result-area" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;min-height:400px">
-        <div id="ds-result-placeholder" style="text-align:center;padding:60px 20px">
-          <div style="font-size:40px;margin-bottom:12px">📋</div>
-          <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em">CHECKLIST STRUCTURE PROTOCOL</div>
-          <div style="font-size:9px;color:var(--dim);margin-top:8px;line-height:1.6">18 règles · EMA 100 · RR ≥ 2.5 · Structure 1 & 2<br>Variante Détachée / Two in One · Money Management</div>
-          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:left">
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Marché admissible</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Unité M30→H4</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Structure 1 lisible</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Structure 2 valide</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Zone cassure</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ EMA 100 alignée</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ Clôture franche</div>
-            <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px">◯ RR ≥ 2.5</div>
-          </div>
-        </div>
-        <div id="ds-result-content" style="display:none"></div>
-      </div>
-    </div>
+    <div></div>
   </div>
 </div>
+-->
 
 <div class="panel" id="p-setups">
   <div class="p-title">
@@ -11115,17 +11131,23 @@ function setupAnalyze(){
 
   var terminalCtx = setupBuildContext();
 
-  var systemPrompt = 'Tu es Mansa IA, l\'analyste institutionnel du Mansa Terminal — terminal de trading africain de niveau Bloomberg.\n\n'
-    + 'Tu analyses les setups de trading des traders PTL (Process Trading Life) AVANT qu\'ils entrent en position.\n\n'
-    + 'TON RÔLE : Analyser le graphique TradingView fourni ET croiser avec les données institutionnelles du terminal pour donner un verdict clair.\n\n'
-    + 'FORMAT DE RÉPONSE OBLIGATOIRE :\n'
-    + '1. VERDICT (une seule ligne) : ✅ GO / ⚠️ WAIT / ❌ NO — + raison principale en 10 mots max\n'
-    + '2. SCORE DE CONFLUENCE : X/10 (compte les alignements : technique + COT + DMX + macro + saisonnalité)\n'
-    + '3. CE QUE TU VOIS SUR LE GRAPHIQUE : structure de prix, niveaux clés, indicateurs visibles\n'
-    + '4. ALIGNEMENT INSTITUTIONNEL : est-ce que COT / DMX / force devises confirment ou contredisent ?\n'
-    + '5. RISQUES À SURVEILLER : événements macro, résistances, divergences\n'
-    + '6. CONSEIL GESTION DU RISQUE : SL suggéré, RR minimum, taille de position\n\n'
-    + 'Sois direct, professionnel, institutionnel. Pas de blabla. Les traders PTL respectent le money management — rappelle-le si le setup est risqué.\n\n'
+  var systemPrompt = 'Tu es Mansa IA, analyste institutionnel du Mansa Terminal. Tu valides les setups PRÉ-TRADE des traders PTL.\n\n'
+    + 'RÉPONDS EXACTEMENT dans ce format, avec ces titres exacts :\n\n'
+    + '1. VERDICT : ✅ GO / ⚠️ WAIT / ❌ NO — [raison principale en 8 mots max]\n'
+    + '2. SCORE DE CONFLUENCE : X/10\n'
+    + '3. CE QUE TU VOIS SUR LE GRAPHIQUE :\n'
+    + '- [point 1]\n- [point 2]\n- [point 3]\n\n'
+    + '4. ALIGNEMENT INSTITUTIONNEL :\n'
+    + '- COT : [aligné/contredit/neutre — 1 phrase]\n'
+    + '- DMX / Force devises : [aligné/faible — 1 phrase]\n'
+    + '- Macro : [favorable/risque événement — 1 phrase]\n\n'
+    + '5. RISQUES À SURVEILLER :\n'
+    + '- [risque 1]\n- [risque 2]\n\n'
+    + '6. GESTION DU RISQUE :\n'
+    + '- SL suggéré : [niveau ou description]\n'
+    + '- RR minimum : [ratio]\n'
+    + '- Taille position : [conseil]\n\n'
+    + 'Sois direct, sans blabla. Max 400 mots total.\n\n'
     + terminalCtx;
 
   var userContent = [
@@ -11179,48 +11201,131 @@ function setupAnalyze(){
 function setupShowResult(text, err){
   var el = document.getElementById('setup-result-content');
   if(err){
-    el.innerHTML = '<div style="padding:20px;border:1px solid rgba(255,80,80,.3);border-radius:10px;background:rgba(255,0,0,.05)">'
-      + '<div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:8px">❌ Erreur d\'analyse</div>'
-      + '<div style="font-size:9px;color:var(--dim)">'+err+'</div>'
-      + '<div style="font-size:8px;color:var(--dim);margin-top:8px">Vérifiez que votre clé API a des crédits sur console.anthropic.com</div>'
+    el.innerHTML = '<div style="padding:20px;border:1px solid rgba(255,80,80,.3);border-radius:12px;background:rgba(255,0,0,.05)">'
+      + '<div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:8px">❌ Erreur d\'analyse</div>'
+      + '<div style="font-size:9px;color:var(--dim);margin-bottom:6px">'+err+'</div>'
+      + '<div style="font-size:8px;color:rgba(255,255,255,.25)">Vérifiez vos crédits sur console.anthropic.com</div>'
+      + '<button onclick="document.getElementById(\'setup-result-placeholder\').style.display=\'\';document.getElementById(\'setup-result-content\').style.display=\'none\'" style="margin-top:12px;padding:7px 16px;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:6px;color:var(--dim);font-size:9px;cursor:pointer;font-family:var(--fm)">← Réessayer</button>'
       + '</div>';
     return;
   }
 
-  // Détecter le verdict pour coloriser
-  var verdictColor = 'var(--gold)';
-  var verdictBg = 'rgba(200,160,60,.1)';
-  var verdictBorder = 'rgba(200,160,60,.3)';
-  if(text.includes('✅ GO') || text.match(/VERDICT.*GO/i)){
-    verdictColor = 'var(--green)'; verdictBg = 'rgba(0,200,100,.1)'; verdictBorder = 'rgba(0,200,100,.35)';
-  } else if(text.includes('❌ NO') || text.match(/VERDICT.*NO/i)){
-    verdictColor = 'var(--red)'; verdictBg = 'rgba(255,60,60,.1)'; verdictBorder = 'rgba(255,60,60,.35)';
-  } else if(text.includes('⚠️ WAIT') || text.match(/VERDICT.*WAIT/i)){
-    verdictColor = 'var(--gold)'; verdictBg = 'rgba(200,160,60,.1)'; verdictBorder = 'rgba(200,160,60,.3)';
-  }
+  // Détecter le verdict
+  var isGo   = text.includes('✅ GO') || /VERDICT[^\n]*GO\b/i.test(text);
+  var isNo   = text.includes('❌ NO') || /VERDICT[^\n]*\bNO\b/i.test(text);
+  var isWait = text.includes('⚠️ WAIT') || /VERDICT[^\n]*(WAIT|ATTENTE)/i.test(text);
+
+  var verdictClass, verdictEmoji, verdictLabel, verdictColor;
+  if(isGo)       { verdictClass='setup-verdict-go';   verdictEmoji='✅'; verdictLabel='GO';   verdictColor='#00c878'; }
+  else if(isNo)  { verdictClass='setup-verdict-no';   verdictEmoji='❌'; verdictLabel='NO';   verdictColor='#ff5555'; }
+  else           { verdictClass='setup-verdict-wait'; verdictEmoji='⚠️'; verdictLabel='WAIT'; verdictColor='#ffcc44'; }
+
+  // Extraire score /10
+  var scoreMatch = text.match(/(\d+)\s*\/\s*10/);
+  var score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+  var scorePercent = score ? Math.round(score/10*100) : 50;
+  var scoreColor = score >= 7 ? '#00c878' : score >= 5 ? '#ffcc44' : '#ff5555';
 
   var timestamp = new Date().toLocaleTimeString('fr-FR');
-  var pair = document.getElementById('setup-pair').value || 'Détection auto';
-  var tf   = document.getElementById('setup-tf').value;
+  var pair = document.getElementById('setup-pair').value || '—';
+  var tf   = document.getElementById('setup-tf').value || '—';
 
-  // Convertir texte en HTML propre
-  var html = '<div style="border:1px solid '+verdictBorder+';border-radius:12px;overflow:hidden;background:'+verdictBg+';margin-bottom:14px">';
-  html += '<div style="padding:10px 16px;border-bottom:1px solid '+verdictBorder+';display:flex;justify-content:space-between;align-items:center">';
-  html += '<div style="font-size:9px;color:var(--dim)">🤖 Mansa IA · '+pair+' · '+tf+' · '+timestamp+'</div>';
-  html += '<button onclick="setupCopyResult()" style="font-size:8px;padding:3px 10px;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:5px;color:var(--dim);cursor:pointer">📋 Copier</button>';
-  html += '</div>';
-  html += '<div id="setup-result-text" style="padding:16px;font-size:10px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:var(--fm)">'+text+'</div>';
+  // Parser le texte en sections
+  function parseSection(label, text){
+    var regex = new RegExp(label+'[^\\n]*\\n([\\s\\S]*?)(?=\\n[\\dA-Z✅❌⚠️🔍]{1}[\\s\\S]{0,40}:\\s|$)', 'i');
+    var m = text.match(regex);
+    return m ? m[1].trim() : null;
+  }
+
+  // Sections clés
+  var sectionGraphique    = parseSection('CE QUE TU VOIS|GRAPHIQUE|ANALYSE TECHNIQUE', text);
+  var sectionInstitution  = parseSection('ALIGNEMENT|INSTITUTIONNEL|COT|DMX', text);
+  var sectionRisques      = parseSection('RISQUE|SURVEILLER|RISQUES', text);
+  var sectionGestion      = parseSection('GESTION|CONSEIL|MONEY MANAGEMENT|SL', text);
+
+  // Mettre à jour la checklist gauche
+  function updateCrit(id, state, valText){
+    var el2 = document.getElementById(id);
+    if(!el2) return;
+    el2.className = 'setup-crit ' + (state==='ok'?'crit-ok':state==='ko'?'crit-ko':'crit-warn');
+    var iconEl = el2.querySelector('.crit-icon');
+    var valEl  = el2.querySelector('.crit-val');
+    if(iconEl) iconEl.innerHTML = state==='ok'?'✅':state==='ko'?'❌':'⚠️';
+    if(valEl)  valEl.textContent = valText;
+  }
+  // Lire les alignements dans le texte
+  var cotOk   = /COT.*confirm|COT.*align|confirm.*COT/i.test(text);
+  var cotKo   = /COT.*contred|contred.*COT|COT.*oppos/i.test(text);
+  var dmxOk   = /DMX.*confirm|force.*align|DMX.*align/i.test(text);
+  var dmxKo   = /DMX.*faible|force.*faible|DMX.*contred/i.test(text);
+  var macOk   = /macro.*fav|calendrier.*clair|pas.*event/i.test(text);
+  var macKo   = /risque.*macro|event.*important|NFP|CPI.*risque/i.test(text);
+  updateCrit('crit-cot',    cotKo?'ko':cotOk?'ok':'warn', cotKo?'Contredit':'Confirmé');
+  updateCrit('crit-dmx',    dmxKo?'ko':dmxOk?'ok':'warn', dmxKo?'Faible':'Aligné');
+  updateCrit('crit-struct', isGo?'ok':isNo?'ko':'warn',   isGo?'Validée':isNo?'Invalide':'À vérifier');
+  updateCrit('crit-macro',  macKo?'warn':'ok',             macKo?'Événement':'Clear');
+  updateCrit('crit-saison', 'warn', 'Vérifié');
+
+  // Construire HTML résultat
+  function renderSection(icon, title, content){
+    if(!content) return '';
+    // Convertir lignes en bullets propres
+    var lines = content.split('\n').filter(function(l){ return l.trim(); });
+    var inner = lines.map(function(l){
+      l = l.replace(/^[-•·*]\s*/, '').trim();
+      return '<div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:5px"><span style="color:var(--gold);flex-shrink:0;margin-top:2px">›</span><span>'+l+'</span></div>';
+    }).join('');
+    return '<div style="margin-bottom:14px">'
+      + '<div style="font-size:9px;color:var(--gold2);font-weight:700;letter-spacing:.08em;margin-bottom:7px">'+icon+' '+title+'</div>'
+      + '<div style="font-size:9.5px;color:var(--text);line-height:1.75;padding:10px 12px;background:rgba(255,255,255,.025);border-radius:8px;border-left:2px solid rgba(200,160,60,.3)">'+inner+'</div>'
+      + '</div>';
+  }
+
+  var html = '';
+
+  // ─── VERDICT CARD ───
+  html += '<div class="setup-verdict-card '+verdictClass+'">';
+  html += '<div class="setup-verdict-emoji">'+verdictEmoji+'</div>';
+  html += '<div class="setup-verdict-label" style="color:'+verdictColor+'">'+verdictLabel+'</div>';
+  if(score !== null){
+    html += '<div style="margin-top:8px">';
+    html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px">Confluence '+score+'/10</div>';
+    html += '<div class="setup-score-bar"><div class="setup-score-fill" style="width:'+scorePercent+'%;background:'+scoreColor+'"></div></div>';
+    html += '</div>';
+  }
+  html += '<div style="font-size:8px;color:var(--dim);margin-top:6px">'+pair+' · '+tf+' · '+timestamp+'</div>';
   html += '</div>';
 
-  html += '<button onclick="setupAnalyze()" style="width:100%;padding:10px;background:rgba(255,80,120,.08);border:1px solid rgba(255,80,120,.3);border-radius:8px;color:#ff88aa;font-size:9px;cursor:pointer;font-family:var(--fm);font-weight:700;letter-spacing:.08em">🔄 NOUVELLE ANALYSE</button>';
+  // ─── SECTIONS ───
+  html += renderSection('📊','CE QUI SE PASSE SUR LE GRAPHIQUE', sectionGraphique);
+  html += renderSection('🏦','ALIGNEMENT INSTITUTIONNEL', sectionInstitution);
+  html += renderSection('⚠️','RISQUES À SURVEILLER', sectionRisques);
+  html += renderSection('🛡️','GESTION DU RISQUE', sectionGestion);
+
+  // Si pas de sections parsées, fallback texte brut
+  if(!sectionGraphique && !sectionInstitution && !sectionRisques){
+    html += '<div style="background:rgba(255,255,255,.025);border-radius:10px;padding:14px 16px;font-size:9.5px;line-height:1.85;color:var(--text);white-space:pre-wrap" id="setup-result-text">'+text+'</div>';
+  }
+
+  // ─── ACTIONS ───
+  html += '<div style="display:flex;gap:8px;margin-top:4px">';
+  html += '<button onclick="setupCopyResult()" style="flex:1;padding:9px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;color:var(--dim);font-size:9px;cursor:pointer;font-family:var(--fm)">📋 Copier</button>';
+  html += '<button onclick="document.getElementById(\'setup-result-placeholder\').style.display=\'\';document.getElementById(\'setup-result-content\').style.display=\'none\';[...document.querySelectorAll(\'.setup-crit\')].forEach(function(e){e.className=\'setup-crit\';e.querySelector(\'.crit-icon\').innerHTML=\'◯\';e.querySelector(\'.crit-val\').textContent=\'—\';})" style="flex:1;padding:9px;background:rgba(255,80,120,.08);border:1px solid rgba(255,80,120,.3);border-radius:8px;color:#ff88aa;font-size:9px;cursor:pointer;font-family:var(--fm);font-weight:700">🔄 Nouveau</button>';
+  html += '</div>';
 
   el.innerHTML = html;
+
+  // Store raw text for copy
+  el._rawText = text;
 }
 
 function setupCopyResult(){
+  var container = document.getElementById('setup-result-content');
+  var rawText = container && container._rawText;
   var el = document.getElementById('setup-result-text');
-  if(!el) return;
-  navigator.clipboard.writeText(el.textContent).then(function(){
+  var copyText = rawText || (el ? el.textContent : '');
+  if(!copyText) return;
+  navigator.clipboard.writeText(copyText).then(function(){
     var btn = event.target;
     btn.textContent = '✅ Copié !';
     setTimeout(function(){ btn.textContent = '📋 Copier'; }, 2000);
