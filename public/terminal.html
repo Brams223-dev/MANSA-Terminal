@@ -989,7 +989,6 @@ body{padding-top:22px;}
 <div id="navwrap">
   <div id="nav-arrow-l" onclick="document.getElementById('navtabs').scrollBy({left:-160,behavior:'smooth'})">◀</div>
   <div id="navtabs">
-    <div class="ntab" onclick="nav('screener')" id="nt-screener">🔍 SCREENER</div>
     <div class="ntab" onclick="nav('charts')" id="nt-charts">📉 CHARTS</div>
     <div class="ntab" onclick="nav('setups')" id="nt-setups" style="color:var(--gold)">🎯 SETUPS PTL</div>
     <div class="ntab" onclick="nav('ptl')" id="nt-ptl">⚡ STRATS</div>
@@ -1752,43 +1751,6 @@ body{padding-top:22px;}
     <span class="badge badge-live">LIVE</span>
   </div>
   <div id="squawk-list"></div>
-</div>
-
-<div class="panel" id="p-screener">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🔍</span><div><div class="p-title-text">SCREENER — WALL STREET GRADE</div><div class="p-title-sub">Williams %R · Score Buffett · Signal Combiné 30/70 · S&P 500</div></div></div>
-    <span class="badge badge-gold">S&amp;P 500</span>
-  </div>
-  <div style="font-size:10px;color:var(--dim);margin-bottom:12px;line-height:1.6">Score combiné = <strong style="color:var(--blue)">30% technique</strong> (Williams %R normalisé, oversold &lt; -80) + <strong style="color:var(--gold)">70% fondamental</strong> (10 critères Buffett). Tri par score global décroissant.</div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-    <div class="pills" id="scr-pills"></div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
-      <span style="font-size:9px;color:var(--dim)">Min. Buffett:</span>
-      <select id="scr-min-buf" onchange="renderScreener()" style="font-family:var(--fm);font-size:9px;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:3px 6px;border-radius:3px;cursor:pointer">
-        <option value="4">4+/10</option>
-        <option value="5" selected>5+/10</option>
-        <option value="6">6+/10</option>
-        <option value="7">7+/10</option>
-      </select>
-      <span style="font-size:9px;color:var(--dim)">Min. W%R:</span>
-      <select id="scr-min-wpr" onchange="renderScreener()" style="font-family:var(--fm);font-size:9px;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:3px 6px;border-radius:3px;cursor:pointer">
-        <option value="-100">-100</option>
-        <option value="-95" selected>-95</option>
-        <option value="-90">-90</option>
-        <option value="-80">-80</option>
-      </select>
-    </div>
-  </div>
-  <!-- TradingView Stock Screener complet -->
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-      {"width":"100%","height":560,"defaultColumn":"overview","defaultScreen":"top_gainers","market":"america","showToolbar":true,"colorTheme":"dark","locale":"fr","isTransparent":true}</script>
-    </div>
-  </div>
-  <div id="scr-table"></div>
-  <div id="scr-detail" style="display:none"></div>
 </div>
 
 <!-- ═══ PANEL DOUBLE STRUCTURE (SUPPRIMÉ) ═══
