@@ -1002,7 +1002,6 @@ body{padding-top:22px;}
     <div class="ntab" onclick="nav('indices')" id="nt-indices">💪 DEVISES</div>
     <div class="ntab" onclick="nav('actions')" id="nt-actions">📈 ACTIONS</div>
     <div class="ntab" onclick="nav('rendement')" id="nt-rendement" style="color:var(--green)">💰 REND.</div>
-    <div class="ntab" onclick="nav('crypto')" id="nt-crypto">🪙 CRYPTO</div>
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('macro')" id="nt-macro">📆 MACRO</div>
     <div class="ntab" onclick="nav('mva')" id="nt-mva" style="background:linear-gradient(135deg,rgba(0,200,120,.14),rgba(68,136,255,.08));border:1px solid rgba(0,200,120,.35);color:#00c878;font-weight:900">🧠 MVA</div>
@@ -1015,7 +1014,6 @@ body{padding-top:22px;}
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 SETUP</div>
     <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALC</div>
-    <div class="ntab" onclick="nav('api')" id="nt-api">🔌 API</div>
     <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 JOIN</div>
   </div>
   <div id="nav-arrow-r" onclick="document.getElementById('navtabs').scrollBy({left:160,behavior:'smooth'})">▶</div>
@@ -1204,30 +1202,6 @@ body{padding-top:22px;}
   </div>
   <div id="rend-stats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
   <div id="rend-content"></div>
-</div>
-
-<div class="panel" id="p-crypto">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🪙</span><div>
-      <div class="p-title-text">CRYPTO — MARCHÉS NUMÉRIQUES</div>
-      <div class="p-title-sub">Top 10 · Prix Live · Cap Market · Volume · Fear &amp; Greed · Corrélation Forex</div>
-    </div></div>
-    <div class="p-title-right" style="display:flex;align-items:center;gap:10px">
-      <span id="crypto-last-update" style="font-size:8px;color:var(--dim)">—</span>
-      <span class="badge badge-live">LIVE</span>
-    </div>
-  </div>
-  <div class="stat-row" id="crypto-stats"></div>
-  <div id="crypto-table"></div>
-  <!-- TradingView Crypto Market Widget -->
-  <div style="margin-top:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:.08em;padding:10px 12px 0">📊 CRYPTO MARKET SCREENER</div>
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-      {"width":"100%","height":400,"defaultColumn":"overview","screener_type":"crypto_mkt","displayCurrency":"USD","colorTheme":"dark","locale":"fr","isTransparent":true}</script>
-    </div>
-  </div>
 </div>
 
 <!-- Focus Forex & Actions US/EU - International -->
@@ -1855,42 +1829,6 @@ body{padding-top:22px;}
 </div>
 
 <!-- API LIVE PANEL -->
-<div class="panel" id="p-api">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🔌</span><div><div class="p-title-text">API LIVE — DONNÉES EN TEMPS RÉEL</div><div class="p-title-sub">CoinGecko · Twelve Data · NewsAPI · CFTC · ForexFactory · Sources directes</div></div></div>
-    <span class="badge badge-live">LIVE</span>
-  </div>
-  <!-- API Status Grid -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px" id="api-status-grid"></div>
-  <!-- API Config -->
-  <div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin-bottom:16px">
-    <div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:12px;letter-spacing:.07em">⚙️ CONFIGURATION DES CLÉS API</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="api-keys-form"></div>
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="hdr-btn" onclick="saveApiKeys()">💾 Sauvegarder les clés</button>
-      <button class="hdr-btn" onclick="testAllApis()">🧪 Tester toutes les API</button>
-      <button class="hdr-btn" onclick="fetchLiveNow()">⚡ Rafraîchir maintenant</button>
-      <button class="hdr-btn" onclick="toggleAutoRefresh()">⏱ Auto-refresh (30s)</button>
-    </div>
-  </div>
-  <!-- Live Data Preview -->
-  <div style="background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin-bottom:16px">
-    <div style="font-family:var(--fd);font-size:11px;color:var(--gold2);margin-bottom:10px;letter-spacing:.07em">📊 DONNÉES LIVE REÇUES</div>
-    <div id="api-live-output" style="font-size:9px;color:var(--dim);line-height:1.9;max-height:260px;overflow-y:auto"></div>
-  </div>
-  <!-- Info block -->
-  <div style="background:rgba(68,136,255,.05);border:1px solid rgba(68,136,255,.2);border-radius:8px;padding:14px 16px;font-size:9px;color:var(--dim);line-height:1.8">
-    <div style="color:var(--blue);font-weight:700;margin-bottom:8px;font-size:10px">ℹ️ POURQUOI PAS "PRIME MARKET TERMINAL" ?</div>
-    Prime Market Terminal est un terminal <strong style="color:var(--text)">fermé et propriétaire</strong> (sans API publique, ~€150/mois). Il utilise lui-même des sources comme TwelveData, CoinGecko, Bloomberg et Reuters en backend. Mansa Terminal se connecte <strong style="color:var(--green)">directement aux mêmes sources</strong>, sans intermédiaire :<br><br>
-    • <strong style="color:var(--gold)">CoinGecko</strong> — Prix crypto temps réel · <span style="color:var(--green)">GRATUIT sans clé</span><br>
-    • <strong style="color:var(--gold)">Twelve Data</strong> — Forex, Actions, Indices · <span style="color:var(--green)">800 req/jour gratuit</span><br>
-    • <strong style="color:var(--gold)">Alpha Vantage</strong> — Forex, Actions, Macro · <span style="color:var(--green)">500 req/jour gratuit</span><br>
-    • <strong style="color:var(--gold)">NewsAPI</strong> — Actualités financières · <span style="color:var(--green)">100 req/jour gratuit</span><br>
-    • <strong style="color:var(--gold)">CFTC.gov</strong> — Données COT officielles · <span style="color:var(--green)">GRATUIT public</span><br>
-    • <strong style="color:var(--gold)">ForexFactory</strong> — Calendrier économique · <span style="color:var(--green)">GRATUIT public</span>
-  </div>
-</div>
-
 <!-- PTL STRATÉGIES PANEL -->
 <div class="panel" id="p-ptl">
   <div class="p-title">
