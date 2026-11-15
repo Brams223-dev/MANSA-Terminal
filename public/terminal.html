@@ -989,9 +989,6 @@ body{padding-top:22px;}
 <div id="navwrap">
   <div id="nav-arrow-l" onclick="document.getElementById('navtabs').scrollBy({left:-160,behavior:'smooth'})">◀</div>
   <div id="navtabs">
-    <div class="ntab" onclick="nav('charts')" id="nt-charts">📉 CHARTS</div>
-    <div class="ntab" onclick="nav('setups')" id="nt-setups" style="color:var(--gold)">🎯 SETUPS PTL</div>
-    <div class="ntab" onclick="nav('ptl')" id="nt-ptl">⚡ STRATS</div>
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('cot')" id="nt-cot">📊 COT</div>
     <div class="ntab" onclick="nav('dmx')" id="nt-dmx">👥 DMX</div>
@@ -1000,21 +997,13 @@ body{padding-top:22px;}
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('fx')" id="nt-fx">💱 FOREX</div>
     <div class="ntab" onclick="nav('indices')" id="nt-indices">💪 DEVISES</div>
-    <div class="ntab" onclick="nav('actions')" id="nt-actions">📈 ACTIONS</div>
-    <div class="ntab" onclick="nav('rendement')" id="nt-rendement" style="color:var(--green)">💰 REND.</div>
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('macro')" id="nt-macro">📆 MACRO</div>
     <div class="ntab" onclick="nav('mva')" id="nt-mva" style="background:linear-gradient(135deg,rgba(0,200,120,.14),rgba(68,136,255,.08));border:1px solid rgba(0,200,120,.35);color:#00c878;font-weight:900">🧠 MVA</div>
-    <div class="ntab" onclick="nav('heatmap')" id="nt-heatmap">🌡️ HEAT</div>
-    <div class="ntab" onclick="nav('sessions')" id="nt-sessions">🕐 SESSIONS</div>
-    <div class="ntab" onclick="nav('backtest')" id="nt-backtest">🔬 BACKTEST</div>
     <div class="ntab" onclick="nav('ia')" id="nt-ia" style="background:linear-gradient(135deg,rgba(68,136,255,.18),rgba(68,136,255,.08));border:1px solid rgba(68,136,255,.35);color:#8af">🤖 IA</div>
-    <div class="ntab" onclick="nav('news')" id="nt-news">📰 NEWS</div>
-    <div class="ntab" onclick="nav('squawk')" id="nt-squawk">🔊 SQUAWK</div>
     <div class="nav-sep"></div>
     <div class="ntab" onclick="nav('setup')" id="nt-setup" style="background:linear-gradient(135deg,rgba(255,80,120,.15),rgba(160,60,255,.1));border:1px solid rgba(255,80,120,.35);color:#ff88aa;font-weight:800">📸 SETUP</div>
     <div class="ntab" onclick="nav('calc')" id="nt-calc">🧮 CALC</div>
-    <div class="ntab" onclick="nav('community')" id="nt-community" style="background:linear-gradient(135deg,rgba(200,160,60,.18),rgba(200,160,60,.08));border-color:rgba(200,160,60,.4)">🌍 JOIN</div>
   </div>
   <div id="nav-arrow-r" onclick="document.getElementById('navtabs').scrollBy({left:160,behavior:'smooth'})">▶</div>
 </div>
@@ -1162,50 +1151,7 @@ body{padding-top:22px;}
   <div id="sz-stats"></div>
 </div>
 
-<div class="panel" id="p-actions">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">📈</span><div><div class="p-title-text">ACTIONS US & EU — MARCHÉS MONDIAUX</div><div class="p-title-sub">Growth · Dividendes · Europe · IA Live</div></div></div>
-    <div class="p-title-right">
-      <button class="tool-btn" onclick="actRefreshLive()" title="Actualiser données live">🔄 LIVE</button>
-    </div>
-  </div>
-  <div class="pills" id="act-pills"></div>
-  <div id="act-live-bar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"></div>
-  <div id="act-table"></div>
-  <div id="act-detail" style="display:none"></div>
-</div>
-
 <!-- ═══ RENDEMENT BOURSE — MODULE DIVIDENDES & FONDAMENTAUX ═══ -->
-<div class="panel" id="p-rendement">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">💰</span><div><div class="p-title-text">RENDEMENT — DIVIDENDES & ANALYSE FONDAMENTALE</div><div class="p-title-sub">Score Sûreté · Historique Dividendes · Calendrier · Résultats</div></div></div>
-    <div class="p-title-right">
-      <button class="tool-btn" onclick="rendRefresh()" title="Actualiser">🔄 LIVE</button>
-    </div>
-  </div>
-  <div class="pills" id="rend-pills"></div>
-  <div id="rend-search-bar" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <input id="rend-search" placeholder="🔍 Rechercher une action (AAPL, MC.PA, MSFT...)" oninput="rendSearch(this.value)"
-      style="background:var(--s1);border:1px solid var(--border2);border-radius:5px;padding:7px 12px;font-size:11px;color:var(--text);width:280px;outline:none">
-    <select id="rend-mkt" onchange="rendFilterMkt(this.value)" style="background:var(--s1);border:1px solid var(--border2);border-radius:5px;padding:7px 10px;font-size:10px;color:var(--text);outline:none">
-      <option value="all">Tous les marchés</option>
-      <option value="us">🇺🇸 Actions US</option>
-      <option value="eu">🇪🇺 Actions EU</option>
-      <option value="fr">🇫🇷 Euronext Paris</option>
-    </select>
-    <select id="rend-sort" onchange="rendSort(this.value)" style="background:var(--s1);border:1px solid var(--border2);border-radius:5px;padding:7px 10px;font-size:10px;color:var(--text);outline:none">
-      <option value="yld">Rendement ↓</option>
-      <option value="score">Score Sûreté ↓</option>
-      <option value="growth">Années Croissance ↓</option>
-      <option value="pe">P/E ↑</option>
-    </select>
-  </div>
-  <div id="rend-stats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
-  <div id="rend-content"></div>
-</div>
-
-<!-- Focus Forex & Actions US/EU - International -->
-
 <div class="panel" id="p-macro">
   <div class="p-title">
     <div class="p-title-left"><span class="p-title-icon">📆</span><div><div class="p-title-text">CALENDRIER ÉCONOMIQUE</div><div class="p-title-sub">NFP · CPI · PMI · FOMC · Banques centrales · Impact en temps réel</div></div></div>
@@ -1287,191 +1233,6 @@ body{padding-top:22px;}
   </div>
 </div>
 
-<div class="panel" id="p-heatmap">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🌡️</span><div><div class="p-title-text">MARKET HEATMAP</div><div class="p-title-sub">Performance J · Semaine · Mois — Forex · Indices · Crypto · Actions</div></div></div>
-    <div class="p-title-right" style="display:flex;align-items:center;gap:8px">
-      <div class="pills" id="hm-period-pills">
-        <button class="pill on" onclick="hmSetPeriod('day',this)">Jour</button>
-        <button class="pill" onclick="hmSetPeriod('week',this)">Semaine</button>
-        <button class="pill" onclick="hmSetPeriod('month',this)">Mois</button>
-      </div>
-      <span id="hm-live-dot" style="font-size:8px;color:var(--green);display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></span>LIVE</span>
-    </div>
-  </div>
-  <!-- TradingView Heatmap widget + custom grid -->
-  <div id="heatmap-tv" style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
-      {"exchanges":[],"dataSource":"SPX500","grouping":"sector","blockSize":"market_cap_basic","blockColor":"change","locale":"fr","colorTheme":"dark","hasTopBar":false,"isDataSetEnabled":false,"isZoomEnabled":true,"hasSymbolTooltip":true,"isMonoSize":false,"width":"100%","height":400}</script>
-    </div>
-  </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-    <a href="https://fr.tradingview.com/markets/currencies/rates-major/" target="_blank" style="font-size:9px;padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;color:var(--gold2);text-decoration:none;font-weight:700">💱 Forex complet TradingView ↗</a>
-    <a href="https://fr.tradingview.com/markets/cryptocurrencies/prices-all/" target="_blank" style="font-size:9px;padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;color:var(--gold2);text-decoration:none;font-weight:700">🪙 Crypto complet TradingView ↗</a>
-    <a href="https://fr.tradingview.com/markets/indices/" target="_blank" style="font-size:9px;padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;color:var(--gold2);text-decoration:none;font-weight:700">📊 Indices complet TradingView ↗</a>
-    <a href="https://fr.tradingview.com/markets/stocks-usa/market-movers-large-cap/" target="_blank" style="font-size:9px;padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;color:var(--gold2);text-decoration:none;font-weight:700">📈 Actions US complet TradingView ↗</a>
-  </div>
-  <div id="hm-sect-forex" class="hm-sect">💱 FOREX MAJEURS</div>
-  <div id="hm-grid-forex" class="heatmap-grid"></div>
-  <div id="hm-sect-crypto" class="hm-sect">🪙 CRYPTO TOP 10</div>
-  <div id="hm-grid-crypto" class="heatmap-grid"></div>
-  <div id="hm-sect-indices" class="hm-sect">📊 INDICES MONDIAUX</div>
-  <div id="hm-grid-indices" class="heatmap-grid"></div>
-</div>
-
-<div class="panel" id="p-sessions">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🕐</span><div><div class="p-title-text">SESSIONS DE TRADING</div><div class="p-title-sub">Horaires live · Timeline 24h · Meilleures paires · Corrélations · Volatilité</div></div></div>
-    <div id="world-clock" style="font-size:9px;font-weight:700;color:var(--gold2);font-family:monospace">--:--:-- UTC</div>
-  </div>
-
-  <!-- Horloges mondiales -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
-    <div class="sess-clock-card" id="scc-paris">
-      <div style="font-size:16px;margin-bottom:2px">🇫🇷</div>
-      <div style="font-size:9px;color:var(--muted);font-weight:700">PARIS</div>
-      <div id="sct-paris" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
-      <div id="scd-paris" style="font-size:7px;color:var(--dim)">--</div>
-    </div>
-    <div class="sess-clock-card" id="scc-london">
-      <div style="font-size:16px;margin-bottom:2px">🇬🇧</div>
-      <div style="font-size:9px;color:var(--muted);font-weight:700">LONDRES</div>
-      <div id="sct-london" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
-      <div id="scd-london" style="font-size:7px;color:var(--dim)">--</div>
-    </div>
-    <div class="sess-clock-card" id="scc-newyork">
-      <div style="font-size:16px;margin-bottom:2px">🇺🇸</div>
-      <div style="font-size:9px;color:var(--muted);font-weight:700">NEW YORK</div>
-      <div id="sct-newyork" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
-      <div id="scd-newyork" style="font-size:7px;color:var(--dim)">--</div>
-    </div>
-    <div class="sess-clock-card" id="scc-tokyo">
-      <div style="font-size:16px;margin-bottom:2px">🇯🇵</div>
-      <div style="font-size:9px;color:var(--muted);font-weight:700">TOKYO</div>
-      <div id="sct-tokyo" style="font-size:15px;font-weight:800;font-family:monospace;color:var(--text)">--:--</div>
-      <div id="scd-tokyo" style="font-size:7px;color:var(--dim)">--</div>
-    </div>
-  </div>
-
-  <!-- Status sessions + countdown -->
-  <div class="session-bar" id="session-bar" style="margin-bottom:16px">
-    <div class="sess-item" id="sess-tokyo"><span class="sess-dot" id="sd-tokyo"></span><div><div class="sess-name">🇯🇵 TOKYO</div><div class="sess-time" id="st-tokyo">00:00–09:00 UTC</div></div></div>
-    <div class="sess-divider"></div>
-    <div class="sess-item" id="sess-london"><span class="sess-dot" id="sd-london"></span><div><div class="sess-name">🇬🇧 LONDRES</div><div class="sess-time" id="st-london">07:00–16:00 UTC</div></div></div>
-    <div class="sess-divider"></div>
-    <div class="sess-item" id="sess-newyork"><span class="sess-dot" id="sd-newyork"></span><div><div class="sess-name">🇺🇸 NEW YORK</div><div class="sess-time" id="st-newyork">12:00–21:00 UTC</div></div></div>
-    <div class="sess-divider"></div>
-    <div class="sess-item" id="sess-sydney"><span class="sess-dot" id="sd-sydney"></span><div><div class="sess-name">🇦🇺 SYDNEY</div><div class="sess-time" id="st-sydney">21:00–06:00 UTC</div></div></div>
-    <div style="margin-left:auto;font-size:9px;color:var(--dim);line-height:1.6">
-      <div><span style="color:var(--gold)">●</span> Overlap = volatilité max</div>
-      <div id="next-session" style="color:var(--gold2);font-weight:700;margin-top:3px"></div>
-    </div>
-  </div>
-
-  <!-- Timeline 24h animée -->
-  <div style="margin-bottom:20px">
-    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      🕐 TIMELINE 24H — HEURE UTC
-      <span id="sess-overlap-badge" style="display:none;font-size:8px;padding:2px 8px;border-radius:10px;background:rgba(200,160,60,.2);color:var(--gold2);font-weight:700;animation:pulse 1.5s infinite">⚡ OVERLAP ACTIF</span>
-    </div>
-    <div style="position:relative;height:56px;background:#0a0a14;border-radius:8px;overflow:hidden;border:1px solid var(--border2)" id="sess-timeline-wrap">
-      <!-- Barres sessions -->
-      <!-- Tokyo: 0-9 UTC -->
-      <div style="position:absolute;left:0%;width:37.5%;top:6px;height:18px;background:rgba(255,136,68,.25);border-radius:3px;border:1px solid rgba(255,136,68,.4)" title="Tokyo"></div>
-      <div style="position:absolute;left:0%;top:6px;font-size:7px;color:#ff8844;padding:3px 5px;font-weight:700">🇯🇵</div>
-      <!-- London: 7-16 UTC (29.2%-66.7%) -->
-      <div style="position:absolute;left:29.2%;width:37.5%;top:28px;height:18px;background:rgba(77,166,255,.25);border-radius:3px;border:1px solid rgba(77,166,255,.4)" title="Londres"></div>
-      <div style="position:absolute;left:30%;top:28px;font-size:7px;color:#4da6ff;padding:3px 5px;font-weight:700">🇬🇧</div>
-      <!-- NY: 12-21 UTC (50%-87.5%) -->
-      <div style="position:absolute;left:50%;width:37.5%;top:6px;height:40px;background:rgba(200,160,60,.18);border-radius:3px;border:1px solid rgba(200,160,60,.35)" title="New York"></div>
-      <div style="position:absolute;left:51%;top:6px;font-size:7px;color:#c8a03c;padding:3px 5px;font-weight:700">🇺🇸</div>
-      <!-- Overlap London/NY: 12-16 UTC (50%-66.7%) = zone chaude -->
-      <div style="position:absolute;left:50%;width:16.7%;top:6px;height:40px;background:rgba(255,200,50,.13);border-radius:2px;border-top:2px solid rgba(255,200,50,.6);border-bottom:2px solid rgba(255,200,50,.6)" title="Overlap Londres/NY"></div>
-      <!-- Aiguille curseur temps actuel -->
-      <div id="sess-time-cursor" style="position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.9);box-shadow:0 0 6px rgba(255,255,255,.6);transition:left .5s linear;z-index:10">
-        <div style="position:absolute;top:-4px;left:-4px;width:10px;height:10px;background:white;border-radius:50%;box-shadow:0 0 8px white"></div>
-      </div>
-      <!-- Labels heures -->
-      <div style="position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:space-between;padding:0 4px">
-        <span style="font-size:6px;color:rgba(255,255,255,.3)">00h</span>
-        <span style="font-size:6px;color:rgba(255,255,255,.3)">06h</span>
-        <span style="font-size:6px;color:rgba(255,255,255,.3)">12h</span>
-        <span style="font-size:6px;color:rgba(255,255,255,.3)">18h</span>
-        <span style="font-size:6px;color:rgba(255,255,255,.3)">24h</span>
-      </div>
-    </div>
-    <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
-      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#ff8844">■</span> Tokyo 00h–09h UTC</span>
-      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#4da6ff">■</span> Londres 07h–16h UTC</span>
-      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#c8a03c">■</span> New York 12h–21h UTC</span>
-      <span style="font-size:8px;color:rgba(255,255,255,.4)"><span style="color:#ffcc33">■</span> Overlap London/NY</span>
-    </div>
-  </div>
-
-  <!-- Meilleures paires par session -->
-  <div style="margin-bottom:20px">
-    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px">🎯 MEILLEURES PAIRES PAR SESSION</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <div style="background:rgba(255,136,68,.08);border:1px solid rgba(255,136,68,.25);border-radius:8px;padding:10px">
-        <div style="font-size:9px;font-weight:800;color:#ff8844;margin-bottom:8px">🇯🇵 TOKYO (00h–09h UTC)</div>
-        <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Paris : 02h–11h</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">USD/JPY</div>
-          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">AUD/USD</div>
-          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">GBP/JPY</div>
-          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">EUR/JPY</div>
-          <div class="sess-pair-tag" style="border-color:rgba(255,136,68,.4);color:#ff8844">NZD/USD</div>
-        </div>
-        <div style="font-size:7px;color:var(--dim);margin-top:8px;line-height:1.5">⚠️ Volatilité modérée<br>Éviter EUR/USD, GBP/USD</div>
-      </div>
-      <div style="background:rgba(77,166,255,.08);border:1px solid rgba(77,166,255,.25);border-radius:8px;padding:10px">
-        <div style="font-size:9px;font-weight:800;color:#4da6ff;margin-bottom:8px">🇬🇧 LONDRES (07h–16h UTC)</div>
-        <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Paris : 09h–18h ⭐ Prime</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">EUR/USD ⭐</div>
-          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">GBP/USD ⭐</div>
-          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">GBP/JPY</div>
-          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">XAU/USD</div>
-          <div class="sess-pair-tag" style="border-color:rgba(77,166,255,.4);color:#4da6ff">EUR/GBP</div>
-        </div>
-        <div style="font-size:7px;color:var(--green);margin-top:8px;line-height:1.5">✅ Meilleure session PTL<br>Structure Protocol actif</div>
-      </div>
-      <div style="background:rgba(200,160,60,.08);border:1px solid rgba(200,160,60,.25);border-radius:8px;padding:10px">
-        <div style="font-size:9px;font-weight:800;color:#c8a03c;margin-bottom:8px">🇺🇸 NEW YORK (12h–21h UTC)</div>
-        <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Paris : 14h–23h</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">EUR/USD ⭐</div>
-          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">USD/CAD</div>
-          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">XAU/USD</div>
-          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">US30 / NAS100</div>
-          <div class="sess-pair-tag" style="border-color:rgba(200,160,60,.4);color:#c8a03c">GBP/USD</div>
-        </div>
-        <div style="font-size:7px;color:var(--gold2);margin-top:8px;line-height:1.5">⚡ Overlap 14h–18h Paris<br>Volatilité maximale !</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Volatility timeline -->
-  <div style="margin-bottom:20px">
-    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px">📈 PROFIL DE VOLATILITÉ HORAIRE (EUR/USD)</div>
-    <div id="vol-timeline" style="display:flex;gap:2px;align-items:flex-end;height:60px;padding:0 4px"></div>
-    <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:var(--dim);padding:0 4px">
-      <span>00h</span><span>03h</span><span>06h</span><span>09h</span><span>12h</span><span>15h</span><span>18h</span><span>21h</span>
-    </div>
-  </div>
-
-  <!-- Correlation Matrix -->
-  <div style="margin-bottom:16px">
-    <div style="font-size:10px;font-weight:800;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      📐 MATRICE DE CORRÉLATION — 30 jours
-      <span style="font-size:8px;color:var(--dim);font-weight:400">(données historiques)</span>
-    </div>
-    <div style="overflow-x:auto"><div id="corr-matrix"></div></div>
-  </div>
-</div>
-
 <div class="panel" id="p-perf">
   <div class="p-title">
     <div class="p-title-left"><span class="p-title-icon">📊</span><div><div class="p-title-text">SUIVI DE PERFORMANCE</div><div class="p-title-sub">Courbe d'équité · Drawdown · Win rate · Statistiques détaillées</div></div></div>
@@ -1481,16 +1242,6 @@ body{padding-top:22px;}
     </div>
   </div>
   <div id="perf-content"></div>
-</div>
-
-<div class="panel" id="p-backtest">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🔬</span><div><div class="p-title-text">BACKTESTING PTL — MOTEUR PRO</div><div class="p-title-sub">Moteur de simulation algorithmique · 15 ans de données · 4 stratégies PTL · Métriques institutionnelles</div></div></div>
-    <div class="p-title-right">
-      <span style="font-size:8px;color:var(--dim)">Monte Carlo · Sharpe · Calmar · Heatmap mensuelle</span>
-    </div>
-  </div>
-  <div id="backtest-content"></div>
 </div>
 
 <!-- ═══ PANEL ANALYSE SETUP ═══ -->
@@ -1683,50 +1434,6 @@ body{padding-top:22px;}
   </div>
 </div>
 
-<div class="panel" id="p-news">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">📰</span><div><div class="p-title-text">NEWS FLOW — TEMPS RÉEL</div><div class="p-title-sub">Reuters · Bloomberg · Forexlive · Importance ⭐ · Paires Forex concernées</div></div></div>
-    <div class="p-title-right" style="display:flex;align-items:center;gap:8px">
-      <span id="news-live-dot" style="display:inline-flex;align-items:center;gap:5px;font-size:9px;color:var(--green)"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;box-shadow:0 0 8px var(--green)"></span>LIVE</span>
-      <button class="tool-btn" onclick="if(typeof newsRefresh==='function')newsRefresh();else renderNewsWithAPI()">🔄 REFRESH</button>
-    </div>
-  </div>
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-    <div class="pills" id="news-filter-pills"></div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
-      <span style="font-size:9px;color:var(--dim)">Min. importance:</span>
-      <select id="news-min-stars" onchange="newsApplyFilter()" style="background:var(--s1);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:10px;color:var(--text);outline:none">
-        <option value="1">⭐ 1+</option>
-        <option value="2">⭐⭐ 2+</option>
-        <option value="3" selected>⭐⭐⭐ 3+</option>
-      </select>
-    </div>
-  </div>
-  <div id="news-urgent-bar" style="background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.25);border-radius:6px;padding:7px 14px;margin-bottom:12px;overflow:hidden;display:none">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:10px;font-weight:800;color:var(--red);flex-shrink:0">🚨 BREAKING</span>
-      <div id="news-urgent-text" style="font-size:10px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-    </div>
-  </div>
-  <div id="news-stats-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"></div>
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
-      {"feedMode":"all_symbols","isTransparent":true,"displayMode":"regular","width":"100%","height":320,"colorTheme":"dark","locale":"fr"}</script>
-    </div>
-  </div>
-  <div id="news-list"></div>
-</div>
-
-<div class="panel" id="p-squawk">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🔊</span><div><div class="p-title-text">SQUAWK — FLUX INSTITUTIONNEL</div><div class="p-title-sub">Commentaires pros en temps réel</div></div></div>
-    <span class="badge badge-live">LIVE</span>
-  </div>
-  <div id="squawk-list"></div>
-</div>
-
 <!-- ═══ PANEL DOUBLE STRUCTURE (SUPPRIMÉ) ═══
 <div class="panel" id="p-ds" style="display:none">
   <div class="p-title">
@@ -1815,33 +1522,6 @@ body{padding-top:22px;}
 </div>
 -->
 
-<div class="panel" id="p-setups">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🎯</span><div><div class="p-title-text">SETUPS PTL — OPPORTUNITÉS À SURVEILLER</div><div class="p-title-sub">Multi-TF · Structure Protocol · Swing Action · Filtrage automatique COT/DMX/Saison/Macro</div></div></div>
-    <span class="badge badge-gold">PTL</span>
-  </div>
-  <div style="font-size:10px;color:var(--dim);margin-bottom:12px;line-height:1.8">
-    Critères <strong style="color:var(--green)">✅ détectables</strong> automatiquement. Confirmation chartiste (trendline, pattern, MA100) à effectuer manuellement.
-    <span style="color:var(--orange)"> ⚠ Données simulées à titre éducatif.</span>
-  </div>
-  <div class="pills" id="setups-pills"></div>
-  <div id="setups-content"></div>
-</div>
-
-<!-- API LIVE PANEL -->
-<!-- PTL STRATÉGIES PANEL -->
-<div class="panel" id="p-ptl">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">⚡</span><div><div class="p-title-text">PTL STRATÉGIES — PROCESS TRADING LIFE</div><div class="p-title-sub">Structure Protocol · Multi TF Ichimoku · Swing Action Market</div></div></div>
-    <span class="badge badge-gold">PTL</span>
-  </div>
-
-  <!-- STRAT SELECTOR -->
-  <div class="pills" id="ptl-pills" style="margin-bottom:14px"></div>
-  <div id="ptl-content"></div>
-</div>
-
-<!-- INDICES DEVISES PANEL -->
 <div class="panel" id="p-indices">
   <div class="p-title">
     <div class="p-title-left"><span class="p-title-icon">💪</span><div><div class="p-title-text">FORCE DES DEVISES — CURRENCY STRENGTH</div><div class="p-title-sub">DXY · EXY · GXY · JXY · AXY — Indices synthétiques temps réel</div></div></div>
@@ -1945,60 +1625,6 @@ body{padding-top:22px;}
 </div>
 
 <!-- COMMUNITY PANEL -->
-<div class="panel" id="p-community">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🌍</span><div><div class="p-title-text">NOUS REJOINDRE — PROCESS TRADING LIFE</div><div class="p-title-sub">Communauté · Formation · Signaux · Coaching</div></div></div>
-    <span class="badge" style="background:rgba(200,160,60,.15);border:1px solid var(--gold);color:var(--gold)">PTL</span>
-  </div>
-  <div id="community-content"></div>
-</div>
-
-<div class="panel" id="p-charts">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">📉</span><div><div class="p-title-text">CHARTS — ANALYSE GRAPHIQUE LIVE</div><div class="p-title-sub">TradingView · Bougies · Ichimoku · EMA · Multi-paires · Temps Réel</div></div></div>
-    <span class="badge badge-live">LIVE</span>
-  </div>
-
-  <!-- TOOLBAR PAIRES -->
-  <div class="chart-toolbar" style="flex-wrap:wrap;gap:4px">
-    <span class="ct-lbl">FOREX</span>
-    <button class="ct-btn on" id="ct-p-EURUSD" onclick="tvLoadSymbol('FX:EURUSD')">EUR/USD</button>
-    <button class="ct-btn" id="ct-p-GBPUSD" onclick="tvLoadSymbol('FX:GBPUSD')">GBP/USD</button>
-    <button class="ct-btn" id="ct-p-USDJPY" onclick="tvLoadSymbol('FX:USDJPY')">USD/JPY</button>
-    <button class="ct-btn" id="ct-p-GBPJPY" onclick="tvLoadSymbol('FX:GBPJPY')">GBP/JPY</button>
-    <button class="ct-btn" id="ct-p-AUDUSD" onclick="tvLoadSymbol('FX:AUDUSD')">AUD/USD</button>
-    <button class="ct-btn" id="ct-p-EURJPY" onclick="tvLoadSymbol('FX:EURJPY')">EUR/JPY</button>
-    <div class="ct-sep"></div>
-    <span class="ct-lbl">MÉTAUX</span>
-    <button class="ct-btn" id="ct-p-XAUUSD" onclick="tvLoadSymbol('TVC:GOLD')">GOLD</button>
-    <button class="ct-btn" id="ct-p-XAGUSD" onclick="tvLoadSymbol('TVC:SILVER')">SILVER</button>
-    <div class="ct-sep"></div>
-    <span class="ct-lbl">ACTIONS</span>
-    <button class="ct-btn" id="ct-p-NVDA" onclick="tvLoadSymbol('NASDAQ:NVDA')">NVDA</button>
-    <button class="ct-btn" id="ct-p-AAPL" onclick="tvLoadSymbol('NASDAQ:AAPL')">AAPL</button>
-    <button class="ct-btn" id="ct-p-MSFT" onclick="tvLoadSymbol('NASDAQ:MSFT')">MSFT</button>
-    <button class="ct-btn" id="ct-p-ASML" onclick="tvLoadSymbol('NASDAQ:ASML')">ASML</button>
-    <div class="ct-sep"></div>
-    <span class="ct-lbl">INDICES</span>
-    <button class="ct-btn" id="ct-p-SPX" onclick="tvLoadSymbol('SP:SPX')">S&P500</button>
-    <button class="ct-btn" id="ct-p-NDX" onclick="tvLoadSymbol('NASDAQ:NDX')">NASDAQ</button>
-    <button class="ct-btn" id="ct-p-DAX" onclick="tvLoadSymbol('XETR:DAX')">DAX</button>
-    <button class="ct-btn" id="ct-p-DXY" onclick="tvLoadSymbol('TVC:DXY')">DXY</button>
-    <div class="ct-sep"></div>
-    <span class="ct-lbl">CRYPTO</span>
-    <button class="ct-btn" id="ct-p-BTCUSD" onclick="tvLoadSymbol('BINANCE:BTCUSDT')">BTC</button>
-    <button class="ct-btn" id="ct-p-ETHUSD" onclick="tvLoadSymbol('BINANCE:ETHUSDT')">ETH</button>
-    <button class="ct-btn" id="ct-p-SOLUSD" onclick="tvLoadSymbol('BINANCE:SOLUSDT')">SOL</button>
-  </div>
-
-  <!-- TradingView Advanced Chart -->
-  <div id="tv-chart-container" style="width:100%;height:calc(100vh - 220px);min-height:520px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container" style="height:100%;width:100%">
-      <div id="tradingview_chart_main" style="height:100%;width:100%"></div>
-    </div>
-  </div>
-</div>
-
 <!-- ═══════════════════════════════════════════════════════ MT5 TRADING PANEL -->
 <div class="panel" id="p-mt5">
   <div class="p-title">
