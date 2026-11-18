@@ -3403,104 +3403,107 @@ function renderActions(filter){
   document.getElementById('act-pills').innerHTML=pills.map(function(p){
     return '<div class="pill'+(ACT_FILTER===p.k?' on':'')+'" onclick="renderActions(\''+p.k+'\')">'+p.l+'</div>';
   }).join('');
-  var h='';
+
+  /* ── Carte action ── */
+  function actCard(d, cur, scoreVal, scoreLabel, sub1, sub2){
+    var p=actGetPrice(d.t, d.p||0);
+    var ch=actGetChg(d.t, d.ch||0);
+    var chN=parseFloat(ch);
+    var chC=chN>=0?'var(--green)':'var(--red)';
+    var sc=scoreVal||d.buf||70;
+    var scC=sc>=80?'var(--green)':sc>=60?'var(--gold)':'var(--red)';
+    var grade=sc>=85?'A':sc>=70?'B':sc>=50?'C':'D';
+    var rank=d._rank?'<span style="font-size:9px;color:var(--dim);font-weight:700">#'+d._rank+'</span> ':'';
+    var mktTag=d.mkt?(d.mkt.toUpperCase()):'';
+    return '<div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .2s" '
+      +'onmouseover="this.style.borderColor=\'rgba(200,160,60,.5)\'" onmouseout="this.style.borderColor=\'var(--border2)\'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+      +'<div>'+rank+'<span style="font-size:13px;font-weight:800;color:var(--gold2)" onclick="actDetail(\''+d.t+'\')" >'+d.t.split('.')[0]+'</span>'
+      +(mktTag?' <span style="font-size:9px;color:var(--dim)">'+mktTag+'</span>':'')+'</div>'
+      +'<span style="background:'+scC+';color:#000;font-weight:800;border-radius:4px;padding:2px 7px;font-size:10px">'+grade+'</span>'
+      +'</div>'
+      +'<div style="font-size:10px;color:var(--muted);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d.n+'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">'
+      +'<div><div style="font-size:18px;font-weight:800">'+cur+parseFloat(p).toFixed(2)+'</div>'
+      +'<div style="font-size:11px;font-weight:700;color:'+chC+'">'+(chN>=0?'+':'')+chN.toFixed(2)+'%</div></div>'
+      +'<div style="text-align:right"><div style="font-size:9px;color:var(--dim)">'+scoreLabel+'</div>'
+      +'<div style="font-size:14px;font-weight:800;color:'+scC+'">'+sc+'/100</div></div>'
+      +'</div>'
+      +'<div style="font-size:8px;color:var(--dim);border-top:1px solid rgba(255,255,255,.06);padding-top:7px;display:flex;justify-content:space-between">'
+      +'<span>'+sub1+'</span><span>'+sub2+'</span>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;margin-top:8px">'
+      +'<button class="ia-btn" style="flex:1;padding:4px" onclick="openAI(\''+d.t+'\')">🤖 IA</button>'
+      +'<button class="chart-open-btn" style="flex:1;padding:4px" onclick="openChartModal(\''+d.t.split(\'.\')[0]+'\',\''+d.n+'\')">📊</button>'
+      +'</div>'
+      +'</div>';
+  }
+
+  /* ── Stats bar ── */
+  function actStats(data, fields){
+    var el=document.getElementById('act-live-bar');
+    if(!el)return;
+    el.innerHTML=fields.map(function(f){return sc(f.l,f.v,f.c,f.s);}).join('');
+  }
+
+  var h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">';
 
   if(filter==='growth'){
-    h+=tHead(['Ticker','Société','Secteur','Prix','Var 24H','P/E','Marge','Score','IA'],'🚀 GROWTH TECH US ('+GROWTH.length+' valeurs)');
-    GROWTH.forEach(function(d){
-      var p=actGetPrice(d.t,d.p),ch=actGetChg(d.t,d.ch);
-      var c=ch>=0?'up':'dn';
-      var score=d.buf||70;
-      var sc2=score>=80?'var(--green)':score>=60?'var(--gold)':'var(--red)';
-      h+=tRow([
-        '<strong style="cursor:pointer;color:var(--gold2)" onclick="actDetail(\''+d.t+'\')">' + d.t + '</strong>',
-        d.n,'<span class="neu">'+d.s+'</span>',
-        '$'+parseFloat(p).toFixed(2),
-        '<span class="'+c+'">'+(ch>=0?'+':'')+parseFloat(ch).toFixed(2)+'%</span>',
-        d.pe,d.mg||'-',
-        '<span style="color:'+sc2+';font-weight:700">'+score+'/100</span>',
-        '<button class="ia-btn" onclick="openAI(\''+d.t+'\')">IA</button>'
-      ]);
-    });
-    h+='</tbody></table></div>';
+    actStats(GROWTH,[
+      {l:'Valeurs',v:GROWTH.length,c:'var(--blue)',s:''},
+      {l:'Score Moy.',v:Math.round(GROWTH.reduce(function(s,d){return s+(d.buf||70);},0)/GROWTH.length)+'/100',c:'var(--gold)',s:''},
+      {l:'En hausse',v:GROWTH.filter(function(d){return actGetChg(d.t,d.ch)>=0;}).length,c:'var(--green)',s:'aujourd\'hui'},
+    ]);
+    GROWTH.forEach(function(d){ h+=actCard(d,'$',d.buf||70,'Score','P/E '+d.pe,'Marge '+(d.mg||'-')); });
 
   } else if(filter==='div'){
-    h+=tHead(['Ticker','Société','Prix','Div/An','Rendement','Ans Croiss.','Payout','Score Sûreté','IA'],'💰 ARISTOCRATES DIVIDENDES US ('+DIVS.length+' valeurs)');
-    [].concat(DIVS).sort(function(a,b){return b.yld-a.yld;}).forEach(function(d){
-      var p=actGetPrice(d.t,d.p),ch=actGetChg(d.t,d.ch||0);
-      var c=ch>=0?'up':'dn';
-      var s=d.score||70; var sc2=s>=85?'var(--green)':s>=70?'var(--gold)':'var(--red)';
-      var grade=s>=85?'A':s>=75?'B':s>=60?'C':'D';
-      h+=tRow([
-        '<div style="display:flex;align-items:center;gap:5px"><strong style="cursor:pointer;color:var(--gold2)" onclick="rendDetail(\''+d.t+'\')">'+d.t+'</strong><button class="wl-btn'+(wlHas(d.t)?' active':'')+'" data-t="'+d.t+'" onclick="event.stopPropagation();wlToggle(\''+d.t+'\',\''+d.n+'\',\''+p+'\',0,\'div\',\'us\');this.classList.toggle(\'active\')">⭐</button><button class="chart-open-btn" onclick="event.stopPropagation();openChartModal(\''+d.t+'\',\''+d.n+'\')">📊</button></div>',
-        d.n,'$'+parseFloat(p).toFixed(2),
-        '<span class="up">$'+d.div+'</span>',
-        '<span class="up" style="font-weight:700">'+parseFloat(d.yld).toFixed(2)+'%</span>',
-        '<span style="color:var(--green)">'+(d.ans||0)+' ans</span>',
-        (d.pay||'-')+'%',
-        '<span style="color:'+sc2+';font-weight:700">'+grade+' ('+s+')</span>',
-        '<button class="ia-btn" onclick="openAI(\''+d.t+'\')">IA</button>'
-      ]);
+    var divSort=[].concat(DIVS).sort(function(a,b){return b.yld-a.yld;});
+    var avgY=(divSort.reduce(function(s,d){return s+d.yld;},0)/Math.max(divSort.length,1)).toFixed(2);
+    actStats(DIVS,[
+      {l:'Dividendes',v:DIVS.length,c:'var(--blue)',s:''},
+      {l:'Rend. Moy.',v:avgY+'%',c:'var(--green)',s:''},
+      {l:'25+ ans',v:DIVS.filter(function(d){return d.ans>=25;}).length,c:'var(--gold)',s:'aristocrates'},
+    ]);
+    divSort.forEach(function(d,i){
+      d._rank=i+1;
+      h+=actCard(d,'$',d.score||70,'Score Sûreté','Rend. '+parseFloat(d.yld).toFixed(2)+'%',d.ans+' ans croissance');
     });
-    h+='</tbody></table></div>';
 
   } else if(filter==='eu_growth'){
-    h+=tHead(['Ticker','Société','Bourse','Secteur','Prix','Var 24H','P/E','Rend.','IA'],'🇪🇺 TECH & CROISSANCE EUROPE ('+EU_GROWTH.length+' valeurs)');
-    EU_GROWTH.forEach(function(d){
-      var c=d.ch>=0?'up':'dn'; var cur=d.mkt==='us'?'$':'€';
-      h+=tRow([
-        '<strong style="cursor:pointer;color:var(--gold2)">'+d.t.split('.')[0]+'</strong>',
-        d.n,'<span class="neu">'+d.bourse+'</span>','<span class="neu">'+d.s+'</span>',
-        cur+parseFloat(d.p).toFixed(2),
-        '<span class="'+c+'">'+(d.ch>=0?'+':'')+d.ch.toFixed(2)+'%</span>',
-        d.pe,
-        d.yld>0?'<span class="up">'+d.yld.toFixed(2)+'%</span>':'-',
-        '<button class="ia-btn" onclick="openAI(\''+d.t+'\')">IA</button>'
-      ]);
-    });
-    h+='</tbody></table></div>';
+    actStats(EU_GROWTH,[
+      {l:'Valeurs EU',v:EU_GROWTH.length,c:'var(--blue)',s:''},
+      {l:'Score Moy.',v:Math.round(EU_GROWTH.reduce(function(s,d){return s+(d.buf||65);},0)/EU_GROWTH.length)+'/100',c:'var(--gold)',s:''},
+    ]);
+    EU_GROWTH.forEach(function(d){ h+=actCard(d,'€',d.buf||65,'Score','P/E '+d.pe,d.bourse||'EU'); });
 
   } else if(filter==='eu_div'){
-    h+=tHead(['Ticker','Société','Bourse','Prix','Div/An','Rendement','Ans Croiss.','Score Sûreté','IA'],'🇪🇺 DIVIDENDES EUROPE ('+EU_DIVS.length+' valeurs)');
-    [].concat(EU_DIVS).sort(function(a,b){return b.yld-a.yld;}).forEach(function(d){
-      var cur='€';
-      var s=d.score||70; var sc2=s>=85?'var(--green)':s>=70?'var(--gold)':'var(--red)';
-      var grade=s>=85?'A':s>=75?'B':s>=60?'C':'D';
-      h+=tRow([
-        '<strong style="cursor:pointer;color:var(--gold2)" onclick="rendDetail(\''+d.t.split('.')[0]+'\')">'+d.t.split('.')[0]+'</strong>',
-        d.n,'<span class="neu">'+d.bourse+'</span>',
-        cur+parseFloat(d.p).toFixed(2),
-        '<span class="up">'+cur+d.div+'</span>',
-        '<span class="up" style="font-weight:700">'+parseFloat(d.yld).toFixed(2)+'%</span>',
-        '<span style="color:var(--green)">'+(d.ans||0)+' ans</span>',
-        '<span style="color:'+sc2+';font-weight:700">'+grade+' ('+s+')</span>',
-        '<button class="ia-btn" onclick="openAI(\''+d.t+'\')">IA</button>'
-      ]);
+    var euSort=[].concat(EU_DIVS).sort(function(a,b){return b.yld-a.yld;});
+    actStats(EU_DIVS,[
+      {l:'Dividendes EU',v:EU_DIVS.length,c:'var(--blue)',s:''},
+      {l:'Rend. Moy.',v:(euSort.reduce(function(s,d){return s+d.yld;},0)/Math.max(euSort.length,1)).toFixed(2)+'%',c:'var(--green)',s:''},
+    ]);
+    euSort.forEach(function(d,i){
+      d._rank=i+1;
+      h+=actCard(d,'€',d.score||70,'Score Sûreté','Rend. '+parseFloat(d.yld).toFixed(2)+'%',(d.bourse||'EU')+' · '+d.ans+' ans');
     });
-    h+='</tbody></table></div>';
 
   } else if(filter==='all_div'){
     var all=[].concat(
-      DIVS.map(function(d){return {t:d.t,n:d.n,p:d.p,div:d.div,yld:d.yld,ans:d.ans||0,score:d.score||70,bourse:'NYSE/NASDAQ',cur:'$'};}),
-      EU_DIVS.map(function(d){return {t:d.t,n:d.n,p:d.p,div:d.div,yld:d.yld,ans:d.ans||0,score:d.score||70,bourse:d.bourse,cur:'€'};})
+      DIVS.map(function(d){return Object.assign({},d,{mkt:d.mkt||'us',bourse:'NYSE/NASDAQ'});}),
+      EU_DIVS.map(function(d){return Object.assign({},d,{mkt:d.mkt||'eu'});})
     ).sort(function(a,b){return b.yld-a.yld;}).slice(0,20);
-    h+=tHead(['Ticker','Société','Bourse','Prix','Div/An','Rendement','Ans Croiss.','Score Sûreté'],'⭐ TOP 20 MEILLEURS RENDEMENTS US + EU');
-    all.forEach(function(d){
-      var s=d.score; var sc2=s>=85?'var(--green)':s>=70?'var(--gold)':'var(--red)';
-      var grade=s>=85?'A':s>=75?'B':s>=60?'C':'D';
-      h+=tRow([
-        '<strong style="cursor:pointer;color:var(--gold2)" onclick="rendDetail(\''+d.t.split('.')[0]+'\')">'+d.t.split('.')[0]+'</strong>',
-        d.n,'<span class="neu">'+d.bourse+'</span>',
-        d.cur+parseFloat(d.p).toFixed(2),
-        '<span class="up">'+d.cur+d.div+'</span>',
-        '<span class="up" style="font-weight:800;font-size:12px">'+parseFloat(d.yld).toFixed(2)+'%</span>',
-        '<span style="color:var(--green)">'+d.ans+' ans</span>',
-        '<span style="color:'+sc2+';font-weight:700">'+grade+' ('+s+')</span>'
-      ]);
+    actStats(all,[
+      {l:'Top 20',v:'US + EU',c:'var(--gold)',s:''},
+      {l:'Meilleur Rend.',v:parseFloat(all[0]&&all[0].yld||0).toFixed(2)+'%',c:'var(--green)',s:all[0]&&all[0].t||''},
+    ]);
+    all.forEach(function(d,i){
+      d._rank=i+1;
+      var cur=d.mkt==='us'?'$':'€';
+      h+=actCard(d,cur,d.score||70,'Score Sûreté','Rend. '+parseFloat(d.yld).toFixed(2)+'%',(d.bourse||'')+'  · '+d.ans+' ans');
     });
-    h+='</tbody></table></div>';
   }
 
+  h+='</div>';
   document.getElementById('act-table').innerHTML=h;
 }
 
