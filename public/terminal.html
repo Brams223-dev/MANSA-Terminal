@@ -1111,24 +1111,12 @@ body{padding-top:22px;}
   </div>
   <!-- VUE FORCE -->
   <div id="fx-view-force" style="display:none">
-    <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js" async>
-        {"width":"100%","height":400,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD"],"isTransparent":true,"colorTheme":"dark","locale":"fr"}</script>
-      </div>
-    </div>
+    <div id="fx-force-tv" style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)"></div>
     <div id="fx-force-bars"></div>
   </div>
   <!-- VUE HEATMAP -->
   <div id="fx-view-heatmap" style="display:none">
-    <div style="border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js" async>
-        {"width":"100%","height":500,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD","CNY"],"isTransparent":true,"colorTheme":"dark","locale":"fr"}</script>
-      </div>
-    </div>
+    <div id="fx-heatmap-tv" style="border-radius:8px;overflow:hidden;border:1px solid var(--border2)"></div>
   </div>
   <!-- VUE SIZING -->
   <div id="fx-view-calc" style="display:none"></div>
@@ -1220,14 +1208,10 @@ body{padding-top:22px;}
   </div>
   <div class="stat-row" id="crypto-stats"></div>
   <div id="crypto-table"></div>
-  <!-- TradingView Crypto Market Widget -->
-  <div style="margin-top:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
+  <!-- TradingView Crypto Market Widget (chargé dynamiquement) -->
+  <div id="crypto-tv-screener" style="margin-top:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
     <div style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:.08em;padding:10px 12px 0">📊 CRYPTO MARKET SCREENER</div>
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-      {"width":"100%","height":400,"defaultColumn":"overview","screener_type":"crypto_mkt","displayCurrency":"USD","colorTheme":"dark","locale":"fr","isTransparent":true}</script>
-    </div>
+    <div id="crypto-tv-screener-inner"></div>
   </div>
 </div>
 
@@ -1326,14 +1310,8 @@ body{padding-top:22px;}
       <span id="hm-live-dot" style="font-size:8px;color:var(--green);display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></span>LIVE</span>
     </div>
   </div>
-  <!-- TradingView Heatmap widget + custom grid -->
-  <div id="heatmap-tv" style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
-      {"exchanges":[],"dataSource":"SPX500","grouping":"sector","blockSize":"market_cap_basic","blockColor":"change","locale":"fr","colorTheme":"dark","hasTopBar":false,"isDataSetEnabled":false,"isZoomEnabled":true,"hasSymbolTooltip":true,"isMonoSize":false,"width":"100%","height":400}</script>
-    </div>
-  </div>
+  <!-- TradingView Heatmap widget (chargé dynamiquement) -->
+  <div id="heatmap-tv" style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)"></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
     <a href="https://fr.tradingview.com/markets/currencies/rates-major/" target="_blank" style="font-size:9px;padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;color:var(--gold2);text-decoration:none;font-weight:700">💱 Forex complet TradingView ↗</a>
     <a href="https://fr.tradingview.com/markets/cryptocurrencies/prices-all/" target="_blank" style="font-size:9px;padding:5px 12px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;color:var(--gold2);text-decoration:none;font-weight:700">🪙 Crypto complet TradingView ↗</a>
@@ -1736,13 +1714,7 @@ body{padding-top:22px;}
     </div>
   </div>
   <div id="news-stats-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"></div>
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
-      {"feedMode":"all_symbols","isTransparent":true,"displayMode":"regular","width":"100%","height":320,"colorTheme":"dark","locale":"fr"}</script>
-    </div>
-  </div>
+  <div id="news-tv-timeline" style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)"></div>
   <div id="news-list"></div>
 </div>
 
@@ -1779,14 +1751,8 @@ body{padding-top:22px;}
       </select>
     </div>
   </div>
-  <!-- TradingView Stock Screener complet -->
-  <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-      {"width":"100%","height":560,"defaultColumn":"overview","defaultScreen":"top_gainers","market":"america","showToolbar":true,"colorTheme":"dark","locale":"fr","isTransparent":true}</script>
-    </div>
-  </div>
+  <!-- TradingView Stock Screener (chargé dynamiquement) -->
+  <div id="screener-tv" style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)"></div>
   <div id="scr-table"></div>
   <div id="scr-detail" style="display:none"></div>
 </div>
@@ -3228,7 +3194,15 @@ function fxShowView(v){
     var pills=document.getElementById('fx-pills');
     if(pills&&!pills.innerHTML) renderFX('all');
   }
-  if(v==='force') renderFXForceBars();
+  if(v==='force'){
+    injectTV('fx-force-tv','https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js',
+      {"width":"100%","height":400,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD"],"isTransparent":true,"colorTheme":"dark","locale":"fr"});
+    renderFXForceBars();
+  }
+  if(v==='heatmap'){
+    injectTV('fx-heatmap-tv','https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js',
+      {"width":"100%","height":500,"currencies":["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD","CNY"],"isTransparent":true,"colorTheme":"dark","locale":"fr"});
+  }
   if(v==='calc') renderFXSizing();
 }
 
@@ -6500,6 +6474,25 @@ function toggleAI(){
 }
 
 /* NAV */
+/* ── Injection dynamique TradingView ─────────────────────────── */
+function injectTV(containerId, scriptSrc, config){
+  var el=document.getElementById(containerId);
+  if(!el||el._tvLoaded)return;
+  el._tvLoaded=true;
+  var wrap=document.createElement('div');
+  wrap.className='tradingview-widget-container';
+  var inner=document.createElement('div');
+  inner.className='tradingview-widget-container__widget';
+  wrap.appendChild(inner);
+  var sc=document.createElement('script');
+  sc.type='text/javascript';
+  sc.src=scriptSrc;
+  sc.async=true;
+  sc.text=JSON.stringify(config);
+  wrap.appendChild(sc);
+  el.appendChild(wrap);
+}
+
 function nav(id){
   CURRENT_TAB=id;
   document.querySelectorAll('.ntab').forEach(function(el){el.classList.remove('on');});
@@ -6525,7 +6518,13 @@ function nav(id){
   if(id==='alertes'){renderAlertes();}
   if(id==='actions'){renderActions(ACT_FILTER);}
   if(id==='rendement'){renderRendement(REND_TAB);}
-  if(id==='heatmap'){renderHeatmap();}
+  if(id==='heatmap'){
+    setTimeout(function(){
+      injectTV('heatmap-tv','https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js',
+        {"exchanges":[],"dataSource":"SPX500","grouping":"sector","blockSize":"market_cap_basic","blockColor":"change","locale":"fr","colorTheme":"dark","hasTopBar":false,"isDataSetEnabled":false,"isZoomEnabled":true,"hasSymbolTooltip":true,"isMonoSize":false,"width":"100%","height":400});
+    },50);
+    renderHeatmap();
+  }
   if(id==='sessions'){renderV20Sessions();startV20SessionClock();}
   if(id==='ia'){renderIAPanel();}
   if(id==='setup'){renderSetupAnalysis();}
@@ -6538,6 +6537,24 @@ function nav(id){
   if(id==='saison'){renderSaison(SZ_PAIR||'EUR/USD');}
   if(id==='squawk'){renderSquawk();}
   if(id==='setups'){renderSetups();}
+  if(id==='news'){
+    setTimeout(function(){
+      injectTV('news-tv-timeline','https://s3.tradingview.com/external-embedding/embed-widget-timeline.js',
+        {"feedMode":"all_symbols","isTransparent":true,"displayMode":"regular","width":"100%","height":320,"colorTheme":"dark","locale":"fr"});
+    },50);
+  }
+  if(id==='screener'){
+    setTimeout(function(){
+      injectTV('screener-tv','https://s3.tradingview.com/external-embedding/embed-widget-screener.js',
+        {"width":"100%","height":560,"defaultColumn":"overview","defaultScreen":"top_gainers","market":"america","showToolbar":true,"colorTheme":"dark","locale":"fr","isTransparent":true});
+    },50);
+  }
+  if(id==='crypto'){
+    setTimeout(function(){
+      injectTV('crypto-tv-screener-inner','https://s3.tradingview.com/external-embedding/embed-widget-screener.js',
+        {"width":"100%","height":400,"defaultColumn":"overview","screener_type":"crypto_mkt","displayCurrency":"USD","colorTheme":"dark","locale":"fr","isTransparent":true});
+    },50);
+  }
   if(id==='fx'){
     _fxView='scan';
     ['scan','table','force','heatmap','calc'].forEach(function(k){
