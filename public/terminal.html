@@ -1638,93 +1638,6 @@ body{padding-top:22px;}
   <div id="scr-detail" style="display:none"></div>
 </div>
 
-<!-- ═══ PANEL DOUBLE STRUCTURE (SUPPRIMÉ) ═══
-<div class="panel" id="p-ds" style="display:none">
-  <div class="p-title">
-    <div class="p-title-left"><span class="p-title-icon">🎯</span></div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-
-    <!-- COLONNE GAUCHE : Upload + paramètres -->
-    <div>
-      <!-- Zone drop/paste -->
-      <div id="ds-drop-zone" onclick="document.getElementById('ds-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='#ffcc44'" ondragleave="this.style.borderColor='rgba(255,180,0,.3)'" ondrop="event.preventDefault();dsHandleFile(event.dataTransfer.files[0])" style="border:2px dashed rgba(255,180,0,.3);border-radius:12px;padding:32px 16px;text-align:center;cursor:pointer;transition:border-color .2s;background:rgba(255,180,0,.03);margin-bottom:12px">
-        <div id="ds-drop-preview" style="display:none;margin-bottom:10px"><img id="ds-preview-img" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid rgba(255,180,0,.3)" /></div>
-        <div id="ds-drop-hint">
-          <div style="font-size:28px;margin-bottom:8px">📊</div>
-          <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em;margin-bottom:10px">COLLE OU DÉPOSE TON GRAPHIQUE</div>
-          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
-            <button onclick="event.stopPropagation();dsPasteFromClipboard()" style="background:rgba(255,180,0,.15);border:1px solid rgba(255,180,0,.4);border-radius:7px;color:var(--gold);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,180,0,.3)'" onmouseout="this.style.background='rgba(255,180,0,.15)'">📋 Coller</button>
-            <button onclick="event.stopPropagation();document.getElementById('ds-file-input').click()" style="background:rgba(255,180,0,.05);border:1px solid rgba(255,180,0,.2);border-radius:7px;color:var(--dim);font-size:10px;font-weight:700;font-family:var(--fm);cursor:pointer;padding:7px 14px;transition:all .2s" onmouseover="this.style.background='rgba(255,180,0,.15)'" onmouseout="this.style.background='rgba(255,180,0,.05)'">📁 Parcourir</button>
-          </div>
-          <div style="font-size:8px;color:rgba(255,180,0,.4);margin-top:4px">ou glisse ici · Ctrl+V aussi supporté</div>
-        </div>
-        <input type="file" id="ds-file-input" accept="image/*" style="display:none" onchange="dsHandleFile(this.files[0])">
-      </div>
-
-      <!-- Paramètres du setup -->
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;margin-bottom:12px">
-        <div style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:.1em;margin-bottom:10px">⚙️ PARAMÈTRES DU SETUP</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div>
-            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">PAIRE</div>
-            <select id="ds-pair" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
-              <option value="">Sélectionner...</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">UNITÉ DE TEMPS</div>
-            <select id="ds-tf" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
-              <option value="">Sélectionner...</option>
-              <option value="M30">M30</option>
-              <option value="H1">H1</option>
-              <option value="H2">H2</option>
-              <option value="H4">H4</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div>
-            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">SENS ANTICIPÉ</div>
-            <select id="ds-dir" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
-              <option value="">Sélectionner...</option>
-              <option value="BUY">📈 BUY</option>
-              <option value="SELL">📉 SELL</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:7px;color:var(--dim);margin-bottom:3px">VARIANTE</div>
-            <select id="ds-variant" style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm)">
-              <option value="">Non identifiée</option>
-              <option value="detachee">Structure Détachée</option>
-              <option value="twoinone">Two in One</option>
-            </select>
-          </div>
-        </div>
-        <div style="margin-bottom:8px">
-          <div style="font-size:7px;color:var(--dim);margin-bottom:3px">ENTRÉE / SL / TP (optionnel)</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-            <input id="ds-entry" type="text" placeholder="Entrée" style="background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm);width:100%;box-sizing:border-box">
-            <input id="ds-sl" type="text" placeholder="SL" style="background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm);width:100%;box-sizing:border-box">
-            <input id="ds-tp" type="text" placeholder="TP" style="background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:5px 8px;font-family:var(--fm);width:100%;box-sizing:border-box">
-          </div>
-        </div>
-        <div>
-          <div style="font-size:7px;color:var(--dim);margin-bottom:3px">NOTES / OBSERVATIONS</div>
-          <textarea id="ds-notes" placeholder="Décris ce que tu vois : structure 1, structure 2, zone de cassure, position EMA..." style="width:100%;background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:10px;padding:8px;font-family:var(--fm);resize:vertical;min-height:60px;box-sizing:border-box"></textarea>
-        </div>
-      </div>
-
-      <!-- Bouton analyse -->
-      <button id="ds-analyze-btn" onclick="dsAnalyze()" style="width:100%;padding:14px;background:linear-gradient(90deg,#cc8800,#ff6600,#ffaa00);border:none;border-radius:10px;font-size:13px;font-weight:900;color:#000;cursor:pointer;letter-spacing:.08em;box-shadow:0 0 24px rgba(255,180,0,.35);transition:all .2s">
-        🎯 VALIDER STRUCTURE PROTOCOL
-      </button>
-    </div>
-    <div></div>
-  </div>
-</div>
--->
 
 <div class="panel" id="p-setups">
   <div class="p-title">
@@ -6408,7 +6321,6 @@ function nav(id){
   }
   if(id==='sessions'){renderV20Sessions();startV20SessionClock();}
   if(id==='ia'){renderIAPanel();}
-  if(id==='ds'){renderDSPanel();}
   if(id==='macro'){renderMacro();}
   if(id==='mva'){renderMVA();}
   if(id==='backtest'){renderBacktest();}
@@ -10925,19 +10837,6 @@ function setupClearImage(){
   document.getElementById('setup-ia-status').textContent = '⚪ En attente';
 }
 
-// Écouter Ctrl+V sur le panel setup
-document.addEventListener('paste', function(e){
-  if(document.getElementById('p-setup') && document.getElementById('p-setup').classList.contains('on')){
-    var items = e.clipboardData && e.clipboardData.items;
-    if(!items) return;
-    for(var i=0;i<items.length;i++){
-      if(items[i].type.startsWith('image/')){
-        setupHandleFile(items[i].getAsFile());
-        break;
-      }
-    }
-  }
-});
 
 function setupBuildContext(){
   var ctx = '=== CONTEXTE TERMINAL MANSA ===\n';
@@ -11462,18 +11361,12 @@ function dsHandleFile(file){
   reader.readAsDataURL(file);
 }
 
-// Ctrl+V dans l'onglet Structure Protocol
+// (ds panel supprimé)
 document.addEventListener('paste', function(e){
   var panel = document.getElementById('p-ds');
   if(panel && panel.classList.contains('on')){
-    var items = e.clipboardData && e.clipboardData.items;
-    if(!items) return;
-    for(var i=0;i<items.length;i++){
-      if(items[i].type.startsWith('image/')){
-        dsHandleFile(items[i].getAsFile());
-        break;
-      }
-    }
+    // panel supprimé - ne rien faire
+    return;
   }
 });
 
