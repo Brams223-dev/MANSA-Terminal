@@ -411,11 +411,9 @@ def dispatch(action: str, msg: dict) -> dict:
     if action in {"place_order", "close_position", "modify_position", "close_all"}:
         return {"ok": False, "error": "Trading désactivé dans cette version MANSA. Aucune instruction n'a été envoyée à MT5."}
     if action == "connect":
-        return mt5_connect(
-            login=msg.get("login"),
-            password=msg.get("password"),
-            server=msg.get("server"),
-        )
+        # Le bridge utilise uniquement le compte démo déjà ouvert dans MT5.
+        # Aucun identifiant de compte n'est accepté depuis le navigateur.
+        return mt5_connect()
     elif action == "account":
         return get_account_info()
     elif action == "positions":
@@ -489,18 +487,6 @@ async def main(args):
     # Le pont n'accepte que les interfaces locales dans cette version.
     if args.host not in {"localhost", "127.0.0.1"}:
         raise SystemExit("Sécurité MANSA : le bridge doit écouter sur localhost ou 127.0.0.1.")
-    # Auto-connect si credentials fournis en CLI
-    if args.login:
-        result = mt5_connect(
-            login=int(args.login),
-            password=args.password,
-            server=args.server,
-        )
-        if not result["ok"]:
-            log.error(f"Connexion MT5 échouée: {result['error']}")
-        else:
-            log.info("MT5 connecté au démarrage")
-
     SYMBOLS_LIVE = ["EURUSD", "GBPUSD", "USDJPY", "GBPJPY", "XAUUSD",
                     "BTCUSD", "US30", "NAS100", "SP500"]
 
@@ -518,9 +504,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Mansa Terminal — Bridge MT5")
     parser.add_argument("--host", default="localhost", help="Adresse locale d'écoute (localhost uniquement)")
     parser.add_argument("--port", default=8765, type=int, help="Port WebSocket")
-    parser.add_argument("--login", default=None, help="Numéro de compte démo MT5 (facultatif)")
-    parser.add_argument("--password", default=None, help="Mot de passe démo MT5 (facultatif)")
-    parser.add_argument("--server", default=None, help="Serveur démo MT5 (facultatif)")
     args = parser.parse_args()
 
     if not MT5_AVAILABLE or not WS_AVAILABLE:
