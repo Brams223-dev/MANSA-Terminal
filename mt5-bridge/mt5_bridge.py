@@ -11,8 +11,9 @@ Prérequis :
 
 Usage :
   python mt5_bridge.py
-  python mt5_bridge.py --host 0.0.0.0 --port 8765  (accès réseau local)
-  python mt5_bridge.py --login 12345678 --password MonMDP --server "ICMarkets-Demo"
+  python mt5_bridge.py
+  # Le mode réseau (0.0.0.0) est volontairement interdit dans cette version.
+  # Utiliser le compte démo déjà ouvert dans MetaTrader 5.
 """
 
 import asyncio
@@ -73,8 +74,16 @@ def mt5_connect(login: Optional[int] = None,
         MT5_CONNECTED = False
         return {"ok": False, "error": "Compte non trouvé"}
 
+    # V1 MANSA : connexion strictement limitée aux comptes de démonstration.
+    demo_mode = getattr(mt5, "ACCOUNT_TRADE_MODE_DEMO", 0)
+    if getattr(info, "trade_mode", None) != demo_mode:
+        mt5.shutdown()
+        MT5_CONNECTED = False
+        log.warning("Connexion refusée : le compte MT5 actif n'est pas un compte démo.")
+        return {"ok": False, "error": "MANSA V1 accepte uniquement les comptes MT5 de démonstration."}
+
     MT5_CONNECTED = True
-    log.info(f"✅ MT5 connecté — {info.name} | {info.server} | Balance: {info.balance}")
+    log.info(f"✅ MT5 démo connecté — {info.name} | {info.server} | Balance: {info.balance}")
     return {
         "ok": True,
         "account": {
@@ -397,6 +406,10 @@ async def handler(websocket, path=""):
 def dispatch(action: str, msg: dict) -> dict:
     """Route les messages vers la bonne fonction MT5."""
     log.info(f"← {action}")
+    # Les ordres réels et simulés restent désactivés dans cette première étape.
+    # Le cockpit est en lecture seule jusqu'à validation complète du parcours d'exécution.
+    if action in {"place_order", "close_position", "modify_position", "close_all"}:
+        return {"ok": False, "error": "Trading désactivé dans cette version MANSA. Aucune instruction n'a été envoyée à MT5."}
     if action == "connect":
         return mt5_connect(
             login=msg.get("login"),
@@ -473,6 +486,9 @@ async def broadcast_ticks(symbols: list, interval: float = 1.0):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 async def main(args):
+    # Le pont n'accepte que les interfaces locales dans cette version.
+    if args.host not in {"localhost", "127.0.0.1"}:
+        raise SystemExit("Sécurité MANSA : le bridge doit écouter sur localhost ou 127.0.0.1.")
     # Auto-connect si credentials fournis en CLI
     if args.login:
         result = mt5_connect(
@@ -500,11 +516,11 @@ async def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Mansa Terminal — Bridge MT5")
-    parser.add_argument("--host",     default="localhost", help="Adresse d'écoute")
-    parser.add_argument("--port",     default=8765, type=int, help="Port WebSocket")
-    parser.add_argument("--login",    default=None, help="Numéro de compte MT5")
-    parser.add_argument("--password", default=None, help="Mot de passe MT5")
-    parser.add_argument("--server",   default=None, help="Serveur broker MT5")
+    parser.add_argument("--host", default="localhost", help="Adresse locale d'écoute (localhost uniquement)")
+    parser.add_argument("--port", default=8765, type=int, help="Port WebSocket")
+    parser.add_argument("--login", default=None, help="Numéro de compte démo MT5 (facultatif)")
+    parser.add_argument("--password", default=None, help="Mot de passe démo MT5 (facultatif)")
+    parser.add_argument("--server", default=None, help="Serveur démo MT5 (facultatif)")
     args = parser.parse_args()
 
     if not MT5_AVAILABLE or not WS_AVAILABLE:
