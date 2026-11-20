@@ -93,21 +93,52 @@
  function renderChartGrid(){
    const grid=$("chart-grid");gridLayout=Math.max(1,Math.min(6,gridLayout));grid.dataset.layout=String(gridLayout);
    document.querySelectorAll("#chart-layout button").forEach(b=>b.classList.toggle("active",Number(b.dataset.layout)===gridLayout));
-   miniCharts.forEach(x=>{try{x.remove()}catch{}});miniCharts=[];
+   miniCharts.forEach(p=>{try{p.chart.remove()}catch{}});miniCharts=[];
    const picks=[current,...symbols.filter(x=>x.s!==current.s)].slice(0,gridLayout);
    grid.innerHTML=picks.map((item,i)=>'<div class="chart-cell"><div class="chart-cell-head"><strong>'+item.s+' · '+tf+'</strong><span>'+(i===0?'PRINCIPAL':'DÉMO')+'</span></div><div class="chart-cell-canvas" id="grid-chart-'+i+'"></div></div>').join("");
    picks.forEach((item,i)=>{
      const node=$("grid-chart-"+i);
      const c=LightweightCharts.createChart(node,{autoSize:true,layout:{background:{type:"solid",color:"#0b0e14"},textColor:"#8d96a5",fontFamily:"Inter,system-ui,sans-serif",fontSize:i?10:11},grid:{vertLines:{color:"#171d26"},horzLines:{color:"#171d26"}},rightPriceScale:{borderColor:"#252b36"},timeScale:{borderColor:"#252b36",timeVisible:true,secondsVisible:false},attributionLogo:true,handleScroll:true,handleScale:true});
-     miniCharts.push(c);
-     if(i===0){chart=c;candles=c.addSeries(LightweightCharts.CandlestickSeries,{upColor:"#2cc58d",downColor:"#fa6470",borderUpColor:"#2cc58d",borderDownColor:"#fa6470",wickUpColor:"#2cc58d",wickDownColor:"#fa6470",priceLineVisible:true});ema=c.addSeries(LightweightCharts.LineSeries,{color:"#8d79ff",lineWidth:2,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});volumes=c.addSeries(LightweightCharts.HistogramSeries,{priceFormat:{type:"volume"},priceScaleId:"volume",lastValueVisible:false,priceLineVisible:false});c.priceScale("volume").applyOptions({scaleMargins:{top:.82,bottom:0},borderVisible:false});}
-     else{const cs=c.addSeries(LightweightCharts.CandlestickSeries,{upColor:"#2cc58d",downColor:"#fa6470",borderUpColor:"#2cc58d",borderDownColor:"#fa6470",wickUpColor:"#2cc58d",wickDownColor:"#fa6470"});cs.setData(miniBars(item,i));c.timeScale().fitContent();}
+     let priceSeries,bars;
+     if(i===0){
+       chart=c;candles=c.addSeries(LightweightCharts.CandlestickSeries,{upColor:"#2cc58d",downColor:"#fa6470",borderUpColor:"#2cc58d",borderDownColor:"#fa6470",wickUpColor:"#2cc58d",wickDownColor:"#fa6470",priceLineVisible:true});priceSeries=candles;
+       ema=c.addSeries(LightweightCharts.LineSeries,{color:"#8d79ff",lineWidth:2,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+       volumes=c.addSeries(LightweightCharts.HistogramSeries,{priceFormat:{type:"volume"},priceScaleId:"volume",lastValueVisible:false,priceLineVisible:false});c.priceScale("volume").applyOptions({scaleMargins:{top:.82,bottom:0},borderVisible:false});
+       bars=series().arr;
+     }else{
+       priceSeries=c.addSeries(LightweightCharts.CandlestickSeries,{upColor:"#2cc58d",downColor:"#fa6470",borderUpColor:"#2cc58d",borderDownColor:"#fa6470",wickUpColor:"#2cc58d",wickDownColor:"#fa6470"});
+       bars=miniBars(item,i);priceSeries.setData(bars);c.timeScale().fitContent();
+     }
+     miniCharts.push({chart:c,series:priceSeries,bars,symbol:item.s});
    });
+   wireChartSynchronization();
    if(live)loadLiveCandles();else draw();
+ }
+ let chartSyncLock=false;
+ function wireChartSynchronization(){
+   miniCharts.forEach((source,index)=>{
+     source.chart.timeScale().subscribeVisibleLogicalRangeChange(range=>{
+       if(chartSyncLock||!range)return;chartSyncLock=true;
+       miniCharts.forEach((target,j)=>{if(j!==index)try{target.chart.timeScale().setVisibleLogicalRange(range)}catch{}});
+       chartSyncLock=false;
+     });
+     source.chart.subscribeCrosshairMove(param=>{
+       if(chartSyncLock)return;
+       if(!param||param.time===undefined){chartSyncLock=true;miniCharts.forEach((target,j)=>{if(j!==index)target.chart.clearCrosshairPosition()});chartSyncLock=false;return;}
+       chartSyncLock=true;
+       miniCharts.forEach((target,j)=>{
+         if(j===index)return;
+         const bar=target.bars.find(x=>x.time===param.time);
+         if(bar)target.chart.setCrosshairPosition(bar.close,param.time,target.series);
+         else target.chart.clearCrosshairPosition();
+       });
+       chartSyncLock=false;
+     });
+   });
  }
  document.querySelectorAll("#chart-layout button").forEach(b=>b.addEventListener("click",()=>{gridLayout=Number(b.dataset.layout);renderChartGrid()}));
  function updateOverlays(bars){let k=2/21,value=bars[0]?.close;ema.setData(bars.map((bar,i)=>{value=i?bar.close*k+value*(1-k):bar.close;return{time:bar.time,value}}));priceLines.forEach(line=>candles.removePriceLine(line));priceLines=[];if(live)return;let p=positions.find(x=>x.symbol===current.s);if(p?.sl)priceLines.push(candles.createPriceLine({price:+p.sl,color:"#f34d62",lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:"SL"}));if(p?.tp)priceLines.push(candles.createPriceLine({price:+p.tp,color:"#27c58d",lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:"TP"}));if(current.s==="EURUSD+")priceLines.push(candles.createPriceLine({price:1.08291,color:"#4d8cff",lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:"Achat limite SIM"}));}
- function draw(){if(!candles)return;let d=series();candles.setData(d.arr);volumes.setData(d.vol);updateOverlays(d.arr);chart.timeScale().fitContent();let last=d.arr.at(-1),delta=last.close-current.p*(1-current.c/100);updateSymbol(last.close,delta);$("chart-title").textContent=current.n;$("asset-icon").textContent=current.icon;$("chart-subtitle").textContent=live?"FOREX · MT5 LIVE":"MARCHÉ · DÉMO SIMULÉ";$("chart-legend").textContent="EMA 20　"+fmt(last.close*.9997,current.d)+"　　Vol";}
+ function draw(){if(!candles)return;let d=series();candles.setData(d.arr);if(miniCharts[0])miniCharts[0].bars=d.arr;volumes.setData(d.vol);updateOverlays(d.arr);chart.timeScale().fitContent();let last=d.arr.at(-1),delta=last.close-current.p*(1-current.c/100);updateSymbol(last.close,delta);$("chart-title").textContent=current.n;$("asset-icon").textContent=current.icon;$("chart-subtitle").textContent=live?"FOREX · MT5 LIVE":"MARCHÉ · DÉMO SIMULÉ";$("chart-legend").textContent="EMA 20　"+fmt(last.close*.9997,current.d)+"　　Vol";}
  function updateSymbol(price=current.p,delta=current.p*current.c/100){let pct=delta/(price-delta||price)*100;$("top-symbol").textContent=current.s;$("symbol-select").textContent=current.s+" ▾";$("top-price").textContent=fmt(price,current.d);$("quote").textContent=fmt(price,current.d);$("top-change").textContent=(pct>=0?"+":"")+pct.toFixed(2)+"%";$("quote-change").textContent=(delta>=0?"+":"")+fmt(delta,current.d)+" ("+(pct>=0?"+":"")+pct.toFixed(2)+"%)";$("quote-change").style.color=pct>=0?"var(--green)":"var(--red)";let spread=current.s.includes("JPY")?.012:current.s.includes("XAU")?.25:current.s.includes("NAS")?1:.00007;if($("sell-quote"))$("sell-quote").textContent=fmt(price,current.d);if($("buy-quote"))$("buy-quote").textContent=fmt(price+spread,current.d);if($("detail-symbol"))$("detail-symbol").innerHTML=current.s+'　<small>'+current.n+'</small>';if($("detail-price"))$("detail-price").textContent=fmt(price,current.d);if($("detail-change")){$("detail-change").textContent=(pct>=0?"+":"")+fmt(delta,current.d)+"　"+(pct>=0?"+":"")+pct.toFixed(2)+"%";$("detail-change").className="instrument-change "+(pct<0?"down":"");}}
  function renderWatch(){ $("watch-list").innerHTML=symbols.map(x=>'<div class="watch-row '+(x.s===current.s?"selected":"")+'" data-s="'+x.s+'"><div class="ticker"><span class="coin">'+x.icon+'</span><span><strong>'+x.s+'</strong><small>'+x.n.split(" / ")[0]+'</small></span></div><span class="watch-price">'+fmt(x.p,x.d)+'</span><span class="watch-change '+(x.c<0?"down":"")+'">'+(x.c>0?"+":"")+x.c.toFixed(2)+'%</span></div>').join("");
  $("watch-list").querySelectorAll(".watch-row").forEach(row=>row.onclick=()=>selectSymbol(row.dataset.s));}
@@ -132,7 +163,7 @@
  function tabs(){document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));renderBottom(b.dataset.tab)})}
  function request(action,extra={}){return new Promise((resolve,reject)=>{if(!ws||ws.readyState!==1)return reject(Error("Pont MT5 déconnecté"));let id=String(++requestId),timer=setTimeout(()=>{pending.delete(id);reject(Error("Délai dépassé"))},7000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({action,_id:id,...extra}));})}
  async function sync(){try{let [a,p,h]=await Promise.all([request("account"),request("positions"),request("history",{days:30})]);if(!a.ok)throw Error(a.error||"Compte MT5 indisponible");account=a;positions=p.positions||[];history=h.deals||[];renderAccount();$("positions-count").textContent=positions.length;renderBottom(document.querySelector(".tab.active").dataset.tab);await loadLiveCandles();$("status-text").textContent="Connecté à MT5 — synchronisation active";$("statusbar").classList.remove("demo");$("mode-badge").innerHTML='<i class="dot" style="background:var(--green);box-shadow:0 0 8px #2cc58d55"></i><span>MT5 · CONNECTÉ</span>';$("connect-open").textContent="MT5 connecté";if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(pollLive,5000);}catch(e){disconnect(e.message)}}
- async function loadLiveCandles(){try{let r=await request("ohlcv",{symbol:current.s,tf,count:180});if(!r.ok||!r.candles?.length)return;let bars=r.candles.map(c=>({time:typeof c.time==="number"?c.time:Math.floor(new Date(c.time).getTime()/1000),open:+c.open,high:+c.high,low:+c.low,close:+c.close})).filter(c=>Number.isFinite(c.time)).sort((a,b)=>a.time-b.time);candles.setData(bars);volumes.setData([]);updateOverlays(bars);chart.timeScale().fitContent();updateSymbol(bars.at(-1).close);$("chart-subtitle").textContent="MARCHÉ · MT5 LIVE";}catch{}}
+ async function loadLiveCandles(){try{let r=await request("ohlcv",{symbol:current.s,tf,count:180});if(!r.ok||!r.candles?.length)return;let bars=r.candles.map(c=>({time:typeof c.time==="number"?c.time:Math.floor(new Date(c.time).getTime()/1000),open:+c.open,high:+c.high,low:+c.low,close:+c.close})).filter(c=>Number.isFinite(c.time)).sort((a,b)=>a.time-b.time);candles.setData(bars);if(miniCharts[0])miniCharts[0].bars=bars;volumes.setData([]);updateOverlays(bars);chart.timeScale().fitContent();updateSymbol(bars.at(-1).close);$("chart-subtitle").textContent="MARCHÉ · MT5 LIVE";}catch{}}
  async function pollLive(){if(!live)return;try{let [a,p,t]=await Promise.all([request("account"),request("positions"),request("tick",{symbol:current.s})]);if(a.ok)account=a;if(p.ok)positions=p.positions||[];if(t.ok){updateSymbol(t.bid);if($("buy-quote"))$("buy-quote").textContent=fmt(t.ask,current.d)}$("positions-count").textContent=positions.length;renderAccount();renderBottom(document.querySelector(".tab.active").dataset.tab);if(Date.now()%15000<5500)await loadLiveCandles()}catch{}}
  function disconnect(message="Connexion fermée"){if(pollTimer){clearInterval(pollTimer);pollTimer=null}live=false;account=null;positions=[];history=[];if(ws){ws.onclose=null;ws.close();ws=null}renderAccount();renderBottom("positions");$("statusbar").classList.add("demo");$("status-text").textContent="Mode démonstration — "+message;$("mode-badge").innerHTML='<i class="dot"></i><span>DÉMO · DONNÉES SIMULÉES</span>';$("connect-open").textContent="Connecter MT5";}
  $("connect-open").onclick=()=>{$("modal-msg").textContent="";$("connect-modal").classList.add("open")};$("connect-cancel").onclick=()=>$("connect-modal").classList.remove("open");$("connect-modal").onclick=e=>{if(e.target===$("connect-modal"))$("connect-modal").classList.remove("open")};
