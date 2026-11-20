@@ -27,6 +27,15 @@
 .drawing-toolbar-state.visible{display:block}
 #drawing-undo{font-size:11px}
 
+
+.drawing-manager{position:absolute;z-index:6;top:52px;left:14px;width:min(330px,calc(100% - 28px));max-height:70%;overflow:auto;background:#141a23;border:1px solid #303846;border-radius:8px;padding:12px;box-shadow:0 14px 40px #0009;display:none}
+.drawing-manager.open{display:block}.drawing-manager-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:12px;font-weight:700;color:#e5eaf1}
+.drawing-manager-head button{background:transparent;border:0;color:#9aa5b5;cursor:pointer;font-size:16px}
+.drawing-list{display:grid;gap:6px}.drawing-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:7px;padding:7px;border:1px solid #2b3441;border-radius:5px;color:#c2cad5;font-size:11px}
+.drawing-row input{accent-color:var(--accent)}.drawing-row strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawing-row button{background:#202936;border:1px solid #354154;border-radius:4px;color:#cbd5e1;padding:4px 6px;font-size:10px;cursor:pointer}
+.drawing-empty{color:#8792a2;font-size:11px;padding:12px 4px;text-align:center}
+
 </style>
 </head>
 <body>
@@ -38,13 +47,13 @@
   <button class="connect-btn" id="connect-open">Connecter MT5</button><div class="avatar">M</div>
 </header>
 <div class="workspace">
-  <nav class="rail" aria-label="Outils du graphique"><button class="active" title="Curseur">↖</button><button data-draw="trend" title="Ligne de tendance">╱</button><button data-draw="trend" title="Outil de dessin">⌁</button><button data-draw="horizontal" title="Ligne horizontale">☷</button><button data-draw="rectangle" title="Rectangle">▱</button><button data-draw="fib" title="Retracement de Fibonacci">F</button><button title="Indicateurs">⌁</button><button title="Aimant">♢</button><button id="drawing-undo" title="Annuler le dernier tracé">↶</button><button title="Calques">▱</button><button title="Afficher/masquer">◉</button></nav>
+  <nav class="rail" aria-label="Outils du graphique"><button class="active" title="Curseur">↖</button><button data-draw="trend" title="Ligne de tendance">╱</button><button data-draw="trend" title="Outil de dessin">⌁</button><button data-draw="horizontal" title="Ligne horizontale">☷</button><button data-draw="rectangle" title="Rectangle">▱</button><button data-draw="fib" title="Retracement de Fibonacci">F</button><button title="Indicateurs">⌁</button><button title="Aimant">♢</button><button id="drawing-undo" title="Annuler le dernier tracé">↶</button><button id="drawings-open" title="Gestion des dessins">▱</button><button title="Afficher/masquer">◉</button></nav>
   <main class="main">
     <div class="toolbar"><button class="tool-btn" id="symbol-select">EURUSD ▾</button><div class="tool-sep"></div>
       <div id="timeframes"></div><div class="tool-sep"></div><div class="chart-layout" id="chart-layout" aria-label="Disposition des graphiques"><button data-layout="1" class="active">1</button><button data-layout="2">2</button><button data-layout="4">4</button><button data-layout="6">6</button></div><div class="tool-sep"></div><button class="tool-btn">Candles ▾</button><button class="tool-btn" id="indicators-open">ƒx Indicateurs</button><div class="tool-sep"></div><button class="tool-btn">◉ Alerte</button><button class="tool-btn">⤢</button>
     </div>
     <section class="chart-wrap"><div class="chart-head"><div class="asset-icon" id="asset-icon">EU</div><div class="asset-meta"><strong id="chart-title">Euro / U.S. Dollar</strong><small id="chart-subtitle">FOREX · MT5</small></div><div class="tool-sep"></div><div class="quote" id="quote">1.08425</div><div class="quote-change" id="quote-change">+0.00346 (+0.32%)</div><div class="chart-actions"><button>⤢ Ajuster</button><button>☆</button></div></div>
-      <div class="indicator-panel" id="indicator-panel"><h3>INDICATEURS TECHNIQUES</h3><div class="indicator-options"><label class="indicator-option"><input type="checkbox" data-indicator="ema" checked> EMA 20</label><label class="indicator-option"><input type="checkbox" data-indicator="sma"> SMA 50</label><label class="indicator-option"><input type="checkbox" data-indicator="bb"> Bollinger 20</label><label class="indicator-option"><input type="checkbox" data-indicator="rsi" checked> RSI 14</label><label class="indicator-option"><input type="checkbox" data-indicator="macd" checked> MACD 12/26/9</label><label class="indicator-option"><input type="checkbox" data-indicator="atr"> ATR 14</label><label class="indicator-option"><input type="checkbox" data-indicator="stoch"> Stochastique 14/3</label></div><small>Calculs locaux sur les bougies chargées. Les courbes de prix sont superposées au graphique principal ; les oscillateurs sont affichés dans le bandeau de lecture.</small></div><div class="indicator-readout" id="indicator-readout">Indicateurs : chargement…</div><div class="drawing-toolbar-state" id="drawing-state">Mode dessin</div><div class="chart-grid" id="chart-grid" data-layout="1"><div class="chart-cell"><div class="chart-cell-head"><strong id="primary-panel-title">EURUSD+ · 5m</strong><span>PRINCIPAL</span></div><div id="chart" class="chart-cell-canvas"></div></div></div><div class="chart-legend">EMA 20　<b>1.08399</b><br><span>Vol</span></div>
+      <div class="indicator-panel" id="indicator-panel"><h3>INDICATEURS TECHNIQUES</h3><div class="indicator-options"><label class="indicator-option"><input type="checkbox" data-indicator="ema" checked> EMA 20</label><label class="indicator-option"><input type="checkbox" data-indicator="sma"> SMA 50</label><label class="indicator-option"><input type="checkbox" data-indicator="bb"> Bollinger 20</label><label class="indicator-option"><input type="checkbox" data-indicator="rsi" checked> RSI 14</label><label class="indicator-option"><input type="checkbox" data-indicator="macd" checked> MACD 12/26/9</label><label class="indicator-option"><input type="checkbox" data-indicator="atr"> ATR 14</label><label class="indicator-option"><input type="checkbox" data-indicator="stoch"> Stochastique 14/3</label></div><small>Calculs locaux sur les bougies chargées. Les courbes de prix sont superposées au graphique principal ; les oscillateurs sont affichés dans le bandeau de lecture.</small></div><div class="indicator-readout" id="indicator-readout">Indicateurs : chargement…</div><div class="drawing-toolbar-state" id="drawing-state">Mode dessin</div><div class="drawing-manager" id="drawing-manager"><div class="drawing-manager-head"><span>OBJETS DU GRAPHIQUE</span><button id="drawings-close" aria-label="Fermer">×</button></div><div class="drawing-list" id="drawing-list"></div></div><div class="chart-grid" id="chart-grid" data-layout="1"><div class="chart-cell"><div class="chart-cell-head"><strong id="primary-panel-title">EURUSD+ · 5m</strong><span>PRINCIPAL</span></div><div id="chart" class="chart-cell-canvas"></div></div></div><div class="chart-legend">EMA 20　<b>1.08399</b><br><span>Vol</span></div>
       <div class="order-ticket"><div><span>VENDRE</span><b id="sell-quote">1.08412</b></div><i>—<small>0.10</small></i><div><span>ACHETER</span><b id="buy-quote">1.08419</b></div></div>
       <div class="manager-card"><div class="manager-head"><b><i></i> ProTradingManager</b><span>SIM</span><button disabled>⋯</button></div><div class="manager-row"><span>Risque</span><b>1.0 %</b></div><div class="manager-row"><span>Breakeven auto</span><b class="positive">BE 1R</b></div><div class="manager-row"><span>Trailing</span><b>ATR × 2</b></div><div class="manager-row"><span>Positions gérées</span><b>1</b></div><div class="manager-actions"><button disabled>Tout fermer</button><button disabled>Breakeven</button></div></div>
       <div class="demo-alert"><span>◉</span><div><b>DarkCloud PricingLine CCI · Alerte</b><small>Signal d'achat GBPUSD+ · Démo</small></div></div>
@@ -128,7 +137,7 @@
  }
 
  const drawingKey=()=> "mansa.drawings.v1."+current.s+"."+tf;
- function loadDrawings(){try{const v=JSON.parse(localStorage.getItem(drawingKey())||"[]");drawingItems=Array.isArray(v)?v:[]}catch{drawingItems=[]}}
+ function loadDrawings(){try{const v=JSON.parse(localStorage.getItem(drawingKey())||"[]");drawingItems=Array.isArray(v)?v.map((d,i)=>({...d,id:d.id||"legacy-"+i,name:d.name||"",visible:d.visible!==false})):[]}catch{drawingItems=[]}renderDrawingManager()}
  function saveDrawings(){try{localStorage.setItem(drawingKey(),JSON.stringify(drawingItems))}catch{}}
  function svgNode(tag,attrs){const el=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,String(v)));return el}
  function drawingPoint(x,y){const rect=drawingSvg.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;const time=chart.timeScale().coordinateToTime(px),price=candles.coordinateToPrice(py);return time==null||price==null?null:{time,price}}
@@ -138,6 +147,7 @@
    drawingSvg.innerHTML="";
    const width=drawingSvg.clientWidth,height=drawingSvg.clientHeight;
    drawingItems.forEach(d=>{
+     if(d.visible===false)return;
      const a=pointXY(d.a);if(!a)return;
      if(d.type==="horizontal"){drawingSvg.appendChild(svgNode("line",{x1:0,y1:a.y,x2:width,y2:a.y,stroke:"#e7b85c","stroke-width":1.4,"stroke-dasharray":"5 4"}));return}
      const b=pointXY(d.b);if(!b)return;
@@ -150,6 +160,27 @@
    });
    if(drawingDraft){const a=pointXY(drawingDraft.a),b=pointXY(drawingDraft.b);if(a&&b)drawingSvg.appendChild(svgNode("line",{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:"#e7b85c","stroke-width":1.5,"stroke-dasharray":"4 3"}))}
  }
+
+ function drawingTypeName(type){return {trend:"Ligne de tendance",horizontal:"Ligne horizontale",rectangle:"Rectangle",fib:"Fibonacci"}[type]||"Dessin"}
+ function renderDrawingManager(){
+   const list=$("drawing-list");if(!list)return;
+   if(!drawingItems.length){list.innerHTML='<div class="drawing-empty">Aucun dessin pour ce marché et cette unité de temps.</div>';return}
+   list.innerHTML="";
+   drawingItems.forEach((item,index)=>{
+     const row=document.createElement("div");row.className="drawing-row";
+     const toggle=document.createElement("input");toggle.type="checkbox";toggle.checked=item.visible!==false;toggle.title="Afficher ou masquer";
+     toggle.addEventListener("change",()=>{item.visible=toggle.checked;saveDrawings();renderDrawings()});
+     const name=document.createElement("strong");name.textContent=item.name||drawingTypeName(item.type)+" "+(index+1);name.title=name.textContent;
+     const actions=document.createElement("span");actions.style.display="flex";actions.style.gap="4px";
+     const rename=document.createElement("button");rename.textContent="Nom";rename.title="Renommer";
+     rename.addEventListener("click",()=>{const value=window.prompt("Nom du dessin",item.name||drawingTypeName(item.type)+" "+(index+1));if(value!==null&&value.trim()){item.name=value.trim().slice(0,48);saveDrawings();renderDrawingManager()}});
+     const remove=document.createElement("button");remove.textContent="×";remove.title="Supprimer ce dessin";
+     remove.addEventListener("click",()=>{drawingItems.splice(index,1);saveDrawings();renderDrawings();renderDrawingManager()});
+     actions.append(rename,remove);row.append(toggle,name,actions);list.appendChild(row);
+   });
+ }
+ $("drawings-open").onclick=()=>{$("drawing-manager").classList.toggle("open");renderDrawingManager()};
+ $("drawings-close").onclick=()=>$("drawing-manager").classList.remove("open");
  function attachDrawingLayer(){
    const cell=document.querySelector("#chart-grid .chart-cell");if(!cell)return;
    drawingSvg=svgNode("svg",{class:"drawing-layer",xmlns:"http://www.w3.org/2000/svg"});
@@ -158,7 +189,7 @@
      if(!drawingMode)return;const p=drawingPoint(e.clientX,e.clientY);if(!p)return;e.preventDefault();
      if(drawingMode==="horizontal"){drawingItems.push({type:"horizontal",a:p});saveDrawings();renderDrawings();return}
      if(!drawingDraft){drawingDraft={type:drawingMode,a:p,b:p};renderDrawings();return}
-     drawingItems.push({type:drawingMode,a:drawingDraft.a,b:p});drawingDraft=null;saveDrawings();renderDrawings();
+     drawingItems.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,7),type:drawingMode,name:"",visible:true,a:drawingDraft.a,b:p});drawingDraft=null;saveDrawings();renderDrawings();renderDrawingManager();
    });
    drawingSvg.addEventListener("pointermove",e=>{if(!drawingDraft)return;drawingDraft.b=drawingPoint(e.clientX,e.clientY)||drawingDraft.b;renderDrawings()});
    chart.timeScale().subscribeVisibleLogicalRangeChange(()=>renderDrawings());
@@ -173,7 +204,7 @@
    document.querySelectorAll("[data-draw]").forEach(b=>b.classList.toggle("active",!!drawingMode&&b.dataset.draw===drawingMode));
    if(drawingSvg){drawingSvg.classList.toggle("active",!!drawingMode);$("drawing-state").classList.toggle("visible",!!drawingMode);$("drawing-state").textContent=drawingMode?"DESSIN · "+({trend:"Tendance",horizontal:"Horizontale",rectangle:"Rectangle",fib:"Fibonacci"}[drawingMode]):""}
  }));
- $("drawing-undo").onclick=()=>{if(drawingDraft){drawingDraft=null;renderDrawings();return}drawingItems.pop();saveDrawings();renderDrawings()};
+ $("drawing-undo").onclick=()=>{if(drawingDraft){drawingDraft=null;renderDrawings();return}drawingItems.pop();saveDrawings();renderDrawings();renderDrawingManager()};
  let chartSyncLock=false;
  function wireChartSynchronization(){
    miniCharts.forEach((source,index)=>{
