@@ -374,6 +374,13 @@ def get_history(days: int = 7) -> dict:
                 "volume": d.volume,
                 "price":  d.price,
                 "profit": round(d.profit, 2),
+                "commission": round(getattr(d, "commission", 0.0), 2),
+                "swap": round(getattr(d, "swap", 0.0), 2),
+                "fee": round(getattr(d, "fee", 0.0), 2),
+                "net_profit": round(d.profit + getattr(d, "commission", 0.0) + getattr(d, "swap", 0.0) + getattr(d, "fee", 0.0), 2),
+                "position_id": getattr(d, "position_id", None),
+                "entry": int(getattr(d, "entry", -1)),
+                "magic": int(getattr(d, "magic", 0)),
                 "time":   datetime.datetime.fromtimestamp(d.time).strftime("%Y-%m-%d %H:%M"),
                 "comment": d.comment,
             })
