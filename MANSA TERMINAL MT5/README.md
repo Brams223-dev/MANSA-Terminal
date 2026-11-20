@@ -1,6 +1,6 @@
 # MANSA TERMINAL MT5
 
-Terminal de marché Windows avec une interface sombre originale, un graphique interactif, une liste de suivi et une connexion en lecture au pont local MT5 du dépôt.
+Terminal MANSA pour Windows, dont la disposition reprend la capture de référence fournie : graphique central, outils latéraux, watchlist, fiche instrument et tableau des positions. Le design et les éléments graphiques MANSA restent distincts des assets propriétaires de TradingView.
 
 ## Démarrer sur Windows
 
