@@ -1,97 +1,63 @@
-# 🖥️ Mansa Terminal — Bridge MT5
+# MANSA TERMINAL — Bridge MT5 (V1 sécurisée)
 
-Ce script Python crée un pont entre le **Terminal Mansa** (browser) et **MetaTrader 5** installé sur ton PC/VPS.
+Ce pont local permet au cockpit MANSA de lire les informations d'un MetaTrader 5 installé sur le même PC Windows.
 
-Il te permet de :
-- Voir tes graphiques MT5 directement dans le terminal (sans abonnement TradingView)
-- Passer des ordres Market et Pending
-- Gérer tes positions (modifier SL/TP, fermer)
-- Trader depuis n'importe quel compte (prop firm ou compte propre)
+## Périmètre V1
 
----
+- Connexion au terminal MT5 déjà ouvert.
+- Lecture du compte, des positions, des ordres en attente, des cotations, des bougies et de l'historique.
+- **Compte démo uniquement** : la connexion à un compte réel est refusée par le bridge.
+- **Lecture seule** : les actions `place_order`, `close_position`, `modify_position` et `close_all` sont refusées côté serveur.
+- Écoute locale uniquement : `localhost` ou `127.0.0.1`. Les interfaces réseau telles que `0.0.0.0` sont refusées.
 
-## 📦 Installation
+Cette étape ne permet donc pas encore de passer des ordres. Le trading sera réactivé dans une version ultérieure après authentification du canal local, validation des paramètres de risque, gestion des retours MT5 et tests de bout en bout sur compte démo.
 
-### 1. Prérequis
-- Windows (MetaTrader5 Python lib = Windows only)
+## Installation
+
+Prérequis :
+- Windows
 - Python 3.8+
-- MetaTrader 5 installé et ouvert
+- MetaTrader 5 installé et ouvert sur un compte démo
 
-### 2. Installer les dépendances
+Installer les dépendances :
+
 ```bash
 pip install MetaTrader5 websockets
 ```
 
-### 3. Lancer le bridge
+Lancer le bridge depuis ce dossier :
 
-**Option A — MT5 déjà ouvert et connecté (compte actif)**
 ```bash
 python mt5_bridge.py
 ```
-Le bridge se connecte automatiquement au compte actif dans MT5.
 
-**Option B — Connexion avec credentials**
-```bash
-python mt5_bridge.py --login 12345678 --password MonMotDePasse --server "ICMarkets-Demo"
-```
+Le bridge écoute sur `ws://localhost:8765`. Ne modifie pas l'adresse d'écoute pour l'exposer sur le réseau.
 
-**Option C — Accès depuis un autre appareil sur le réseau local**
-```bash
-python mt5_bridge.py --host 0.0.0.0 --port 8765
-```
-Puis dans le terminal Mansa, entre l'IP de ton PC (ex: `192.168.1.10`) au lieu de `localhost`.
+## Connexion dans MANSA
 
----
+1. Ouvre MetaTrader 5 sur un compte de démonstration.
+2. Lance `python mt5_bridge.py` sur le même PC.
+3. Dans MANSA, utilise l'adresse `localhost` et le port `8765`.
+4. Vérifie que l'interface indique clairement la connexion MT5 démo.
 
-## 🌐 Connexion dans le terminal
+## Actions de lecture disponibles
 
-1. Lance le bridge Python sur ton PC
-2. Ouvre le terminal Mansa → onglet **🖥️ TRADING MT5**
-3. Paramètres bridge :
-   - **Adresse** : `localhost` (ou IP de ton PC)
-   - **Port** : `8765`
-4. Clique **CONNECTER**
+| Action | Paramètres | Usage |
+|---|---|---|
+| `connect` | aucun | Vérifie le compte actif et refuse les comptes réels |
+| `account` | — | Informations du compte |
+| `positions` | — | Positions ouvertes |
+| `orders` | — | Ordres en attente |
+| `ohlcv` | `{symbol, tf, count}` | Bougies historiques |
+| `tick` | `{symbol}` | Bid/ask |
+| `history` | `{days}` | Historique des deals |
+| `ping` | — | État du bridge |
 
----
+Les actions d'exécution et de modification d'ordres sont explicitement bloquées côté bridge dans cette version, même si un client tente de les appeler.
 
-## ✅ Comptes supportés
+## Limites et sécurité
 
-Fonctionne avec **n'importe quel compte MT5** :
-- Comptes réels (ton broker)
-- Comptes démo
-- Prop firms (FTMO, MFF, E8, The5ers, Funded Next, etc.)
-- Comptes cent
-
-Il suffit que MetaTrader 5 soit installé avec ce compte actif.
-
----
-
-## 🔒 Sécurité
-
-- Le bridge écoute sur `localhost` par défaut (inaccessible depuis internet)
-- Pour l'utiliser via internet, utilise un tunnel SSH ou VPN
-- Ne partage jamais ton fichier bridge lancé en `--host 0.0.0.0` sans protection
-
----
-
-## 📡 API du bridge (pour développeurs)
-
-Le bridge expose une API WebSocket JSON :
-
-| Action | Paramètres | Retour |
-|--------|------------|--------|
-| `connect` | `{login, password, server}` | `{ok, account}` |
-| `account` | — | `{ok, balance, equity, ...}` |
-| `positions` | — | `{ok, positions:[...]}` |
-| `orders` | — | `{ok, orders:[...]}` |
-| `ohlcv` | `{symbol, tf, count}` | `{ok, candles:[{time,open,high,low,close}]}` |
-| `tick` | `{symbol}` | `{ok, bid, ask, spread}` |
-| `place_order` | `{symbol, type, volume, sl, tp, price}` | `{ok, ticket, price}` |
-| `close_position` | `{ticket}` | `{ok}` |
-| `modify_position` | `{ticket, sl, tp}` | `{ok}` |
-| `close_all` | — | `{ok, closed, total}` |
-| `history` | `{days}` | `{ok, deals:[...]}` |
-| `ping` | — | `{ok, pong, mt5_connected}` |
-
-Les événements push (sans requête) :
-- `{event: "ticks", data: {EURUSD: {bid, ask, time}, ...}}` — envoyé toutes les 1.5s
+- Le bridge est destiné à un usage local sur le PC Windows qui exécute MT5.
+- Ne fournis jamais de mot de passe de compte dans une commande ou dans un dépôt Git.
+- Le protocole WebSocket actuel n'est pas encore doté d'un mécanisme d'appairage/authentification robuste. Ne l'expose pas à un réseau partagé ou à Internet.
+- Ce bridge est une version de développement, pas un composant certifié ni prêt pour une utilisation financière en production.
