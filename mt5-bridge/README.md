@@ -40,7 +40,32 @@ Le bridge écoute sur `ws://localhost:8765`. Ne modifie pas l'adresse d'écoute 
 3. Dans MANSA, utilise l'adresse `localhost` et le port `8765`.
 4. Vérifie que l'interface indique clairement la connexion MT5 démo.
 
-## Profils multi-comptes MANSA (fonction expérimentale)\n\nLe gestionnaire de comptes de l’interface peut mémoriser plusieurs profils locaux (nom, hôte et port) et reconnecter MANSA au profil choisi. Les profils sont conservés dans le stockage local du navigateur ; ils ne contiennent aucun identifiant ni mot de passe MT5.\n\n**Limite importante :** MANSA ne maintient qu’une connexion active à la fois. Enregistrer plusieurs ports ne crée pas plusieurs sessions MT5 et ne permet pas encore de comparer des comptes en parallèle. Le bridge actuel appelle `mt5.initialize()` sans chemin explicite vers une installation/instance donnée ; l’association fiable d’un bridge à plusieurs installations MT5 n’est donc pas encore garantie. Les ports distincts sont réservés à une évolution avec sélection et validation explicites du terminal cible.\n\nPour changer de compte dans cette version, bascule d’abord le compte dans MT5, puis reconnecte le profil qui pointe vers le bridge actif. Vérifie toujours le login et le serveur affichés par MT5 avant de considérer les données comme celles du compte attendu.\n\n## Actions de lecture disponibles
+## Multi-terminal : plusieurs comptes en parallèle
+
+Le gestionnaire **MANSA Intelligence · Fleet Control** peut sonder plusieurs bridges en parallèle, lire l'identité et l'equity de chaque compte démo et afficher les résultats séparément. Pour que cette isolation soit réelle, chaque profil doit utiliser :
+
+- une installation MT5 indépendante (idéalement un dossier d'installation distinct) ;
+- le chemin complet de son propre `terminal64.exe` ;
+- un bridge Python dédié ;
+- un port local unique.
+
+Le bridge accepte désormais `--terminal-path` et transmet ce chemin à `mt5.initialize(path=...)`. Exemple Windows, à lancer depuis le dossier `mt5-bridge` :
+
+```powershell
+# Terminal MT5 A
+python mt5_bridge.py --host localhost --port 8765 --terminal-path "C:\\Program Files\\Broker A MT5\\terminal64.exe"
+
+# Terminal MT5 B (autre installation MT5)
+python mt5_bridge.py --host localhost --port 8766 --terminal-path "D:\\Trading\\Broker B MT5\\terminal64.exe"
+```
+
+Dans MANSA, crée un profil par installation avec le même port et le même chemin. Le bouton **Scanner tous les comptes** interroge chaque bridge indépendamment. Le profil connecté au graphique reste une connexion active ; le scan des autres profils ouvre une courte connexion de lecture pour relever leur compte, puis la ferme.
+
+**Important :** chaque terminal doit déjà être installé et configuré sur le compte démo attendu. Le bridge refuse tout compte qui n'est pas en mode démo. Ne configure pas deux bridges sur le même port. N'utilise pas le même dossier MT5 pour plusieurs bridges : installe des copies indépendantes pour éviter que les processus se disputent la même instance. Le scan est une lecture ponctuelle, pas une garantie de flux temps réel permanent pour tous les comptes.
+
+Les profils et leurs derniers relevés sont conservés dans le stockage local du navigateur. Aucun mot de passe MT5 n'est enregistré ni transmis par MANSA. Les relevés anciens peuvent devenir obsolètes ; relance le scan avant de comparer.
+
+## Actions de lecture disponibles
 
 | Action | Paramètres | Usage |
 |---|---|---|
