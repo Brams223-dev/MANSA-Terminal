@@ -135,7 +135,7 @@
    });
    wireChartSynchronization();
    loadDrawings();
-   if(live)loadLiveCandles();else draw();
+   if(replayTrade){/* Les bougies historiques seront appliquées par loadTradeReplay. */}else if(live)loadLiveCandles();else draw();
    attachDrawingLayer();
  }
 
