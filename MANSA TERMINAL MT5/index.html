@@ -37,7 +37,9 @@
 .drawing-empty{color:#8792a2;font-size:11px;padding:12px 4px;text-align:center}
 
 .template-panel{position:absolute;z-index:7;top:52px;left:14px;width:min(320px,calc(100% - 28px));max-height:65%;overflow:auto;background:#141a23;border:1px solid #303846;border-radius:8px;padding:12px;box-shadow:0 14px 40px #0009;display:none}.template-panel.open{display:block}.template-panel h3{font-size:12px;margin:0 0 9px}.template-actions{display:flex;gap:7px;margin-bottom:9px}.template-actions button,.template-row button{background:#202936;border:1px solid #354154;border-radius:5px;color:#d1d9e5;padding:6px 8px;font-size:10px}.template-list{display:grid;gap:6px}.template-row{display:flex;align-items:center;gap:6px;padding:7px;border:1px solid #2b3441;border-radius:5px;font-size:11px}.template-row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.template-empty{font-size:11px;color:#8792a2;padding:9px 2px}
-.journal-wrap{padding:14px 16px 20px;min-width:780px}.journal-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.journal-heading b{display:block;font-size:13px}.journal-heading small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.sample-pill{border:1px solid #354154;background:#151c27;border-radius:20px;padding:5px 9px;color:#b9c4d4;font-size:10px}.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:9px;margin:12px 0}.metric-card{background:#121821;border:1px solid #293341;border-radius:7px;padding:11px}.metric-card small{display:block;color:var(--muted);font-size:10px}.metric-card strong{display:block;font-size:18px;margin:8px 0 4px;font-variant-numeric:tabular-nums}.metric-card span{color:var(--muted);font-size:10px}.sample-note{border:1px solid #3b3527;background:#1c1a15;color:#cdbd93;border-radius:6px;padding:10px 12px;font-size:11px;margin:10px 0 14px}.journal-section-title{font-weight:700;font-size:12px;margin:16px 0 7px}.journal-table{min-width:900px}.journal-footnote{color:var(--muted);font-size:10px;line-height:1.5;margin-top:10px}.journal-table td{white-space:nowrap}.metric-grid-secondary{grid-template-columns:repeat(2,minmax(130px,1fr));max-width:50%}.journal-section-title{margin-top:18px}</style>
+.journal-wrap{padding:14px 16px 20px;min-width:780px}.journal-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.journal-heading b{display:block;font-size:13px}.journal-heading small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.sample-pill{border:1px solid #354154;background:#151c27;border-radius:20px;padding:5px 9px;color:#b9c4d4;font-size:10px}.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:9px;margin:12px 0}.metric-card{background:#121821;border:1px solid #293341;border-radius:7px;padding:11px}.metric-card small{display:block;color:var(--muted);font-size:10px}.metric-card strong{display:block;font-size:18px;margin:8px 0 4px;font-variant-numeric:tabular-nums}.metric-card span{color:var(--muted);font-size:10px}.sample-note{border:1px solid #3b3527;background:#1c1a15;color:#cdbd93;border-radius:6px;padding:10px 12px;font-size:11px;margin:10px 0 14px}.journal-section-title{font-weight:700;font-size:12px;margin:16px 0 7px}.journal-table{min-width:900px}.journal-footnote{color:var(--muted);font-size:10px;line-height:1.5;margin-top:10px}.journal-table td{white-space:nowrap}.metric-grid-secondary{grid-template-columns:repeat(2,minmax(130px,1fr));max-width:50%}.journal-section-title{margin-top:18px}
+.replay-controls{position:absolute;z-index:8;left:12px;right:12px;bottom:34px;background:#111923f2;border:1px solid #394556;border-radius:8px;padding:9px 12px;box-shadow:0 10px 30px #0008}.replay-summary{display:flex;align-items:center;gap:12px;font-size:10px}.replay-summary b{color:#e8edf5}.replay-summary span,.replay-times{color:var(--muted)}.replay-summary strong{font-size:12px}.replay-summary button,.replay-scrub button{margin-left:auto;background:#202936;border:1px solid #354154;border-radius:5px;color:#d1d9e5;padding:6px 8px;font-size:10px}.replay-scrub{display:flex;align-items:center;gap:8px;margin-top:8px}.replay-scrub button{margin:0}.replay-scrub input{flex:1;accent-color:var(--accent)}.replay-scrub span{font-size:10px;color:var(--muted);min-width:58px;text-align:right}.replay-times{display:flex;gap:20px;font-size:10px;margin-top:7px;flex-wrap:wrap}
+</style>
 </head>
 <body>
 <div class="app">
@@ -61,7 +63,7 @@
 
       <div class="chart-footer"><span id="chart-time">UTC+1</span><span>● Marché ouvert</span><span class="push">Échelle auto</span><span>Log</span><span>%</span><a href="https://www.tradingview.com/lightweight-charts/" target="_blank" rel="noreferrer" style="color:#828b9a;text-decoration:none;margin-left:auto">Charts by TradingView · Lightweight Charts</a></div>
     </section>
-    <section class="bottom"><div class="tabs"><button class="tab active" data-tab="positions">Positions <span id="positions-count">3</span></button><button class="tab" data-tab="orders">Ordres <span>1</span></button><button class="tab" data-tab="performance">Performance</button><button class="tab" data-tab="history">Historique</button><button class="tab" data-tab="journal">Journal</button><button class="tab" data-tab="logs">Logs</button><span class="account-strip">Solde <b id="balance-inline">10 000.00</b>　Équité <b id="equity-inline">9 997.88</b>　P&amp;L <b class="negative">−2.12</b>　Marge libre <b>9 968.90</b>　USD</span></div>
+    <section class="bottom"><div class="tabs"><button class="tab active" data-tab="positions">Positions <span id="positions-count">3</span></button><button class="tab" data-tab="orders">Ordres <span>1</span></button><button class="tab" data-tab="performance">Performance</button><button class="tab" data-tab="history">Historique</button><button class="tab" data-tab="journal">Journal</button><button class="tab" data-tab="replay">Trade Replay</button><button class="tab" data-tab="logs">Logs</button><span class="account-strip">Solde <b id="balance-inline">10 000.00</b>　Équité <b id="equity-inline">9 997.88</b>　P&amp;L <b class="negative">−2.12</b>　Marge libre <b>9 968.90</b>　USD</span></div>
       <div class="tab-content" id="bottom-content"></div>
     </section>
   </main>
@@ -283,6 +285,7 @@
   if(tab==="orders"){el.innerHTML='<div class="table-caption"><span>'+(live?"Ordres en attente MT5":"Ordre en attente · Démo")+'</span></div><table class="table"><thead><tr><th>SYMBOLE</th><th>TYPE</th><th>VOLUME</th><th>PRIX</th><th>STATUT</th></tr></thead><tbody><tr><td>EURUSD+</td><td>Achat limite</td><td>0.10</td><td>1.08291</td><td class="muted">Simulation</td></tr></tbody></table>';return}
   if(tab==="performance"){renderPerformance(el);return}
   if(tab==="journal"){renderJournal(el);return}
+  if(tab==="replay"){renderReplayList(el);return}
   if(tab==="history"){el.innerHTML='<table class="table"><thead><tr><th>DATE</th><th>SYMBOLE</th><th>TYPE</th><th>VOLUME</th><th>PRIX</th><th>PROFIT</th></tr></thead><tbody>'+(history.length?history.map(x=>'<tr><td>'+x.time+'</td><td>'+x.symbol+'</td><td>'+x.type+'</td><td>'+x.volume+'</td><td>'+fmt(x.price,5)+'</td><td class="'+(x.profit>=0?"positive":"negative")+'">'+fmt(x.profit,2)+'</td></tr>').join(""):'<tr><td class="empty" colspan="6">'+(live?"Aucun historique retourné par MT5.":"L’historique MT5 apparaîtra après connexion.")+'</td></tr>')+'</tbody></table>';return}
   el.innerHTML='<div class="placeholder-panel"><strong>Journal de connexion</strong><span>'+(live?"Pont MT5 connecté · synchronisation périodique active.":"Mode démo · aucune connexion à un broker.")+'</span></div>';
  }
@@ -318,6 +321,63 @@
    const rows=deals.map(d=>{const t=meta[d.ticket]||{};return '<tr><td>'+escapeHtml(d.time)+'</td><td><b>'+escapeHtml(d.symbol)+'</b></td><td>'+escapeHtml(d.type)+'</td><td>'+Number(d.volume||0).toFixed(2)+'</td><td class="'+(d.net>=0?'positive':'negative')+'">'+new Intl.NumberFormat("fr-FR",{style:"currency",currency:cur,maximumFractionDigits:2}).format(d.net)+'</td><td>'+escapeHtml(t.setup||"—")+'</td><td>'+escapeHtml(t.session||"—")+'</td><td>'+escapeHtml(t.plan||"—")+'</td><td><button class="row-action" data-journal-ticket="'+escapeHtml(d.ticket)+'">Qualifier</button></td></tr>'}).join("");
    el.innerHTML='<div class="journal-wrap"><div class="journal-heading"><div><b>Journal de trading</b><small>Historique MT5 + annotations personnelles sauvegardées sur cet appareil</small></div><span class="sample-pill">'+deals.length+' deals clôturés</span></div><div class="sample-note">Les trades sont importés automatiquement depuis l’historique MT5. Ajoute tes setups, sessions et le respect du plan : MANSA ne modifie jamais les données du broker.</div><table class="table journal-table"><thead><tr><th>DATE</th><th>ACTIF</th><th>SENS</th><th>VOLUME</th><th>P&L</th><th>SETUP</th><th>SESSION</th><th>PLAN</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="9" class="empty">'+(live?'Aucun deal de clôture reçu de MT5.':'Connecte ton compte démo MT5 pour importer tes trades clôturés.')+'</td></tr>')+'</tbody></table></div>';
    el.querySelectorAll("[data-journal-ticket]").forEach(btn=>btn.onclick=()=>{const id=btn.dataset.journalTicket,old=meta[id]||{},setup=prompt("Setup / stratégie",old.setup||"");if(setup===null)return;const session=prompt("Session (Asie, Londres, New York…)",old.session||"");if(session===null)return;const plan=prompt("Plan respecté ? (Oui / Non / Partiel)",old.plan||"");if(plan===null)return;const error=prompt("Erreur / motif à suivre (ex. entrée trop tôt, revenge trading, stop déplacé)",old.error||"");if(error===null)return;const note=prompt("Note complémentaire",old.note||"");if(note===null)return;meta[id]={setup,session,plan,error,note};if(!saveJournalMeta(meta))alert("Impossible d’enregistrer les annotations dans ce navigateur.");renderJournal(el)});
+ }
+
+ let replayMarkerController=null,replayTrade=null,replayBars=[],replayTimer=null,replayIndex=0;
+ function renderReplayList(el){
+   const map=new Map();journalDeals().forEach(d=>{const id=d.position_id;if(!id)return;const old=map.get(String(id));if(!old||String(d.time)>String(old.time))map.set(String(id),d)});
+   const items=[...map.entries()].sort((a,b)=>String(b[1].time).localeCompare(String(a[1].time)));
+   const rows=items.map(([id,d])=>'<tr><td>'+escapeHtml(d.time)+'</td><td><b>'+escapeHtml(d.symbol)+'</b></td><td>'+escapeHtml(d.type)+'</td><td>'+Number(d.volume||0).toFixed(2)+'</td><td class="'+((d.net_profit??d.profit)>=0?'positive':'negative')+'">'+fmt(d.net_profit??d.profit,2)+'</td><td><button class="row-action" data-replay-id="'+escapeHtml(id)+'">Rejouer</button></td></tr>').join("");
+   el.innerHTML='<div class="journal-wrap"><div class="journal-heading"><div><b>Trade Replay</b><small>Reconstruction d’une position MT5 sur ses bougies historiques</small></div><span class="sample-pill">'+items.length+' positions candidates</span></div><div class="sample-note">Sélectionne une position clôturée. MANSA regroupe ses deals partiels par identifiant MT5, puis charge les bougies autour de l’entrée et de la sortie. Les données sont limitées à l’historique disponible chez ton broker.</div><table class="table journal-table"><thead><tr><th>DERNIER DEAL</th><th>ACTIF</th><th>SENS SORTIE</th><th>VOLUME</th><th>P&L DEAL</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">'+(live?'Aucun identifiant de position disponible dans les deals importés.':'Connecte un compte démo MT5 pour charger des positions historiques.')+'</td></tr>')+'</tbody></table></div>';
+   el.querySelectorAll("[data-replay-id]").forEach(btn=>btn.onclick=()=>loadTradeReplay(btn.dataset.replayId));
+ }
+ async function loadTradeReplay(positionId){
+   if(!live){alert("Connecte d’abord un compte démo MT5 pour charger les bougies historiques.");return}
+   try{
+     const result=await request("trade_replay",{position_id:Number(positionId),tf,days:180});
+     if(!result.ok)throw Error(result.error||"Replay indisponible");
+     if(!result.candles?.length)throw Error("Aucune bougie historique disponible pour cette position.");
+     replayTrade=result.trade;replayBars=result.candles.map(x=>({time:+x.time,open:+x.open,high:+x.high,low:+x.low,close:+x.close}));replayIndex=replayBars.length-1;
+     current=symbols.find(x=>x.s===replayTrade.symbol)||{s:replayTrade.symbol,n:replayTrade.symbol,icon:"MT",p:replayTrade.entry_price,c:0,d:5};
+     gridLayout=1;renderChartGrid();
+     candles.setData(replayBars);volumes.setData([]);ema.setData([]);smaLine.setData([]);bbUpper.setData([]);bbLower.setData([]);
+     const markerData=[
+       {time:replayTrade.entry_time,position:replayTrade.direction==="BUY"?"belowBar":"aboveBar",color:"#2cc58d",shape:replayTrade.direction==="BUY"?"arrowUp":"arrowDown",text:"ENTRÉE"},
+       {time:replayTrade.exit_time,position:replayTrade.direction==="BUY"?"aboveBar":"belowBar",color:"#fa6470",shape:replayTrade.direction==="BUY"?"arrowDown":"arrowUp",text:"SORTIE"}
+     ];
+     if(replayMarkerController?.detach)replayMarkerController.detach();
+     replayMarkerController=LightweightCharts.createSeriesMarkers(candles,markerData);
+     chart.timeScale().fitContent();
+     const currency=replayTrade.currency||account?.currency||"USD";
+     $("chart-title").textContent=replayTrade.symbol+" · REPLAY";$("chart-subtitle").textContent="HISTORIQUE MT5 · POSITION #"+replayTrade.position_id;
+     $("asset-icon").textContent=replayTrade.direction==="BUY"?"BUY":"SELL";
+     $("quote").textContent=fmt(replayTrade.exit_price,5);
+     $("quote-change").textContent=(replayTrade.net_profit>=0?"+":"")+new Intl.NumberFormat("fr-FR",{style:"currency",currency,maximumFractionDigits:2}).format(replayTrade.net_profit);
+     $("quote-change").style.color=replayTrade.net_profit>=0?"var(--green)":"var(--red)";
+     showReplayControls();
+   }catch(e){alert("Trade Replay : "+e.message)}
+ }
+ function showReplayControls(){
+   let panel=$("replay-controls");if(!panel){panel=document.createElement("div");panel.id="replay-controls";panel.className="replay-controls";$("chart-wrap")?.appendChild(panel)}
+   const cur=replayTrade.currency||account?.currency||"USD",money=new Intl.NumberFormat("fr-FR",{style:"currency",currency:cur,maximumFractionDigits:2}).format(replayTrade.net_profit);
+   panel.innerHTML='<div class="replay-summary"><b>POSITION #'+replayTrade.position_id+' · '+replayTrade.direction+'</b><span>'+replayTrade.symbol+' · '+replayTrade.volume+'</span><strong class="'+(replayTrade.net_profit>=0?'positive':'negative')+'">'+money+'</strong><button id="replay-close">Quitter le replay</button></div><div class="replay-scrub"><button id="replay-back">− 1 bougie</button><input id="replay-range" type="range" min="0" max="'+(replayBars.length-1)+'" value="'+replayIndex+'"><button id="replay-forward">+ 1 bougie</button><span id="replay-position">'+(replayIndex+1)+' / '+replayBars.length+'</span></div><div class="replay-times"><span>Entrée : '+new Date(replayTrade.entry_time*1000).toLocaleString("fr-FR")+' · '+fmt(replayTrade.entry_price,5)+'</span><span>Sortie : '+new Date(replayTrade.exit_time*1000).toLocaleString("fr-FR")+' · '+fmt(replayTrade.exit_price,5)+'</span></div>';
+   $("replay-close").onclick=exitTradeReplay;
+   const range=$("replay-range");range.oninput=()=>{replayIndex=+range.value;updateReplayViewport()};
+   $("replay-back").onclick=()=>{replayIndex=Math.max(0,replayIndex-1);range.value=replayIndex;updateReplayViewport()};
+   $("replay-forward").onclick=()=>{replayIndex=Math.min(replayBars.length-1,replayIndex+1);range.value=replayIndex;updateReplayViewport()};
+   if(replayTimer)clearInterval(replayTimer);
+   const play=document.createElement("button");play.id="replay-play";play.textContent="▶ Lecture";play.onclick=()=>{if(replayTimer){clearInterval(replayTimer);replayTimer=null;play.textContent="▶ Lecture";return}play.textContent="Ⅱ Pause";replayTimer=setInterval(()=>{if(replayIndex>=replayBars.length-1){clearInterval(replayTimer);replayTimer=null;play.textContent="▶ Lecture";return}replayIndex++;range.value=replayIndex;updateReplayViewport()},500)};
+   $("replay-scrub").prepend(play);updateReplayViewport();
+ }
+ function updateReplayViewport(){
+   if(!chart||!replayBars.length)return;const end=Math.max(0,Math.min(replayIndex,replayBars.length-1)),from=Math.max(0,end-35);
+   chart.timeScale().setVisibleLogicalRange({from,to:Math.max(from+1,end+1)});
+   const label=$("replay-position");if(label)label.textContent=(end+1)+" / "+replayBars.length;
+ }
+ function exitTradeReplay(){
+   if(replayTimer){clearInterval(replayTimer);replayTimer=null}replayTrade=null;replayBars=[];if(replayMarkerController?.detach)replayMarkerController.detach();replayMarkerController=null;
+   $("replay-controls")?.remove();if(live)loadLiveCandles();else draw();
+   $("chart-title").textContent=current.n;$("chart-subtitle").textContent=live?"MARCHÉ · MT5 LIVE":"MARCHÉ · DÉMO SIMULÉ";updateSymbol(current.p);
  }
  function tabs(){document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));renderBottom(b.dataset.tab)})}
  function request(action,extra={}){return new Promise((resolve,reject)=>{if(!ws||ws.readyState!==1)return reject(Error("Pont MT5 déconnecté"));let id=String(++requestId),timer=setTimeout(()=>{pending.delete(id);reject(Error("Délai dépassé"))},7000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({action,_id:id,...extra}));})}
