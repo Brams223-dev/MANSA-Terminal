@@ -196,8 +196,7 @@ def get_risk_snapshot() -> dict:
     realized_today = 0.0
     if todays:
         for d in todays:
-            if d.entry == mt5.DEAL_ENTRY_IN:
-                continue
+            # Inclut aussi les commissions d'entrée, souvent débitées dès l'ouverture.
             realized_today += float(d.profit) + float(getattr(d, "commission", 0.0)) + float(getattr(d, "swap", 0.0)) + float(getattr(d, "fee", 0.0))
     return {
         "ok": True, "currency": info.currency,
