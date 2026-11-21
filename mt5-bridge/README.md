@@ -65,6 +65,14 @@ Dans MANSA, crée un profil par installation avec le même port et le même chem
 
 Les profils et leurs derniers relevés sont conservés dans le stockage local du navigateur. Aucun mot de passe MT5 n'est enregistré ni transmis par MANSA. Les relevés anciens peuvent devenir obsolètes ; relance le scan avant de comparer.
 
+## MANSA Prop Intelligence
+
+L'onglet **Prop Dashboard** permet d'associer à chaque profil local un nom de prop firm, une phase, un capital initial, un objectif de profit, une perte journalière maximale, une perte totale maximale et un mode de drawdown STATIC ou TRAILING. Les règles sont enregistrées localement dans le navigateur, par profil. Le scan récupère un snapshot MT5 (équité, balance, réalisé du jour, flottant) pour alimenter les indicateurs.
+
+Le calcul journalier V1 additionne le réalisé du jour retourné par MT5 (commissions d'entrée incluses) et le P&L flottant. Le mode TRAILING conserve localement un plus-haut d'équité observé. Ce sont des estimations de suivi : les règles réelles peuvent se baser sur le solde, l'équité, le drawdown relatif, le fuseau horaire du serveur, une heure de reset, les pertes flottantes, des frais ou des règles de cohérence différentes. Il faut saisir les règles exactes de la société et vérifier leur méthode officielle. Le dashboard ne bloque pas les ordres et ne certifie pas qu'un challenge est conforme.
+
+**Compatibilité actuelle :** le bridge refuse toujours les comptes MT5 dont le mode n'est pas DEMO. Certaines prop firms utilisent des comptes de démonstration même en phase funded ; d'autres configurations en compte réel ne seront pas acceptées par cette V1. Aucune restriction de sécurité n'a été levée pour cette fonctionnalité.
+
 ## Actions de lecture disponibles
 
 | Action | Paramètres | Usage |
