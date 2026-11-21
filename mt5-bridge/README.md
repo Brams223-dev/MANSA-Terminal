@@ -40,7 +40,7 @@ Le bridge écoute sur `ws://localhost:8765`. Ne modifie pas l'adresse d'écoute 
 3. Dans MANSA, utilise l'adresse `localhost` et le port `8765`.
 4. Vérifie que l'interface indique clairement la connexion MT5 démo.
 
-## Actions de lecture disponibles
+## Profils multi-comptes MANSA (fonction expérimentale)\n\nLe gestionnaire de comptes de l’interface peut mémoriser plusieurs profils locaux (nom, hôte et port) et reconnecter MANSA au profil choisi. Les profils sont conservés dans le stockage local du navigateur ; ils ne contiennent aucun identifiant ni mot de passe MT5.\n\n**Limite importante :** MANSA ne maintient qu’une connexion active à la fois. Enregistrer plusieurs ports ne crée pas plusieurs sessions MT5 et ne permet pas encore de comparer des comptes en parallèle. Le bridge actuel appelle `mt5.initialize()` sans chemin explicite vers une installation/instance donnée ; l’association fiable d’un bridge à plusieurs installations MT5 n’est donc pas encore garantie. Les ports distincts sont réservés à une évolution avec sélection et validation explicites du terminal cible.\n\nPour changer de compte dans cette version, bascule d’abord le compte dans MT5, puis reconnecte le profil qui pointe vers le bridge actif. Vérifie toujours le login et le serveur affichés par MT5 avant de considérer les données comme celles du compte attendu.\n\n## Actions de lecture disponibles
 
 | Action | Paramètres | Usage |
 |---|---|---|
