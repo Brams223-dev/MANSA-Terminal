@@ -80,6 +80,7 @@ def mt5_connect(login: Optional[int] = None,
 
     info = mt5.account_info()
     if info is None:
+        mt5.shutdown()
         MT5_CONNECTED = False
         return {"ok": False, "error": "Compte non trouvé"}
 
