@@ -410,6 +410,78 @@ async def handler(websocket, path=""):
         CONNECTED_CLIENTS.discard(websocket)
 
 
+
+def get_trade_replay(position_id: int, timeframe_str: str = "M5", days: int = 180) -> dict:
+    """Reconstruit une position clôturée et ses bougies historiques pour Trade Replay."""
+    if not MT5_CONNECTED:
+        return {"ok": False, "error": "Non connecté à MT5"}
+    tf_map = {
+        "M1": mt5.TIMEFRAME_M1, "M5": mt5.TIMEFRAME_M5,
+        "M15": mt5.TIMEFRAME_M15, "M30": mt5.TIMEFRAME_M30,
+        "H1": mt5.TIMEFRAME_H1, "H4": mt5.TIMEFRAME_H4,
+        "D1": mt5.TIMEFRAME_D1, "W1": mt5.TIMEFRAME_W1,
+    }
+    tf_name = timeframe_str.upper()
+    if tf_name not in tf_map:
+        return {"ok": False, "error": "Unité de temps non prise en charge"}
+    end = datetime.datetime.now()
+    start = end - datetime.timedelta(days=max(1, min(int(days), 365)))
+    deals = mt5.history_deals_get(start, end)
+    if deals is None:
+        return {"ok": False, "error": f"Historique MT5 indisponible: {mt5.last_error()}"}
+    grouped = {}
+    for d in deals:
+        pid = int(getattr(d, "position_id", 0) or 0)
+        if pid != int(position_id):
+            continue
+        grouped.setdefault(pid, []).append(d)
+    selected = grouped.get(int(position_id), [])
+    if not selected:
+        return {"ok": False, "error": "Position introuvable dans la période d'historique disponible"}
+    selected.sort(key=lambda d: (d.time, d.ticket))
+    entries = [d for d in selected if d.entry in (mt5.DEAL_ENTRY_IN, mt5.DEAL_ENTRY_INOUT)]
+    exits = [d for d in selected if d.entry in (mt5.DEAL_ENTRY_OUT, mt5.DEAL_ENTRY_OUT_BY, mt5.DEAL_ENTRY_INOUT)]
+    if not entries or not exits:
+        return {"ok": False, "error": "Cette position ne contient pas encore une entrée et une sortie complètes"}
+    first, last = entries[0], exits[-1]
+    entry_volume = sum(float(d.volume) for d in entries)
+    exit_volume = sum(float(d.volume) for d in exits)
+    if exit_volume + 1e-8 < entry_volume:
+        return {"ok": False, "error": "La position est encore partiellement ouverte ; replay clôturé indisponible"}
+    entry_price = sum(float(d.price) * float(d.volume) for d in entries) / max(entry_volume, 1e-8)
+    exit_price = sum(float(d.price) * float(d.volume) for d in exits) / max(exit_volume, 1e-8)
+    net = sum(float(d.profit) + float(getattr(d, "commission", 0.0)) +
+              float(getattr(d, "swap", 0.0)) + float(getattr(d, "fee", 0.0)) for d in selected)
+    symbol = first.symbol
+    step_seconds = {"M1":60, "M5":300, "M15":900, "M30":1800, "H1":3600, "H4":14400, "D1":86400, "W1":604800}[tf_name]
+    before = datetime.timedelta(seconds=step_seconds * 40)
+    after = datetime.timedelta(seconds=step_seconds * 20)
+    rates = mt5.copy_rates_range(symbol, tf_map[tf_name],
+        datetime.datetime.fromtimestamp(first.time) - before,
+        datetime.datetime.fromtimestamp(last.time) + after)
+    candles = []
+    if rates is not None:
+        for bar in rates:
+            candles.append({
+                "time": int(bar["time"]), "open": float(bar["open"]),
+                "high": float(bar["high"]), "low": float(bar["low"]),
+                "close": float(bar["close"]), "volume": int(bar["tick_volume"])
+            })
+    return {
+        "ok": True,
+        "trade": {
+            "position_id": int(position_id), "symbol": symbol,
+            "direction": "BUY" if first.type == mt5.DEAL_TYPE_BUY else "SELL",
+            "volume": round(entry_volume, 8),
+            "entry_price": entry_price, "exit_price": exit_price,
+            "entry_time": int(first.time), "exit_time": int(last.time),
+            "net_profit": round(net, 2), "currency": mt5.account_info().currency,
+            "entry_deals": len(entries), "exit_deals": len(exits),
+        },
+        "candles": candles,
+    }
+
+
 def dispatch(action: str, msg: dict) -> dict:
     """Route les messages vers la bonne fonction MT5."""
     log.info(f"← {action}")
@@ -455,6 +527,8 @@ def dispatch(action: str, msg: dict) -> dict:
         )
     elif action == "close_all":
         return close_all_positions()
+    elif action == "trade_replay":
+        return get_trade_replay(position_id=int(msg.get("position_id", 0)), timeframe_str=msg.get("tf", "M5"), days=int(msg.get("days", 180)))
     elif action == "history":
         return get_history(days=int(msg.get("days", 7)))
     elif action == "ping":
