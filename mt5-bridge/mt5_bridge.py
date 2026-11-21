@@ -180,7 +180,7 @@ def get_risk_snapshot() -> dict:
             "take_profit": float(p.tp), "floating_net": round(float(p.profit) + float(p.swap), 2),
             "risk_to_stop": risk, "risk_error": risk_error
         })
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(datetime.timezone.utc)
     midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     todays = mt5.history_deals_get(midnight, now)
     realized_today = 0.0
@@ -197,7 +197,7 @@ def get_risk_snapshot() -> dict:
         "risk_to_stops": round(known_risk, 2), "positions_without_sl": unknown_stops,
         "realized_today": round(realized_today, 2),
         "positions": rows, "as_of": now.strftime("%Y-%m-%d %H:%M:%S"),
-        "clock_basis": "horloge locale du PC exécutant MT5"
+        "clock_basis": "UTC (horodatage MT5)"
     }
 
 
