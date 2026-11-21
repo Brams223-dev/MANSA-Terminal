@@ -147,6 +147,60 @@ def get_positions() -> dict:
     return {"ok": True, "positions": result}
 
 
+def get_risk_snapshot() -> dict:
+    """Lecture seule : exposition, risque estimé aux stops et résultat clôturé du jour."""
+    if not MT5_CONNECTED:
+        return {"ok": False, "error": "Non connecté à MT5"}
+    info = mt5.account_info()
+    if info is None:
+        return {"ok": False, "error": "Impossible de lire le compte"}
+    positions = mt5.positions_get() or []
+    rows = []
+    known_risk = 0.0
+    unknown_stops = 0
+    for p in positions:
+        risk = None
+        risk_error = None
+        if not p.sl or float(p.sl) <= 0:
+            unknown_stops += 1
+            risk_error = "Stop Loss absent"
+        else:
+            close_type = mt5.ORDER_TYPE_SELL if p.type == mt5.POSITION_TYPE_BUY else mt5.ORDER_TYPE_BUY
+            estimate = mt5.order_calc_profit(close_type, p.symbol, float(p.volume), float(p.price_current), float(p.sl))
+            if estimate is None:
+                risk_error = "Estimation indisponible"
+            else:
+                risk = round(max(0.0, -float(estimate)), 2)
+                known_risk += risk
+        rows.append({
+            "ticket": int(p.ticket), "symbol": p.symbol,
+            "direction": "BUY" if p.type == mt5.POSITION_TYPE_BUY else "SELL",
+            "volume": float(p.volume), "open_price": float(p.price_open),
+            "current_price": float(p.price_current), "stop_loss": float(p.sl),
+            "take_profit": float(p.tp), "floating_net": round(float(p.profit) + float(p.swap), 2),
+            "risk_to_stop": risk, "risk_error": risk_error
+        })
+    now = datetime.datetime.now()
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    todays = mt5.history_deals_get(midnight, now)
+    realized_today = 0.0
+    if todays:
+        for d in todays:
+            if d.entry == mt5.DEAL_ENTRY_IN:
+                continue
+            realized_today += float(d.profit) + float(getattr(d, "commission", 0.0)) + float(getattr(d, "swap", 0.0)) + float(getattr(d, "fee", 0.0))
+    return {
+        "ok": True, "currency": info.currency,
+        "balance": round(float(info.balance), 2), "equity": round(float(info.equity), 2),
+        "margin": round(float(info.margin), 2), "free_margin": round(float(info.margin_free), 2),
+        "floating_net": round(float(info.profit), 2),
+        "risk_to_stops": round(known_risk, 2), "positions_without_sl": unknown_stops,
+        "realized_today": round(realized_today, 2),
+        "positions": rows, "as_of": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "clock_basis": "horloge locale du PC exécutant MT5"
+    }
+
+
 def get_orders() -> dict:
     """Ordres en attente (pending)."""
     if not MT5_CONNECTED:
@@ -497,6 +551,8 @@ def dispatch(action: str, msg: dict) -> dict:
         return get_account_info()
     elif action == "positions":
         return get_positions()
+    elif action == "risk_snapshot":
+        return get_risk_snapshot()
     elif action == "orders":
         return get_orders()
     elif action == "tick":
