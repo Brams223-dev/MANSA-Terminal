@@ -48,12 +48,14 @@ log = logging.getLogger("MT5Bridge")
 # ─── Globals ─────────────────────────────────────────────────────────────────
 CONNECTED_CLIENTS = set()
 MT5_CONNECTED = False
+TERMINAL_PATH = None
 
 # ─── MT5 helpers ─────────────────────────────────────────────────────────────
 
 def mt5_connect(login: Optional[int] = None,
                 password: Optional[str] = None,
-                server: Optional[str] = None) -> dict:
+                server: Optional[str] = None,
+                terminal_path: Optional[str] = None) -> dict:
     """Initialise et connecte MT5. Retourne un dict status."""
     global MT5_CONNECTED
     if not MT5_AVAILABLE:
@@ -63,6 +65,13 @@ def mt5_connect(login: Optional[int] = None,
     if login:    kwargs["login"]    = int(login)
     if password: kwargs["password"] = password
     if server:   kwargs["server"]   = server
+
+    if terminal_path:
+        import os
+        terminal_path = os.path.abspath(os.path.expandvars(os.path.expanduser(terminal_path)))
+        if not os.path.isfile(terminal_path):
+            return {"ok": False, "error": "Terminal MT5 introuvable au chemin configuré."}
+        kwargs["path"] = terminal_path
 
     if not mt5.initialize(**kwargs):
         err = mt5.last_error()
@@ -544,9 +553,9 @@ def dispatch(action: str, msg: dict) -> dict:
     if action in {"place_order", "close_position", "modify_position", "close_all"}:
         return {"ok": False, "error": "Trading désactivé dans cette version MANSA. Aucune instruction n'a été envoyée à MT5."}
     if action == "connect":
-        # Le bridge utilise uniquement le compte démo déjà ouvert dans MT5.
-        # Aucun identifiant de compte n'est accepté depuis le navigateur.
-        return mt5_connect()
+        # Le bridge utilise le terminal explicitement sélectionné au démarrage.
+        # Aucun identifiant ni mot de passe n'est accepté depuis le navigateur.
+        return mt5_connect(terminal_path=TERMINAL_PATH)
     elif action == "account":
         return get_account_info()
     elif action == "positions":
@@ -621,6 +630,8 @@ async def broadcast_ticks(symbols: list, interval: float = 1.0):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 async def main(args):
+    global TERMINAL_PATH
+    TERMINAL_PATH = args.terminal_path
     # Le pont n'accepte que les interfaces locales dans cette version.
     if args.host not in {"localhost", "127.0.0.1"}:
         raise SystemExit("Sécurité MANSA : le bridge doit écouter sur localhost ou 127.0.0.1.")
@@ -641,6 +652,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Mansa Terminal — Bridge MT5")
     parser.add_argument("--host", default="localhost", help="Adresse locale d'écoute (localhost uniquement)")
     parser.add_argument("--port", default=8765, type=int, help="Port WebSocket")
+    parser.add_argument("--terminal-path", default=None, help="Chemin complet vers terminal64.exe de cette instance MT5")
     args = parser.parse_args()
 
     if not MT5_AVAILABLE or not WS_AVAILABLE:
